@@ -1,0 +1,23 @@
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.1.1}{Overview of the files}{chapter.1}% 2
+\BOOKMARK [1][-]{section.1.2}{Building the document}{chapter.1}% 3
+\BOOKMARK [2][-]{subsection.1.2.1}{The makefile}{section.1.2}% 4
+\BOOKMARK [1][-]{section.1.3}{Counting words}{chapter.1}% 5
+\BOOKMARK [0][-]{chapter.2}{Preparation}{}% 6
+\BOOKMARK [0][-]{chapter.3}{Implementation}{}% 7
+\BOOKMARK [1][-]{section.3.1}{Verbatim text}{chapter.3}% 8
+\BOOKMARK [1][-]{section.3.2}{Tables}{chapter.3}% 9
+\BOOKMARK [1][-]{section.3.3}{Simple diagrams}{chapter.3}% 10
+\BOOKMARK [1][-]{section.3.4}{Adding more complicated graphics}{chapter.3}% 11
+\BOOKMARK [0][-]{chapter.4}{Evaluation}{}% 12
+\BOOKMARK [1][-]{section.4.1}{Printing and binding}{chapter.4}% 13
+\BOOKMARK [1][-]{section.4.2}{Further information}{chapter.4}% 14
+\BOOKMARK [0][-]{chapter.5}{Conclusion}{}% 15
+\BOOKMARK [0][-]{chapter.5}{Bibliography}{}% 16
+\BOOKMARK [0][-]{appendix.A}{Latex source}{}% 17
+\BOOKMARK [1][-]{section.A.1}{diss.tex}{appendix.A}% 18
+\BOOKMARK [1][-]{section.A.2}{proposal.tex}{appendix.A}% 19
+\BOOKMARK [0][-]{appendix.B}{Makefile}{}% 20
+\BOOKMARK [1][-]{section.B.1}{makefile}{appendix.B}% 21
+\BOOKMARK [1][-]{section.B.2}{refs.bib}{appendix.B}% 22
+\BOOKMARK [0][-]{appendix.C}{Project Proposal}{}% 23

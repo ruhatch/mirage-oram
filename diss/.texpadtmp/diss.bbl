@@ -1,0 +1,13 @@
+\begin{thebibliography}{1}
+
+\bibitem{Lamport86}
+L.~Lamport.
+\newblock {\em {LaTeX} --- a document preparation system --- user's guide and
+  reference manual}.
+\newblock Addison-Wesley, 1986.
+
+\bibitem{Moore95}
+S.W. Moore.
+\newblock How to prepare a dissertation in latex, 1995.
+
+\end{thebibliography}

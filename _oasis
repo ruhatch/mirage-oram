@@ -1,0 +1,21 @@
+Name: mirage-oram
+Version: 0.0.1
+Synopsis: A library that implements Path ORAM as a functor on the MirageOS V1.BLOCK interface
+Authors: Rupert Horlick <mail@ruperthorlick.com>
+License: LGPL with OCaml linking exception
+
+Description: A library that implements Path ORAM as a functor on the MirageOS V1.BLOCK interface
+Homepage: https://github.com/ruhatch/mirage-oram
+
+OASISFormat: 0.4
+BuildTools: ocamlbuild
+Plugins: META (0.4), DevFiles (0.4)
+
+Library mirage_oram
+  Path:           src
+  Findlibname:    mirage-oram
+  Modules:        Oram,
+                  Stash,
+                  Block
+  BuildDepends:   core_kernel,
+                  mirage
