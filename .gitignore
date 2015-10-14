@@ -18,3 +18,17 @@ _build/
 # oasis generated files
 setup.data
 setup.log
+
+# Mirage generated files
+*.xe
+*.xl
+*.xl.in
+*.xml
+mir-*
+/*/Makefile
+/*/main.ml
+log
+*.img
+
+# LaTeX files
+.texpadtmp/

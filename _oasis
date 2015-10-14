@@ -12,10 +12,10 @@ BuildTools: ocamlbuild
 Plugins: META (0.4), DevFiles (0.4)
 
 Library mirage_oram
-  Path:           src
-  Findlibname:    mirage-oram
-  Modules:        Oram,
-                  Stash,
-                  Block
-  BuildDepends:   core_kernel,
-                  mirage
+  Path:             src
+  Findlibname:      mirage-oram
+  Modules:          Oram
+  InternalModules:  Stash,
+                    OBlock
+  BuildDepends:     core_kernel,
+                    mirage

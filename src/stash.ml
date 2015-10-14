@@ -1,6 +1,6 @@
 open Core_kernel.Std
 
-include Hash_set.Make(Block)
+include Hash_set.Make(OBlock)
 
 let find_index t x =
   let b = Hash_set.find t ~f:(fun (x',_) -> x' = x) in
