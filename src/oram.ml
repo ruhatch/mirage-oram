@@ -1,5 +1,6 @@
 open V1_LWT
 open Printf
+open Lwt
 
 module Make (B: BLOCK) = struct
 
@@ -7,8 +8,10 @@ module Make (B: BLOCK) = struct
 
   let stash = Stash.create ()
 
-  let write = Stash.add stash (Some 1, "test"); B.write (* Add thing to stash and then drop through to B's write *)
+  let number = ref 0
 
-  let read = Printf.printf "Read out: %s" (Stash.find_index stash (Some 1)); B.read (* Find thing in stash and then drop through to B's read *)
+  let write a = Stash.add stash (Some !number, sprintf "test%d" !number); incr number; B.write a
+
+  let read a = B.read a
 
 end

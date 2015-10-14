@@ -67,6 +67,21 @@ module Main (C: CONSOLE)(B: BLOCK) = struct
     incr tests_passed;
     return ()
 
+  (*
+
+  let check_sector_write b kind id offset length =
+    printf "writing %d sectors at %Ld\n" length offset;
+    incr tests_started;
+    lwt info = B.get_info b in
+    let sectors = alloc info.B.sector_size length in
+    B.write b offset sectors >>= fun () ->
+    let sectors' = alloc info.B.sector_size length in
+    List.iter fill_with_zeroes sectors';
+    B.read b offset sectors' >>= fun () ->
+    List.iter (fun (a, b) -> check_equal a b) (List.combine sectors sectors');
+    incr tests_passed;
+    return ()
+
   let check_sector_write_failure b kind id offset length =
     printf "writing %d sectors at %Ld\n" length offset;
     incr tests_started;
@@ -118,5 +133,24 @@ module Main (C: CONSOLE)(B: BLOCK) = struct
     printf "Total tests started: %d\n" !tests_started;
     printf "Total tests passed:  %d\n" !tests_passed;
     printf "Total tests failed:  %d\n%!" !tests_failed;
+    OS.Time.sleep 5.*)
+
+  let start console b =
+    lwt info = B.get_info b in
+    printf "sectors = %Ld\nread_write=%b\nsector_size=%d\n%!"
+      info.B.size_sectors info.B.read_write info.B.sector_size;
+
+    lwt () = check_sector_write b "local" "51712" 0L 1 in
+    lwt () = check_sector_write b "local" "51712" (Int64.sub info.B.size_sectors 1L) 1 in
+    lwt () = check_sector_write b "local" "51712" 0L 2 in
+    lwt () = check_sector_write b "local" "51712" (Int64.sub info.B.size_sectors 2L) 2 in
+    lwt () = check_sector_write b "local" "51712" 0L 12 in
+    lwt () = check_sector_write b "local" "51712" (Int64.sub info.B.size_sectors 12L) 12 in
+
+    printf "Test sequence finished\n";
+    printf "Total tests started: %d\n" !tests_started;
+    printf "Total tests passed:  %d\n" !tests_passed;
+    printf "Total tests failed:  %d\n%!" !tests_failed;
     OS.Time.sleep 5.
+
 end
