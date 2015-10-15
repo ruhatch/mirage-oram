@@ -9,6 +9,5 @@ let img = match get_mode () with
   | `Unix | `MacOSX -> oramify $ (block_of_file "disk.img")
 
 let () =
-  add_to_ocamlfind_libraries ["mirage-console"];
   add_to_ocamlfind_libraries ["mirage-oram"];
   register "oram-client" [main $ default_console $ img]
