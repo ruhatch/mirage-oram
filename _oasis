@@ -16,6 +16,11 @@ Library mirage_oram
   Findlibname:      mirage-oram
   Modules:          Oram
   InternalModules:  Stash,
-                    OBlock
+                    OBlock,
+                    BucketTree,
+                    PosMap
   BuildDepends:     core_kernel,
-                    mirage
+                    mirage,
+                    cstruct,
+                    lwt,
+                    lwt.syntax
