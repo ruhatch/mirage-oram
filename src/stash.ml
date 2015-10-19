@@ -10,5 +10,5 @@ let find_index t x =
 
 let add t b =
   match b with
-    | (Some x, _) -> Hash_set.add t b
-    | (None, _) -> ()
+    | (0L, _) -> ()
+    | (x, _) -> Hash_set.add t b

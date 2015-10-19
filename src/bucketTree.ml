@@ -2,7 +2,7 @@ open Core_kernel.Std
 
 module Bucket = struct
   type t = OBlock.t * OBlock.t * OBlock.t
-  let empty = (OBlock.empty, OBlock.empty, OBlock.empty)
+  let empty = (OBlock.dummy, OBlock.dummy, OBlock.dummy)
   let to_string (b1, b2, b3) = sprintf "[%s, %s, %s]" (OBlock.to_string b1) (OBlock.to_string b2) (OBlock.to_string b3)
 end
 
