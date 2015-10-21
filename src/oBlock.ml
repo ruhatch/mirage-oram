@@ -10,7 +10,7 @@ let compare = Tuple2.compare ~cmp1:Int64.compare ~cmp2:String.compare
 
 let hash = Hashtbl.hash
 
-let dummy = (0L, Bytes.create 1)
+let dummy x = (-1L, Bytes.create x)
 
 (*let to_string (a,b) =
   match a with

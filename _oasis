@@ -17,7 +17,6 @@ Library mirage_oram
   Modules:          Oram
   InternalModules:  Stash,
                     OBlock,
-                    BucketTree,
                     PosMap
   BuildDepends:     core_kernel,
                     mirage,
