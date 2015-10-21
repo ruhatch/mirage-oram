@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.10.18)  16 OCT 2015 20:30
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.10.18)  21 OCT 2015 23:20
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -250,46 +250,43 @@ Package grfext Info: Graphics extension search list:
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 43.
+(Font)              <12> on input line 55.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 43.
+(Font)              <8> on input line 55.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 43.
+(Font)              <6> on input line 55.
  [1
 
-{/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [2] [3] [4]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 155.
+{/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3] [4]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 210.
  (/usr/local/texlive/2014/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 155.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 165.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 210.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 220.
  [5]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 165.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 220.
  (/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/proposal.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 165.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 165.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 220.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 220.
 Package rerunfilecheck Info: File `proposal.out' has not changed.
 (rerunfilecheck)             Checksum: <no file>.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 165.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 220.
  ) 
 Here is how much of TeX's memory you used:
- 5534 strings out of 493117
- 82900 string characters out of 6135432
- 174029 words of memory out of 5000000
+ 5539 strings out of 493117
+ 82935 string characters out of 6135432
+ 177128 words of memory out of 5000000
  8953 multiletter control sequences out of 15000+600000
  7894 words of font info for 28 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 29i,8n,32p,1036b,401s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 29i,8n,32p,1036b,323s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/latxfont/line10.pfb>
-Output written on /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/proposal.pdf (5 pages, 97495 bytes).
+Output written on /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/proposal.pdf (5 pages, 102040 bytes).
 PDF statistics:
- 91 PDF objects out of 1000 (max. 8388607)
- 75 compressed objects within 1 object stream
- 30 named destinations out of 1000 (max. 500000)
+ 98 PDF objects out of 1000 (max. 8388607)
+ 82 compressed objects within 1 object stream
+ 35 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
