@@ -6,6 +6,8 @@
 \usepackage{graphicx}
 \begin{document}
 
+\bibliographystyle{plain}
+
 \vfil
 
 \centerline{\Large Computer Science Project Proposal}
@@ -50,13 +52,13 @@ So let us say that Alice has a set of documents that she wants to store on an un
 
 There are a number of schemes in the literature that use symmetric encryption techniques to build a searchable encryption scheme. They rely on the use of a trapdoor generating function, that allows Bob to search over the encrypted index and respond to Alice with the matching line from the encrypted index. Then Alice requests the relevant documents from Bob.
 
-The problem is that these all leak the access pattern, so Bob knows which documents matched any query, even if he doesn't know what they matched. It turns out that this pattern of access can leak large amounts of information. In a study [1] on an encrypted email repository, up to 80\% of plaintext search queries could be inferred from the access pattern alone! So clearly this a leak worth plugging, but how can we do it?
+The problem is that these all leak the access pattern, so Bob knows which documents matched any query, even if he doesn't know what they matched. It turns out that this pattern of access can leak large amounts of information. In a study \cite{islam2012access} on an encrypted email repository, up to 80\% of plaintext search queries could be inferred from the access pattern alone! So clearly this a leak worth plugging, but how can we do it?
 
 % Describe ORAM and mention Path ORAM
 
 One solution to our problem is to use Oblivious Random Access Memory (ORAM), a cryptographic primitive that hides data access patterns. That is, we turn Bob's server into a block device and we attempt to maintain the property that any two sequences of accesses of the form $(operation,address,data)$, that are the same length, have computationally indistinguishable physical access patterns. Bob should have no way of learning what $address$ we are really accessing, and therefore will never know which documents matched a given search query.
 
-A trivial ORAM algorithm operates by scanning over the whole ORAM and reading/updating only the relevant block, but this has $O(N)$ bandwidth cost, where $N$ is the number of blocks, which is highly impractical for large-scale storage. Luckily, much better algorithms have been proposed. We choose to focus on Path ORAM, because it has only $O(\log N)$ bandwidth cost in the worst case if $B = \Omega(\log^2 N)$, as well as being incredibly simple conceptually.
+A trivial ORAM algorithm operates by scanning over the whole ORAM and reading/updating only the relevant block, but this has $O(N)$ bandwidth cost, where $N$ is the number of blocks, which is highly impractical for large-scale storage. Luckily, much better algorithms have been proposed. We choose to focus on Path ORAM \cite{stefanov2013path}, because it has only $O(\log N)$ bandwidth cost in the worst case if $B = \Omega(\log^2 N)$, as well as being incredibly simple conceptually.
 
 % Extend the threat model to incorporate malicious adversary and describe integrity protection techniques
 
@@ -197,9 +199,9 @@ In particular for Path ORAM, recursion does add an overhead, but we can reduce t
 
 Another optimisation compresses the PosMaps, reducing the number of levels of recursion required to achieve the desired client side storage, resulting in an asymptotic bandwidth complexity decrease for ORAM with small block size.
 
-The last two optimisations were originally designed and tested in a secure processor setting, so their application to the cloud storage setting is novel.
+The last two optimisations were originally designed and tested in a secure processor setting \cite{ren2014unified}, so their application to the cloud storage setting is novel.
 
-Another area that could be addressed is the limitation of Path ORAM (and other tree based ORAMs) to fixed-sized trees. We either need to know our storage requirements before setting up the ORAM, potentially wasting resources, or resize them in the na\"ive way as storage requirements increase. It would be interesting, although open-ended, to explore the possibility of making Path ORAM resizable.
+Another area that could be addressed is the limitation of Path ORAM (and other tree based ORAMs) to fixed-sized trees. We either need to know our storage requirements before setting up the ORAM, potentially wasting resources, or resize them in the na\"ive way as storage requirements increase. Resizability has been implemented for the ORAM construction of \emph{Shi et al.} \cite{shi2011oblivious} in \cite{moataz2015resizable}, but exploring the possibility of making Path ORAM resizable was left as an open research topic.
 
 \section*{Timetable: Work plan and Milestones}
 
@@ -250,5 +252,7 @@ Planned starting date is 16/10/2015.
 	\item MirageOS libraries as a basis for the project
 
 \end{itemize}
+
+\bibliography{refs}
 
 \end{document}
