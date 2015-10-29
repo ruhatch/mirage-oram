@@ -1,24 +1,25 @@
-open OUnit2
+open Testable
 
 let oblock_tests =
-  "oblock_tests" >:::
     [
-      "OBlockToString_ZeroNoBytes_ZeroString" >::
+      "OBlockToString_ZeroNoBytes_ZeroString", `Quick,
         (fun _ ->
-          assert_equal "\000\000\000\000\000\000\000\000" (OBlock.to_string (0L,"")));
-      "OBlockToString_OneNoBytes_OneString" >::
+          Alcotest.(check string) "" "\000\000\000\000\000\000\000\000" (OBlock.to_string (0L,"")));
+      "OBlockToString_OneNoBytes_OneString", `Quick,
         (fun _ ->
-          assert_equal "\001\000\000\000\000\000\000\000" (OBlock.to_string (1L,"")));
-      "OBlockToString_OneBytes_OneBytesString" >::
+          Alcotest.(check string) "" "\001\000\000\000\000\000\000\000" (OBlock.to_string (1L,"")));
+      "OBlockToString_OneBytes_OneBytesString", `Quick,
         (fun _ ->
-          assert_equal "\001\000\000\000\000\000\000\000\001" (OBlock.to_string (1L,"\001")));
-      "OBlockOfString_ZeroNoBytes_ZeroString" >::
+          Alcotest.(check string) "" "\001\000\000\000\000\000\000\000\001" (OBlock.to_string (1L,"\001")));
+      "OBlockOfString_ZeroNoBytes_ZeroString", `Quick,
         (fun _ ->
-          assert_equal (0L,"") (OBlock.of_string "\000\000\000\000\000\000\000\000"));
-      "OBlockOfString_OneBytes_OneBytesString" >::
+          Alcotest.(check oblock) "" (0L,"") (OBlock.of_string "\000\000\000\000\000\000\000\000"));
+      "OBlockOfString_OneBytes_OneBytesString", `Quick,
         (fun _ ->
-          assert_equal (1L,"\001") (OBlock.of_string "\001\000\000\000\000\000\000\000\001"));
+          Alcotest.(check oblock) "" (1L,"\001") (OBlock.of_string "\001\000\000\000\000\000\000\000\001"));
     ]
 
 let () =
-  run_test_tt_main oblock_tests
+  Alcotest.run "OBlock Tests" [
+    "OBlock Tests", oblock_tests
+  ]

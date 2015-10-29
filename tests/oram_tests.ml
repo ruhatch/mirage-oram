@@ -1,14 +1,13 @@
-(*module Testing = Oram.Make(Block)*)
-
-open OUnit2
+module O = Oram.Make(Block)
 
 let oram_tests =
-  "oram_tests" >:::
     [
-      (*"OramFloorLog_One_Zero" >::
+      "OramFloorLog_One_Zero", `Quick,
         (fun _ ->
-          assert_equal 0 0)*)
+          Alcotest.(check int) "OramFloorLog_One_Zero" 0 (O.floor_log 1L))
     ]
 
 let () =
-  run_test_tt_main oram_tests
+  Alcotest.run "ORAM Tests" [
+    "ORAM Tests", oram_tests
+  ]
