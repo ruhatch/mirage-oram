@@ -36,6 +36,8 @@ module Make (B: BLOCK) = struct
     | Read
     | Write
 
+  type bucket = OBlock.t * OBlock.t * OBlock.t * OBlock.t
+
   let get_info { info } = return info
 
   let floor_log x =
@@ -94,31 +96,31 @@ module Make (B: BLOCK) = struct
         else loop Int64.(2L * acc + 4L) (y - 1)
     in loop 0L l
 
-    let write_bucket t a (b1,b2,b3,b4) =
-      (*Printf.printf "Writing bucket at physical address %d...\n" (Option.value ~default:0 @@ Int64.to_int a);*)
-      let open Cstruct in
-      let buf1 = of_string @@ OBlock.to_string b1 in
-      let buf2 = of_string @@ OBlock.to_string b2 in
-      let buf3 = of_string @@ OBlock.to_string b3 in
-      let buf4 = of_string @@ OBlock.to_string b4 in
-      B.write t.bd a [buf1;buf2;buf3;buf4]
+  let write_bucket t a (b1,b2,b3,b4) =
+    (*Printf.printf "Writing bucket at physical address %d...\n" (Option.value ~default:0 @@ Int64.to_int a);*)
+    let open Cstruct in
+    let buf1 = of_string @@ OBlock.to_string b1 in
+    let buf2 = of_string @@ OBlock.to_string b2 in
+    let buf3 = of_string @@ OBlock.to_string b3 in
+    let buf4 = of_string @@ OBlock.to_string b4 in
+    B.write t.bd a [buf1;buf2;buf3;buf4]
 
-    let write_path t x bs =
-      let rec loop bs = function
-        | 0 ->
-          begin match bs with
-            | [b] -> write_bucket t (bucket_address x t.height) b
-            | _ -> return (`Error (`Unknown "Wrong number of buckets in path"))
-          end
-        | y ->
-          match bs with
-            | (b::bs) ->
-              begin match_lwt write_bucket t (bucket_address x (t.height -y)) b with
-                | `Ok () -> (*Printf.printf "Wrote bucket at level %d!\n" y;*) loop bs (y - 1)
-                | `Error x -> return (`Error x)
-              end
-            | _ -> return (`Error (`Unknown "Wrong number of buckets in path"))
-      in loop bs t.height
+  let write_path t x bs =
+    let rec loop bs = function
+      | 0 ->
+        begin match bs with
+          | [b] -> write_bucket t (bucket_address x t.height) b
+          | _ -> return (`Error (`Unknown "Wrong number of buckets in path"))
+        end
+      | y ->
+        match bs with
+          | (b::bs) ->
+            begin match_lwt write_bucket t (bucket_address x (t.height - y)) b with
+              | `Ok () -> (*Printf.printf "Wrote bucket at level %d!\n" y;*) loop bs (y - 1)
+              | `Error x -> return (`Error x)
+            end
+          | _ -> return (`Error (`Unknown "Wrong number of buckets in path"))
+    in loop bs t.height
 
   let read_bucket t a =
     (*Printf.printf "Reading bucket at physical address %d...\n" (Option.value ~default:0 @@ Int64.to_int a);*)

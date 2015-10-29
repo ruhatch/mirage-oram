@@ -25,14 +25,14 @@
 
 \pagestyle{empty}
 
-\rightline{\LARGE \textbf{Martin Richards}}
+\rightline{\LARGE \textbf{Rupert Horlick}}
 
 \vspace*{60mm}
 \begin{center}
 \Huge
-\textbf{How to write a dissertation in \LaTeX} \\[5mm]
+\textbf{Encrypted Keyword Search Using Path ORAM on MirageOS} \\[5mm]
 Computer Science Tripos -- Part II \\[5mm]
-St John's College \\[5mm]
+Homerton College \\[5mm]
 \today  % today's date
 \end{center}
 
@@ -45,14 +45,15 @@ St John's College \\[5mm]
 
 {\large
 \begin{tabular}{ll}
-Name:               & \bf Martin Richards                       \\
-College:            & \bf St John's College                     \\
-Project Title:      & \bf How to write a dissertation in \LaTeX \\
-Examination:        & \bf Computer Science Tripos -- Part II, July 2001  \\
+Name:               & \bf Rupert Horlick                       \\
+College:            & \bf Homerton College                     \\
+Project Title:      & \bf Encrypted Keyword Search Using \\
+& \bf Path ORAM on MirageOS \\
+Examination:        & \bf Computer Science Tripos -- Part II, July 2016  \\
 Word Count:         & \bf 1587\footnotemark[1]
                       (well less than the 12000 limit)  \\
-Project Originator: & Dr M.~Richards                    \\
-Supervisor:         & Dr Markus Kuhn                    \\ 
+Project Originator: & Dr Nik Sultana                    \\
+Supervisors:         & Dr Nik Sultana \& Dr Richard Mortier                    \\ 
 \end{tabular}
 }
 \footnotetext[1]{This word count was computed
@@ -63,33 +64,21 @@ by \texttt{detex diss.tex | tr -cd '0-9A-Za-z $\tt\backslash$n' | wc -w}
 
 \section*{Original Aims of the Project}
 
-To write a demonstration dissertation\footnote{A normal footnote without the
-complication of being in a table.} using \LaTeX\ to save
-student's time when writing their own dissertations. The dissertation
-should illustrate how to use the more common \LaTeX\ constructs. It
-should include pictures and diagrams to show how these can be
-incorporated into the dissertation.  It should contain the entire
-\LaTeX\ source of the dissertation and the makefile.  It should
-explain how to construct an MSDOS disk of the dissertation in
-Postscript format that can be used by the book shop for printing, and,
-finally, it should have the prescribed layout and format of a diploma
-dissertation.
-
+% Give a 100 word summary of what was to be achieved by the project, i.e. secure searchable encrypted documents
 
 \section*{Work Completed}
 
-All that has been completed appears in this dissertation.
+
 
 \section*{Special Difficulties}
 
-Learning how to incorporate encapulated postscript into a \LaTeX\
-document on both Ubuntu Linux and OS X.
+
  
 \newpage
 \section*{Declaration}
 
-I, [Name] of [College], being a candidate for Part II of the Computer
-Science Tripos [or the Diploma in Computer Science], hereby declare
+I, Rupert Horlick of Homerton College, being a candidate for Part II of the Computer
+Science Tripos, hereby declare
 that this dissertation and the work described in it are my own work,
 unaided except as may be specified below, and that the dissertation
 does not contain material that has already been used to any substantial
@@ -105,13 +94,6 @@ extent for a comparable purpose.
 
 \listoffigures
 
-\newpage
-\section*{Acknowledgements}
-
-This document owes much to an earlier version written by Simon Moore
-\cite{Moore95}.  His help, encouragement and advice was greatly 
-appreciated.
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % now for the chapters
 
@@ -119,267 +101,91 @@ appreciated.
 
 \chapter{Introduction}
 
-\section{Overview of the files}
+% Give an overview of the problem - similar to the beginning of the project proposal
 
-This document consists of the following files:
+% Talk about increasing use of cloud computing
 
-\begin{itemize}
-\item \texttt{makefile} --- The makefile for the dissertation and
-                         Project Proposal
-\item \texttt{diss.tex} --- The dissertation
-\item \texttt{proposal.tex}  --- The project proposal 
-\item \texttt{figs} -- A directory containing diagrams and pictures
-\item \texttt{refs.bib} --- The bibliography database
-\end{itemize}
+% Talk about loss of ability to search efficiently over documents
 
-\section{Building the document}
+% Define threat model clearly
 
-This document was produced using \LaTeXe which is based upon
-\LaTeX\cite{Lamport86}.  To build the document you first need to
-generate \texttt{diss.aux} which, amongst other things, contains the
-references used.  This if done by executing the command:
+% Talk about solutions based on symmetric encryption
 
-\texttt{pdflatex diss}
+% Explain why these fail and what the consequences are
 
-\noindent
-Then the bibliography can be generated from \texttt{refs.bib} using:
+% Discuss ORAM as a solution to this problem
 
-\texttt{bibtex diss}
+% Describe other work in the area of ORAM etc.
 
-\noindent
-Finally, to ensure all the page numbering is correct run \texttt{pdflatex}
-on \texttt{diss.tex} until the \texttt{.aux} files do not change.  This
-usually takes 2 more runs.
+\section{Motivation}
 
-\subsection{The makefile}
+\section{Challenges}
 
-To simplify the calls to \texttt{pdflatex} and \texttt{bibtex}, 
-a makefile has been provided, see Appendix~\ref{makefile}. 
-It provides the following facilities:
-
-\begin{description}
-
-\item\texttt{make} \\
- Display help information.
-
-\item\texttt{make proposal.pdf} \\
- Format the proposal document as a PDF.
-
-\item\texttt{make view-proposal} \\
- Run \texttt{make proposal.pdf} and then display it with a Linux PDF viewer
- (preferably ``okular'', if that is not available fall back to ``evince'').
-
-\item\texttt{make diss.pdf} \\
- Format the dissertation document as a PDF.
-
-\item\texttt{make count} \\
-Display an estimate of the word count.
-
-\item\texttt{make all} \\
-Construct \texttt{proposal.pdf} and \texttt{diss.pdf}.
-
-\item\texttt{make pub} \\ Make \texttt{diss.pdf}
-and place it in my \texttt{public\_html} directory.
-
-\item\texttt{make clean} \\ Delete all intermediate files except the
-source files and the resulting PDFs. All these deleted files can
-be reconstructed by typing \texttt{make all}.
-
-\end{description}
-
-
-\section{Counting words}
-
-An approximate word count of the body of the dissertation may be
-obtained using:
-
-\texttt{wc diss.tex}
-
-\noindent
-Alternatively, try something like:
-
-\verb/detex diss.tex | tr -cd '0-9A-Z a-z\n' | wc -w/
-
+\section{Related Work}
 
 \chapter{Preparation}
 
-This chapter is empty!
+% Describe all work undertaken before the coding - show professional approach to project
 
+% Talk about refining and clarifying model
+
+% Talk about reviewing research papers to find best way of bringing things together
+
+% Talk about choosing OCaml 	for its static typing and powerful module system
+
+% Talk about how this led to designing the system in a modular way (include figure for system)
+
+% Talk about MirageOS and building on top of it
+
+\section{Introduction to ORAM}
+
+% Talk about Path ORAM
+
+\section{Introduction to Inverted Indexes}
+
+% Talk about searching using an inverted index
+
+\section{Requirements Analysis}
+
+% Do requirements analysis in order to show that I thought about all of these things
+
+\section{Choice of Tools}
+
+% Do a table of tools used including OPAM, OASIS, git, Make, Atom, etc.
+
+\section{Software Engineering Techniques}
+
+% Talk about writing interface files before writing code in order to fit code to requirements and designing before implementing
+
+% Talk about the ability to do Test Driven Development and the power of unit tests
 
 \chapter{Implementation}
 
-\section{Verbatim text}
-
-Verbatim text can be included using \verb|\begin{verbatim}| and
-\verb|\end{verbatim}|. I normally use a slightly smaller font and
-often squeeze the lines a little closer together, as in:
-
-{\renewcommand{\baselinestretch}{0.8}\small
-\begin{verbatim}
-GET "libhdr"
- 
-GLOBAL { count:200; all  }
- 
-LET try(ld, row, rd) BE TEST row=all
-                        THEN count := count + 1
-                        ELSE { LET poss = all & ~(ld | row | rd)
-                               UNTIL poss=0 DO
-                               { LET p = poss & -poss
-                                 poss := poss - p
-                                 try(ld+p << 1, row+p, rd+p >> 1)
-                               }
-                             }
-LET start() = VALOF
-{ all := 1
-  FOR i = 1 TO 12 DO
-  { count := 0
-    try(0, 0, 0)
-    writef("Number of solutions to %i2-queens is %i5*n", i, count)
-    all := 2*all + 1
-  }
-  RESULTIS 0
-}
-\end{verbatim}
-}
-
-\section{Tables}
-
-\begin{samepage}
-Here is a simple example\footnote{A footnote} of a table.
-
-\begin{center}
-\begin{tabular}{l|c|r}
-Left      & Centred & Right \\
-Justified &         & Justified \\[3mm]
-%\hline\\%[-2mm]
-First     & A       & XXX \\
-Second    & AA      & XX  \\
-Last      & AAA     & X   \\
-\end{tabular}
-\end{center}
-
-\noindent
-There is another example table in the proforma.
-\end{samepage}
-
-\section{Simple diagrams}
-
-Simple diagrams can be written directly in \LaTeX.  For example, see
-figure~\ref{latexpic1} on page~\pageref{latexpic1} and see
-figure~\ref{latexpic2} on page~\pageref{latexpic2}.
-
-\begin{figure}
-\setlength{\unitlength}{1mm}
-\begin{center}
-\begin{picture}(125,100)
-\put(0,80){\framebox(50,10){AAA}}
-\put(0,60){\framebox(50,10){BBB}}
-\put(0,40){\framebox(50,10){CCC}}
-\put(0,20){\framebox(50,10){DDD}}
-\put(0,00){\framebox(50,10){EEE}}
-
-\put(75,80){\framebox(50,10){XXX}}
-\put(75,60){\framebox(50,10){YYY}}
-\put(75,40){\framebox(50,10){ZZZ}}
-
-\put(25,80){\vector(0,-1){10}}
-\put(25,60){\vector(0,-1){10}}
-\put(25,50){\vector(0,1){10}}
-\put(25,40){\vector(0,-1){10}}
-\put(25,20){\vector(0,-1){10}}
-
-\put(100,80){\vector(0,-1){10}}
-\put(100,70){\vector(0,1){10}}
-\put(100,60){\vector(0,-1){10}}
-\put(100,50){\vector(0,1){10}}
-
-\put(50,65){\vector(1,0){25}}
-\put(75,65){\vector(-1,0){25}}
-\end{picture}
-\end{center}
-\caption{A picture composed of boxes and vectors.}
-\label{latexpic1}
-\end{figure}
-
-\begin{figure}
-\setlength{\unitlength}{1mm}
-\begin{center}
-
-\begin{picture}(100,70)
-\put(47,65){\circle{10}}
-\put(45,64){abc}
-
-\put(37,45){\circle{10}}
-\put(37,51){\line(1,1){7}}
-\put(35,44){def}
-
-\put(57,25){\circle{10}}
-\put(57,31){\line(-1,3){9}}
-\put(57,31){\line(-3,2){15}}
-\put(55,24){ghi}
-
-\put(32,0){\framebox(10,10){A}}
-\put(52,0){\framebox(10,10){B}}
-\put(37,12){\line(0,1){26}}
-\put(37,12){\line(2,1){15}}
-\put(57,12){\line(0,2){6}}
-\end{picture}
-
-\end{center}
-\caption{A diagram composed of circles, lines and boxes.}
-\label{latexpic2}
-\end{figure}
-
-
-
-\section{Adding more complicated graphics}
-
-The use of \LaTeX\ format can be tedious and it is often better to use
-encapsulated postscript (EPS) or PDF to represent complicated graphics.
-Figure~\ref{epsfig} and~\ref{xfig} on page \pageref{xfig} are
-examples. The second figure was drawn using \texttt{xfig} and exported in
-{\tt.eps} format. This is my recommended way of drawing all diagrams.
-
-
-\begin{figure}[tbh]
-\centerline{\includegraphics{figs/cuarms.pdf}}
-\caption{Example figure using encapsulated postscript}
-\label{epsfig}
-\end{figure}
-
-\begin{figure}[tbh]
-\vspace{4in}
-\caption{Example figure where a picture can be pasted in}
-\label{pastedfig}
-\end{figure}
-
-
-\begin{figure}[tbh]
-\centerline{\includegraphics{figs/diagram.pdf}}
-\caption{Example diagram drawn using \texttt{xfig}}
-\label{xfig}
-\end{figure}
-
+% Describe what was actually implemented
 
 \chapter{Evaluation}
 
-\section{Printing and binding}
+% ### Functionality ###
 
-Use a ``duplex'' laser printer that can print on both sides to print
-two copies of your dissertation. Then bind them, for example using the
-comb binder in the Computer Laboratory Library.
+% Show that the unit tests show that individual components do what they are specified to do
 
-\section{Further information}
+% Path ORAM reads in and out correctly
 
-See the Unix Tools notes at
+% Encryption does make things encrypted
 
-\url{http://www.cl.cam.ac.uk/teaching/current-1/UnixTools/materials.html}
+% Search is sound and complete...
 
+% Etc.
+
+% ### Performance ###
+
+% Evaluate the performance of the code and do it with different configurations, varying functors used, size of input, potentially simulated network latency etc.
+
+% ### Security ###
+
+% Use statistical methods to show that access pattern is easily visible to Bob before applying ORAM to the system and the show statistical evidence the access pattern is hidden after applying ORAM
 
 \chapter{Conclusion}
-
-I hope that this rough guide to writing a dissertation is \LaTeX\ has
-been helpful and saved you time.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -390,23 +196,6 @@ been helpful and saved you time.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the appendices
 \appendix
-
-\chapter{Latex source}
-
-\section{diss.tex}
-{\scriptsize\verbatiminput{diss.tex}}
-
-\section{proposal.tex}
-{\scriptsize\verbatiminput{proposal.tex}}
-
-\chapter{Makefile}
-
-\section{makefile}\label{makefile}
-{\scriptsize\verbatiminput{makefile.txt}}
-
-\section{refs.bib}
-{\scriptsize\verbatiminput{refs.bib}}
-
 
 \chapter{Project Proposal}
 

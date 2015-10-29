@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.10.18)  22 OCT 2015 20:49
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.10.18)  23 OCT 2015 09:20
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -258,19 +258,19 @@ LaTeX Font Info:    External font `cmex10' loaded for size
  [1
 
 {/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 2486) has occurred while \output is active []
 
  [2]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [3] [4]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 189.
+ [3] [4] [5] [6]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 246.
  (/usr/local/texlive/2014/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 189.
- [5] [6] (/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/proposal.bbl
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 246.
+ (/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/proposal.bbl
 Missing character: There is no Â in font cmti12!
 Missing character: There is no € in font cmti12!
 Missing character: There is no Â in font cmti12!
@@ -287,18 +287,18 @@ Package rerunfilecheck Info: File `proposal.out' has not changed.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 258.
  ) 
 Here is how much of TeX's memory you used:
- 5561 strings out of 493117
- 83369 string characters out of 6135432
+ 5564 strings out of 493117
+ 83394 string characters out of 6135432
  178318 words of memory out of 5000000
  8960 multiletter control sequences out of 15000+600000
  8241 words of font info for 29 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  29i,8n,32p,1078b,401s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/latxfont/line10.pfb>
-Output written on /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/proposal.pdf (7 pages, 128102 bytes).
+Output written on /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/proposal.pdf (7 pages, 128577 bytes).
 PDF statistics:
- 131 PDF objects out of 1000 (max. 8388607)
- 111 compressed objects within 2 object streams
- 46 named destinations out of 1000 (max. 500000)
+ 135 PDF objects out of 1000 (max. 8388607)
+ 115 compressed objects within 2 object streams
+ 49 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

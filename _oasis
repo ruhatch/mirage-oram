@@ -14,8 +14,8 @@ Plugins: META (0.4), DevFiles (0.4)
 Library mirage_oram
   Path:             src
   Findlibname:      mirage-oram
-  Modules:          Oram
-  InternalModules:  Stash,
+  Modules:          Oram,
+                    Stash,
                     OBlock,
                     PosMap
   BuildDepends:     core_kernel,
@@ -23,3 +23,59 @@ Library mirage_oram
                     cstruct,
                     lwt,
                     lwt.syntax
+
+Executable "oram_tests"
+  Path: tests
+  MainIs: oram_tests.ml
+  Build$: flag(tests)
+  CompiledObject: best
+  Install: false
+  BuildDepends: mirage-oram, oUnit, mirage-block-unix
+
+Executable "stash_tests"
+  Path: tests
+  MainIs: stash_tests.ml
+  Build$: flag(tests)
+  CompiledObject: best
+  Install: false
+  BuildDepends: mirage-oram, oUnit
+
+Executable "posmap_tests"
+  Path: tests
+  MainIs: posmap_tests.ml
+  Build$: flag(tests)
+  CompiledObject: best
+  Install: false
+  BuildDepends: mirage-oram, oUnit
+
+Executable "oblock_tests"
+  Path: tests
+  MainIs: oblock_tests.ml
+  Build$: flag(tests)
+  CompiledObject: best
+  Install: false
+  BuildDepends: mirage-oram, oUnit
+
+Test "oram_tests"
+  Run$: flag(tests)
+  TestTools: oram_tests
+  Command: $oram_tests
+  WorkingDirectory: tests
+
+Test "stash_tests"
+  Run$: flag(tests)
+  TestTools: stash_tests
+  Command: $stash_tests
+  WorkingDirectory: tests
+
+Test "posmap_tests"
+  Run$: flag(tests)
+  TestTools: posmap_tests
+  Command: $posmap_tests
+  WorkingDirectory: tests
+
+Test "oblock_tests"
+  Run$: flag(tests)
+  TestTools: oblock_tests
+  Command: $oblock_tests
+  WorkingDirectory: tests
