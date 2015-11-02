@@ -24,6 +24,12 @@ Library mirage_oram
                     lwt,
                     lwt.syntax
 
+Library tests
+  Path: tests
+  Build$:           flag(tests)
+  Modules: Testable
+  BuildDepends: alcotest, lwt, lwt.unix
+
 Executable "oram_tests"
   Path:             tests
   MainIs:           oram_tests.ml
@@ -32,7 +38,9 @@ Executable "oram_tests"
   Install:          false
   BuildDepends:     mirage-oram,
                     alcotest,
-                    mirage-block-unix
+                    mirage-block-unix,
+                    lwt,
+                    tests
 
 Executable "stash_tests"
   Path:             tests
@@ -41,7 +49,8 @@ Executable "stash_tests"
   CompiledObject:   best
   Install:          false
   BuildDepends:     mirage-oram,
-                    alcotest
+                    alcotest,
+                    tests
 
 Executable "posmap_tests"
   Path:             tests
@@ -50,7 +59,8 @@ Executable "posmap_tests"
   CompiledObject:   best
   Install:          false
   BuildDepends:     mirage-oram,
-                    alcotest
+                    alcotest,
+                    tests
 
 Executable "oblock_tests"
   Path:             tests
@@ -59,7 +69,8 @@ Executable "oblock_tests"
   CompiledObject:   best
   Install:          false
   BuildDepends:     mirage-oram,
-                    alcotest
+                    alcotest,
+                    tests
 
 Test "oram_tests"
   Run$:             flag(tests)

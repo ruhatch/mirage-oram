@@ -69,27 +69,12 @@ module Main (C: CONSOLE)(B: BLOCK) = struct
     incr tests_passed;
     return ()
 
-  (*
-
-  let check_sector_write b kind id offset length =
-    printf "writing %d sectors at %Ld\n" length offset;
-    incr tests_started;
-    lwt info = B.get_info b in
-    let sectors = alloc info.B.sector_size length in
-    B.write b offset sectors >>= fun () ->
-    let sectors' = alloc info.B.sector_size length in
-    List.iter fill_with_zeroes sectors';
-    B.read b offset sectors' >>= fun () ->
-    List.iter (fun (a, b) -> check_equal a b) (List.combine sectors sectors');
-    incr tests_passed;
-    return ()
-
   let check_sector_write_failure b kind id offset length =
     printf "writing %d sectors at %Ld\n" length offset;
     incr tests_started;
-    lwt info = B.get_info b in
-    let sectors = alloc info.B.sector_size length in
-    match_lwt B.write b offset sectors with
+    lwt info = O.get_info b in
+    let sectors = alloc info.O.sector_size length in
+    match_lwt O.write b offset sectors with
     | `Ok () ->
       printf "-- expected failure; got success\n%!";
       incr tests_failed;
@@ -101,9 +86,9 @@ module Main (C: CONSOLE)(B: BLOCK) = struct
   let check_sector_read_failure b kind id offset length =
     printf "reading %d sectors at %Ld\n" length offset;
     incr tests_started;
-    lwt info = B.get_info b in
-    let sectors = alloc info.B.sector_size length in
-    match_lwt B.read b offset sectors with
+    lwt info = O.get_info b in
+    let sectors = alloc info.O.sector_size length in
+    match_lwt O.read b offset sectors with
     | `Ok () ->
       printf "-- expected failure; got success\n%!";
       incr tests_failed;
@@ -116,45 +101,28 @@ module Main (C: CONSOLE)(B: BLOCK) = struct
     lwt info = B.get_info b in
     printf "sectors = %Ld\nread_write=%b\nsector_size=%d\n%!"
       info.B.size_sectors info.B.read_write info.B.sector_size;
-
-    lwt () = check_sector_write b "local" "51712" 0L 1 in
-    lwt () = check_sector_write b "local" "51712" (Int64.sub info.B.size_sectors 1L) 1 in
-    lwt () = check_sector_write b "local" "51712" 0L 2 in
-    lwt () = check_sector_write b "local" "51712" (Int64.sub info.B.size_sectors 2L) 2 in
-    lwt () = check_sector_write b "local" "51712" 0L 12 in
-    lwt () = check_sector_write b "local" "51712" (Int64.sub info.B.size_sectors 12L) 12 in
-
-    lwt () = check_sector_read_failure b "local" "51712" info.B.size_sectors 1 in
-    lwt () = check_sector_read_failure b "local" "51712" (Int64.sub info.B.size_sectors 11L) 12 in
-    lwt () = check_sector_write_failure b "local" "51712" info.B.size_sectors 1 in
-    lwt () = check_sector_write_failure b "local" "51712" (Int64.sub info.B.size_sectors 11L) 12 in
-    lwt () = check_sector_read_failure b "local" "51712" info.B.size_sectors 1 in
-    lwt () = check_sector_read_failure b "local" "51712" (Int64.sub info.B.size_sectors 11L) 12 in
-
-    printf "Test sequence finished\n";
-    printf "Total tests started: %d\n" !tests_started;
-    printf "Total tests passed:  %d\n" !tests_passed;
-    printf "Total tests failed:  %d\n%!" !tests_failed;
-    OS.Time.sleep 5.*)
-
-  let start console b =
-    lwt info = B.get_info b in
-    printf "sectors = %Ld\nread_write=%b\nsector_size=%d\n%!"
-      info.B.size_sectors info.B.read_write info.B.sector_size;
     match_lwt O.connect b with
       | `Ok b ->
         lwt info = O.get_info b in
         printf "sectors = %Ld\nread_write=%b\nsector_size=%d\n%!"
           info.O.size_sectors info.O.read_write info.O.sector_size;
+        let start_time = Unix.gettimeofday () in
 
-        lwt () = check_sector_write b "local" "51712" 0L 1 in
+        lwt () = check_sector_write b "local" "51712" 0L 100 in
         lwt () = check_sector_write b "local" "51712" (Int64.sub info.O.size_sectors 1L) 1 in
-        lwt () = check_sector_write b "local" "51712" 0L 2 in
+        lwt () = check_sector_write b "local" "51712" 0L 200 in
         lwt () = check_sector_write b "local" "51712" (Int64.sub info.O.size_sectors 2L) 2 in
-        lwt () = check_sector_write b "local" "51712" 0L 12 in
+        lwt () = check_sector_write b "local" "51712" 0L 1200 in
         lwt () = check_sector_write b "local" "51712" (Int64.sub info.O.size_sectors 12L) 12 in
 
-        printf "Test sequence finished\n";
+        lwt () = check_sector_read_failure b "local" "51712" info.O.size_sectors 1 in
+        lwt () = check_sector_read_failure b "local" "51712" (Int64.sub info.O.size_sectors 11L) 12 in
+        lwt () = check_sector_write_failure b "local" "51712" info.O.size_sectors 1 in
+        lwt () = check_sector_write_failure b "local" "51712" (Int64.sub info.O.size_sectors 11L) 12 in
+        lwt () = check_sector_read_failure b "local" "51712" info.O.size_sectors 1 in
+        lwt () = check_sector_read_failure b "local" "51712" (Int64.sub info.O.size_sectors 11L) 12 in
+
+        printf "Test sequence finished in %f\n" (Unix.gettimeofday () -. start_time);
         printf "Total tests started: %d\n" !tests_started;
         printf "Total tests passed:  %d\n" !tests_passed;
         printf "Total tests failed:  %d\n%!" !tests_failed;
