@@ -24,13 +24,22 @@ Library mirage_oram
                     lwt,
                     lwt.syntax
 
+Library mirage_block_fs
+  Path:             src/fs
+  Findlibname:      mirage-block-fs
+  Modules:          InodeIndex,
+                    Inode,
+                    FreeMap
+  BuildDepends:     cstruct,
+                    core_extended
+
 Library tests
   Path: tests
   Build$:           flag(tests)
   Modules: Testable
   BuildDepends: alcotest, lwt, lwt.unix
 
-Executable "oram_tests"
+Executable oram_tests
   Path:             tests
   MainIs:           oram_tests.ml
   Build$:           flag(tests)
@@ -42,7 +51,7 @@ Executable "oram_tests"
                     lwt,
                     tests
 
-Executable "stash_tests"
+Executable stash_tests
   Path:             tests
   MainIs:           stash_tests.ml
   Build$:           flag(tests)
@@ -52,7 +61,7 @@ Executable "stash_tests"
                     alcotest,
                     tests
 
-Executable "posmap_tests"
+Executable posmap_tests
   Path:             tests
   MainIs:           posmap_tests.ml
   Build$:           flag(tests)
@@ -62,7 +71,7 @@ Executable "posmap_tests"
                     alcotest,
                     tests
 
-Executable "oblock_tests"
+Executable oblock_tests
   Path:             tests
   MainIs:           oblock_tests.ml
   Build$:           flag(tests)
@@ -72,26 +81,74 @@ Executable "oblock_tests"
                     alcotest,
                     tests
 
-Test "oram_tests"
+Executable inode_index_tests
+  Path:             tests/fsTests
+  MainIs:           inodeIndexTests.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-block-fs,
+                    alcotest,
+                    tests
+
+Executable inode_tests
+  Path:             tests/fsTests
+  MainIs:           inodeTests.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-block-fs,
+                    alcotest,
+                    tests
+
+Executable free_map_tests
+  Path:             tests/fsTests
+  MainIs:           free_map_tests.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-block-fs,
+                    alcotest,
+                    tests
+
+Test oram_tests
   Run$:             flag(tests)
   TestTools:        oram_tests
   Command:          $oram_tests
   WorkingDirectory: tests
 
-Test "stash_tests"
+Test stash_tests
   Run$:             flag(tests)
   TestTools:        stash_tests
   Command:          $stash_tests
   WorkingDirectory: tests
 
-Test "posmap_tests"
+Test posmap_tests
   Run$:             flag(tests)
   TestTools:        posmap_tests
   Command:          $posmap_tests
   WorkingDirectory: tests
 
-Test "oblock_tests"
+Test oblock_tests
   Run$:             flag(tests)
   TestTools:        oblock_tests
   Command:          $oblock_tests
+  WorkingDirectory: tests
+
+Test inode_index_tests
+  Run$:             flag(tests)
+  TestTools:        inode_index_tests
+  Command:          $inode_index_tests
+  WorkingDirectory: tests
+
+Test inode_tests
+  Run$:             flag(tests)
+  TestTools:        inode_tests
+  Command:          $inode_tests
+  WorkingDirectory: tests
+
+Test free_map_tests
+  Run$:             flag(tests)
+  TestTools:        free_map_tests
+  Command:          $free_map_tests
   WorkingDirectory: tests

@@ -97,7 +97,13 @@ module Main (C: CONSOLE)(B: BLOCK) = struct
       incr tests_passed;
       return ()
 
+  let check_file_write b offset length =
+    
+
   let start console b =
+    Printf.printf "Please enter a file name: ";
+    let filename = read_line () in
+    Printf.printf "%s%!\n" filename;
     lwt info = B.get_info b in
     printf "sectors = %Ld\nread_write=%b\nsector_size=%d\n%!"
       info.B.size_sectors info.B.read_write info.B.sector_size;
