@@ -26,6 +26,6 @@ let alloc t n =
       if get t pos
       then (
         set t pos false;
-        pos :: (loop (pos + 1) (n - 1))
+        (Int64.of_int pos) :: (loop (pos + 1) (n - 1))
       ) else loop (pos + 1) n
   in loop 3 n

@@ -22,11 +22,11 @@ let free_map_tests =
       "FreeMapAlloc_One_SingletonListOfThree", `Quick,
         (fun () ->
           let freeMap = FreeMap.create 10 in
-          check (list int) "" [3] (FreeMap.alloc freeMap 1));
+          check (list int64) "" [3L] (FreeMap.alloc freeMap 1));
       "FreeMapAlloc_Two_ListOfThreeAndFour", `Quick,
         (fun () ->
           let freeMap = FreeMap.create 10 in
-          check (list int) "" [3;4] (FreeMap.alloc freeMap 2));
+          check (list int64) "" [3L;4L] (FreeMap.alloc freeMap 2));
       "FreeMapAlloc_One_AllocatedThree", `Quick,
         (fun () ->
           let freeMap = FreeMap.create 10 in

@@ -1,4 +1,5 @@
 open Alcotest
+open Testable
 open Lwt
 
 module O = Oram.Make(Block)
@@ -8,9 +9,9 @@ let bd =
     | `Ok bd ->
       begin match_lwt O.connect bd with
         | `Ok bd -> return bd
-        | `Error x -> failwith "Failed to connect to ORAM\n%!"
+        | `Error x -> failwith "Failed to connect to ORAM"
       end
-    | `Error x -> failwith "Failed to connect to raw Block\n%!"
+    | `Error x -> failwith "Failed to connect to raw Block"
 
 let dummy_bucket =
   bd >>= fun bd ->
@@ -33,9 +34,13 @@ let oram_tests =
           check int "" 7 (O.floor_log 128L));
       "OramBlockInitialise_Initialised_BlockZeroZero", `Quick,
         (fun () ->
-          (check (Testable.lwt_t bool)) ""
+          (check (lwt_t bool)) ""
             (fun () -> return_true)
-            (fun () -> ignore_result (bd >>= fun bd -> O.read_bucket bd 0L); return_true))
+            (fun () -> bd >>= fun bd ->
+              match_lwt O.read_bucket bd 0L with
+                | `Ok ((-1L,_),(-1L,_),(-1L,_),(-1L,_)) -> return_true
+                | `Ok _ -> return_false
+                | `Error x -> return_false))
     ]
 
 let () =

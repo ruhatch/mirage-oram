@@ -24,20 +24,32 @@ Library mirage_oram
                     lwt,
                     lwt.syntax
 
+Library mirage_btrees
+  Path:             src/bTrees
+  Findlibname:      mirage-btrees
+  Modules:          BTree,
+                    Node
+  BuildDepends:     cstruct
+
 Library mirage_block_fs
   Path:             src/fs
   Findlibname:      mirage-block-fs
-  Modules:          InodeIndex,
+  Modules:          Fs,
+                    InodeIndex,
                     Inode,
                     FreeMap
-  BuildDepends:     cstruct,
+  BuildDepends:     mirage,
+                    cstruct,
+                    lwt,
+                    lwt.syntax,
+                    mirage-btrees,
                     core_extended
 
 Library tests
   Path: tests
   Build$:           flag(tests)
   Modules: Testable
-  BuildDepends: alcotest, lwt, lwt.unix
+  BuildDepends: alcotest, lwt, lwt.unix, lwt.syntax
 
 Executable oram_tests
   Path:             tests
@@ -81,6 +93,16 @@ Executable oblock_tests
                     alcotest,
                     tests
 
+Executable node_tests
+  Path:             tests/bTreeTests
+  MainIs:           node_tests.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-btrees,
+                    alcotest,
+                    tests
+
 Executable inode_index_tests
   Path:             tests/fsTests
   MainIs:           inodeIndexTests.ml
@@ -88,6 +110,8 @@ Executable inode_index_tests
   CompiledObject:   best
   Install:          false
   BuildDepends:     mirage-block-fs,
+                    mirage-block-unix,
+                    lwt,
                     alcotest,
                     tests
 
@@ -133,6 +157,12 @@ Test oblock_tests
   Run$:             flag(tests)
   TestTools:        oblock_tests
   Command:          $oblock_tests
+  WorkingDirectory: tests
+
+Test node_tests
+  Run$:             flag(tests)
+  TestTools:        node_tests
+  Command:          $node_tests
   WorkingDirectory: tests
 
 Test inode_index_tests
