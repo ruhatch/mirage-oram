@@ -93,7 +93,6 @@ module Make (A : ALLOCATOR) (S : STORE with type pointer = A.pointer) (N : Node.
     return (`Ok ({ allocator ; store ; root ; rootAddress ; minDegree }))
 
   let splitChild t parent parentAddress child childAddress childIndex =
-    Printf.printf "Splitting at time %f\n" (Unix.gettimeofday ());
     let newChild = N.create (N.pageSize t.root) in
     let [newChildAddress] = A.alloc t.allocator 1 in
     N.setLeaf newChild (N.leaf child);
@@ -130,6 +129,7 @@ module Make (A : ALLOCATOR) (S : STORE with type pointer = A.pointer) (N : Node.
     then (
       while !i >= 1 && key < N.getKey node !i do
         N.setKey node (!i + 1) (N.getKey node !i);
+        N.setValue node (!i + 1) (N.getValue node !i);
         decr i
       done;
       N.setKey node (!i + 1) key;
@@ -156,7 +156,6 @@ module Make (A : ALLOCATOR) (S : STORE with type pointer = A.pointer) (N : Node.
   let insert t key value =
     if N.noKeys t.root = (2 * t.minDegree - 1)
     then (
-      Printf.printf "Splitting root\n";
       let s = N.create (N.pageSize t.root) in
       let [sa] = A.alloc t.allocator 1 in
       N.setLeaf s false;
@@ -168,7 +167,10 @@ module Make (A : ALLOCATOR) (S : STORE with type pointer = A.pointer) (N : Node.
     ) else insertNonfull t t.root t.rootAddress key value
 
   let rec find t node key =
-    Printf.printf "%b" (N.leaf node);
+    (* let keyStrings = N.printKeys node in
+    Printf.printf "Looking for key in list: ";
+    List.iter (fun k -> Printf.printf "%s " k) keyStrings;
+    Printf.printf "\n"; *)
     let i = ref 1 in
     while !i <= N.noKeys node && key > N.getKey node !i do
       incr i;

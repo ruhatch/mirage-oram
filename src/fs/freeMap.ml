@@ -29,3 +29,11 @@ let alloc t n =
         (Int64.of_int pos) :: (loop (pos + 1) (n - 1))
       ) else loop (pos + 1) n
   in loop 3 n
+
+let free t ps =
+  let rec loop = function
+    | [] -> ()
+    | (p::ps) ->
+      set t (Int64.to_int p) true;
+      loop ps
+  in loop ps

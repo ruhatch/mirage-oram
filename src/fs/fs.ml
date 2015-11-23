@@ -62,12 +62,16 @@ module Make (B : BLOCK) = struct
     | `Error e -> return (`Error e)
     | `Ok x -> f x
 
-  let flush_meta t =
-    (* Flush freeMap to disk *)
-    (* Flush inodeIndex rootAddress to disk *)
-    (* Everything else can be reconstructed *)
-    B.write t.bd 0L [t.superblock]
+  let hash name =
+    let primary = Hashtbl.hash name in
+    let secondary = primary lxor (primary lsr 21) lxor (primary lsr 17) lxor (primary lsr 48) in
+    secondary land 65535
 
+  (* Flush freeMap to disk *)
+  (* Flush inodeIndex rootAddress to disk *)
+  (* Everything else can be reconstructed *)
+  let flush_meta t =
+    B.write t.bd 0L [t.superblock]
 
   (* Extract info from block device *)
   (* Create relevant data structures of right size *)
@@ -92,19 +96,18 @@ module Make (B : BLOCK) = struct
     I.connect freeMap bd info.B.sector_size rootAddress >>= fun inodeIndex ->
     return (`Ok { superblock ; freeMap ; inodeIndex ; bd ; info })
 
-  let create_file t name ?contents =
+  let createFile t name =
     let inode = Inode.create (t.info.B.sector_size / 8) in
-    let inodeNum = Hashtbl.hash name in
+    let inodeNum = hash name in
     let [diskAddr] = FreeMap.alloc t.freeMap 1 in
     I.insert t.inodeIndex inodeNum diskAddr >>= fun () ->
     B.write t.bd diskAddr [inode] >>= fun () ->
-    flush_meta t >>= fun () ->
-    return (`Ok t)
+    flush_meta t
 
   (* Should probably remove inode and free memory if there is an error *)
 
   let inodeForFile t name =
-    let inodeNum = Hashtbl.hash name in
+    let inodeNum = hash name in
     I.find t.inodeIndex t.inodeIndex.I.root inodeNum >>= fun a ->
     match a with
       | None -> return (`Error (`Unknown "File not found"))
@@ -113,6 +116,14 @@ module Make (B : BLOCK) = struct
         B.read t.bd diskAddr [inode] >>= fun () ->
         return (`Ok inode)
 
+  let flushInodeForFile t name inode =
+    let inodeNum = hash name in
+    I.find t.inodeIndex t.inodeIndex.I.root inodeNum >>= fun a ->
+    match a with
+      | None -> return (`Error (`Unknown "File not found"))
+      | Some diskAddr ->
+        B.write t.bd diskAddr [inode]
+
   (*let read_file t name =
     let inode = inodeForFile t name in
     let inodeLength = Inode.length inode in
@@ -120,23 +131,46 @@ module Make (B : BLOCK) = struct
     for i = 0 to inodeLength - 1 do
       B.read t.bd (Inode.getPtr inode i) [(Cstruct.sub result (i * t.info.sector_size) t.info.sector_size)];
     done;
-    result
+    result*)
 
-  let write_file t name contents =
-    let inode = inodeForFile t name in
-    let inodeLength = Inode.length inode in
-    let contentLength = Cstruct.len contents in
+  let writeFile t name contents =
+    inodeForFile t name >>= fun inode ->
+    let inodeLength = Inode.noPtrs inode in
+    let contentLength = (Cstruct.len contents - 1) / t.info.B.sector_size + 1 in
     if contentLength < inodeLength
     then
-      let ptrs = Inode.prunePtrs inode contentLength in
-      FreeMap.free ptrs;
+      let freed = Inode.prunePtrs inode contentLength in
+      FreeMap.free t.freeMap freed
     else if contentLength > inodeLength
-    then
-      let ptrs = FreeMap.alloc t.freeMap (contentLength - inodeLength) in
-      Inode.addPtrs ptrs;
-    else ();
-    (* Write subpart of Cstruct to disk *);
-    flush_meta t;
-    t*)
+    then (
+      let allocated = FreeMap.alloc t.freeMap (contentLength - inodeLength) in
+      Inode.addPtrs inode allocated
+    );
+    flushInodeForFile t name inode;
+    (* Loop around writing contents to pointers *)
+    let rec loop = function
+      | 0 -> return (`Ok ())
+      | n ->
+        let buffer = Cstruct.sub contents ((n - 1) * t.info.B.sector_size) t.info.B.sector_size in
+        Printf.printf "Writing to address %Ld\n" (Inode.getPtr inode n);
+        B.write t.bd (Inode.getPtr inode n) [buffer] >>= fun () ->
+        loop (n - 1)
+    in loop (Inode.noPtrs inode) >>= fun () ->
+    flush_meta t
+
+  (* Need length or EOF markers so that we don't need sector_size aligned files*)
+  let readFile t name =
+    inodeForFile t name >>= fun inode ->
+    let inodeLength = Inode.noPtrs inode in
+    let result = Cstruct.create (inodeLength * t.info.B.sector_size) in
+    let rec loop = function
+      | 0 -> return (`Ok ())
+      | n ->
+        let buffer = Cstruct.sub result ((n - 1) * t.info.B.sector_size) t.info.B.sector_size in
+        Printf.printf "Reading from address %Ld\n" (Inode.getPtr inode n);
+        B.read t.bd (Inode.getPtr inode n) [buffer] >>= fun () ->
+        loop (n - 1)
+    in loop (Inode.noPtrs inode) >>= fun () ->
+    return (`Ok result)
 
 end

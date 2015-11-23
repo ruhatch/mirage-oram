@@ -34,6 +34,14 @@ module type NODE = sig
 
   val setValue : t -> int -> value -> unit
 
+  val getKeys : t -> key list
+
+  val printKeys : t -> string list
+
+  val getValues : t -> value list
+
+  val printValues : t -> string list
+
 end
 
 module Node = struct
@@ -70,6 +78,7 @@ module Node = struct
     match Cstruct.BE.get_uint16 t 6 with
       | 0 -> false
       | 1 -> true
+      | _ -> failwith "Invalid node"
 
   let setLeaf t b =
     if b
@@ -95,5 +104,23 @@ module Node = struct
 
   let setValue t i p =
     Cstruct.BE.set_uint64 t (18 * i) p
+
+  let getKeys t =
+    let rec loop = function
+      | 0 -> []
+      | n -> (getKey t n) :: loop (n - 1)
+    in loop (noKeys t)
+
+  let printKeys t =
+    List.map string_of_int (getKeys t)
+
+  let getValues t =
+    let rec loop = function
+      | 0 -> []
+      | n -> (getValue t n) :: loop (n - 1)
+    in loop (noKeys t)
+
+  let printValues t =
+    List.map Int64.to_string (getValues t)
 
 end

@@ -49,7 +49,7 @@ Library tests
   Path: tests
   Build$:           flag(tests)
   Modules: Testable
-  BuildDepends: alcotest, lwt, lwt.unix, lwt.syntax
+  BuildDepends: alcotest, lwt, lwt.unix, lwt.syntax, cstruct
 
 Executable oram_tests
   Path:             tests
@@ -103,6 +103,18 @@ Executable node_tests
                     alcotest,
                     tests
 
+Executable fs_tests
+  Path:             tests/fsTests
+  MainIs:           fsTests.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-block-fs,
+                    mirage-block-unix,
+                    lwt,
+                    alcotest,
+                    tests
+
 Executable inode_index_tests
   Path:             tests/fsTests
   MainIs:           inodeIndexTests.ml
@@ -135,6 +147,19 @@ Executable free_map_tests
                     alcotest,
                     tests
 
+Executable oram_fs_tests
+  Path:             tests
+  MainIs:           oramFsTests.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-oram,
+                    mirage-block-fs,
+                    alcotest,
+                    mirage-block-unix,
+                    lwt,
+                    tests
+
 Test oram_tests
   Run$:             flag(tests)
   TestTools:        oram_tests
@@ -165,6 +190,12 @@ Test node_tests
   Command:          $node_tests
   WorkingDirectory: tests
 
+Test fs_tests
+  Run$:             flag(tests)
+  TestTools:        fs_tests
+  Command:          $fs_tests
+  WorkingDirectory: tests
+
 Test inode_index_tests
   Run$:             flag(tests)
   TestTools:        inode_index_tests
@@ -181,4 +212,10 @@ Test free_map_tests
   Run$:             flag(tests)
   TestTools:        free_map_tests
   Command:          $free_map_tests
+  WorkingDirectory: tests
+
+Test oram_fs_tests
+  Run$:             flag(tests)
+  TestTools:        oram_fs_tests
+  Command:          $oram_fs_tests
   WorkingDirectory: tests
