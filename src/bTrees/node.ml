@@ -56,7 +56,7 @@ module Node = struct
 
   let create length =
     let minDegree = (length + 2) / 36 in
-    let node = Cstruct.create (length * 8) in
+    let node = Cstruct.create length in
     Cstruct.BE.set_uint16 node 0 0;
     Cstruct.BE.set_uint16 node 2 minDegree;
     Cstruct.BE.set_uint16 node 4 length;

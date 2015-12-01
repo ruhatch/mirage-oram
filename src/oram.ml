@@ -143,7 +143,7 @@ module Make (B: BLOCK) = struct
     in loop t.height
 
   let access t op a data' =
-    (*Printf.printf "%s at block %d\n" (match op with | Read -> "Reading" | Write -> "Writing") (Option.value ~default:0 @@ Int64.to_int a);*)
+    Printf.printf "%s at block %d\n" (match op with | Read -> "Reading" | Write -> "Writing") (Option.value ~default:0 @@ Int64.to_int a);
     let x = PosMap.get t.position a in
     PosMap.set t.position a @@ Random.int64 Int64.(((t.info.size_sectors / 4L) + 1L) / 2L);
     (*Printf.printf "Remapped block %d to position %d\n" (Option.value ~default:0 @@ Int64.to_int a) (Option.value ~default:0 @@ Int64.to_int @@ PosMap.get t.position a);*)
@@ -185,13 +185,15 @@ module Make (B: BLOCK) = struct
       in
       write_path t x (build_path [] t.height) >>= fun () -> return (`Ok (data))
 
+  (* Remove off + from Cstruct.copy because I think it is wrong (and it seems like I was right!) *)
+
   let write_to_buffer t sector_start b =
     let off = b.Cstruct.off in
     let len = b.Cstruct.len / t.info.sector_size in
     let rec loop = function
       | 0 -> return (`Ok ())
       | x ->
-        let data = Cstruct.copy b (off + ((x - 1) * t.info.sector_size)) t.info.sector_size in
+        let data = Cstruct.copy b ((x - 1) * t.info.sector_size) t.info.sector_size in
         access t Write Int64.(sector_start + (of_int x) - 1L) (Some data) >>=
         fun _ -> loop (x - 1)
     in loop len
@@ -212,7 +214,7 @@ module Make (B: BLOCK) = struct
       | x ->
         access t Read Int64.(sector_start + (of_int x) - 1L) None >>=
         fun data ->
-          Cstruct.blit_from_string data 0 b (off + ((x - 1) * t.info.sector_size)) t.info.sector_size;
+          Cstruct.blit_from_string data 0 b ((x - 1) * t.info.sector_size) t.info.sector_size;
           loop (x - 1)
     in loop len
 
