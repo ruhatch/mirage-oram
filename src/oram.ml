@@ -28,6 +28,7 @@ module Make (B: BLOCK) = struct
     stash : Stash.t;
     position : PosMap.t;
     bd : B.t;
+    output : Out_channel.t;
   }
 
   type id = string
@@ -76,7 +77,12 @@ module Make (B: BLOCK) = struct
         let size_sectors = Int64.(4L * (pow 2L (of_int height + 1L) - 1L)) in
         let stash = Stash.create () in
         let position = PosMap.create size_sectors in
-        return (`Ok { info = { read_write; sector_size; size_sectors } ; height ; stash ; position ; bd })
+        let time = Unix.gmtime (Unix.time ()) in
+        let twoDigit i = if i > 9 then Printf.sprintf "%d" i else Printf.sprintf "0%d" i in
+        let filename = Printf.sprintf "oramOutput%d%d%d_%s%s%s" time.Unix.tm_mday time.Unix.tm_mon time.Unix.tm_year (twoDigit time.Unix.tm_hour) (twoDigit time.Unix.tm_min) (twoDigit time.Unix.tm_sec) in
+        let output = Out_channel.create filename in
+        Random.self_init ();
+        return (`Ok { info = { read_write; sector_size; size_sectors } ; height ; stash ; position ; bd ; output })
       else return (`Error `Disconnected)
 
   let disconnect t =
@@ -143,8 +149,11 @@ module Make (B: BLOCK) = struct
     in loop t.height
 
   let access t op a data' =
-    Printf.printf "%s at block %d\n" (match op with | Read -> "Reading" | Write -> "Writing") (Option.value ~default:0 @@ Int64.to_int a);
+    (*Printf.printf "%s at block %d\n" (match op with | Read -> "Reading" | Write -> "Writing") (Option.value ~default:0 @@ Int64.to_int a);*)
     let x = PosMap.get t.position a in
+    Out_channel.output_string t.output @@ Printf.sprintf "%Ld" x;
+    Out_channel.newline t.output;
+    Out_channel.flush t.output;
     PosMap.set t.position a @@ Random.int64 Int64.(((t.info.size_sectors / 4L) + 1L) / 2L);
     (*Printf.printf "Remapped block %d to position %d\n" (Option.value ~default:0 @@ Int64.to_int a) (Option.value ~default:0 @@ Int64.to_int @@ PosMap.get t.position a);*)
     read_path t x >>=
