@@ -39,3 +39,6 @@ log
 
 # Test files
 testFiles/
+*.input
+*.output
+*.test
