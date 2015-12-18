@@ -15,6 +15,9 @@ _tests/
 # ocamlbuild targets
 *.byte
 *.native
+*.mllib
+*.mldylib
+META
 
 # oasis generated files
 setup.data
@@ -33,3 +36,6 @@ log
 
 # LaTeX files
 .texpadtmp/
+
+# Test files
+testFiles/
