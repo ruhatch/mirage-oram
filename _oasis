@@ -81,6 +81,8 @@ Executable posmap_tests
   Install:          false
   BuildDepends:     mirage-oram,
                     alcotest,
+                    mirage-block-unix,
+                    lwt,
                     tests
 
 Executable oblock_tests
@@ -158,7 +160,8 @@ Executable oram_fs_tests
                     alcotest,
                     mirage-block-unix,
                     lwt,
-                    tests
+                    tests,
+                    core_kernel
 
 Test oram_tests
   Run$:             flag(tests)

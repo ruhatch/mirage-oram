@@ -59,4 +59,4 @@ let lwt_t (type a) elt =
   end in
   (module M: Alcotest.TESTABLE with type t = M.t)
 
-let oblock = Alcotest.(pair int64 string)
+let oblock = Alcotest.(pair int64 cstruct)

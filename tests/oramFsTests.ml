@@ -2,7 +2,7 @@ open Alcotest
 open Testable
 open Lwt
 
-module O = Oram.Make(Block)
+module O = Oram.Make(Oram.Make(PosMap.InMemory))(Block)
 
 module F = Fs.Make(O)
 
@@ -12,7 +12,9 @@ let ( >>= ) x f = x >>= function
 
 let newFs () =
   Block.connect "disk.img" >>= fun bd ->
-  O.connect bd >>= fun bd ->
+  O.initialise bd >>= fun () ->
+  let size = Core_kernel.Std.Int64.(pow 2L 16L - 4L) in (* multiplication by 4 is put into sum *)
+  O.create ~size bd >>= fun bd ->
   F.initialise bd
 
 let newFile (fs : F.t) contents =
@@ -25,7 +27,7 @@ let newFile (fs : F.t) contents =
   file
 
 let readWholeFile name =
-  let file = Unix.openfile name [Unix.O_RDWR] 0o664 in
+  let file = Unix.openfile name [Unix.O_RDWR; Unix.O_CREAT] 0o664 in
   let length = (Unix.fstat file).Unix.st_size in
   let buff = Bytes.create length in
   let rec loop off = function
@@ -33,6 +35,18 @@ let readWholeFile name =
     | n ->
       let read = Unix.read file buff off n in
       loop (off + read) (n - read)
+  in loop 0 length
+
+let writeWholeFile name contents =
+  let file = Unix.openfile name [Unix.O_RDWR; Unix.O_CREAT] 0o664 in
+  let length = Cstruct.len contents in
+  let buff = Bytes.create length in
+  Cstruct.blit_to_string contents 0 buff 0 length;
+  let rec loop off = function
+    | 0 -> ()
+    | n ->
+      let written = Unix.write file buff off n in
+      loop (off + written) (n - written)
   in loop 0 length
 
 let oram_fs_tests =
@@ -70,14 +84,17 @@ let oram_fs_tests =
             (fun () ->
               newFs () >>= fun fs ->
               let file = newFile fs contents in
+              writeWholeFile "pg61.input" file;
               return (`Ok (file)))
             (fun () ->
               newFs () >>= fun fs ->
               let file = newFile fs contents in
               F.createFile fs "pg61.txt" >>= fun () ->
-              F.writeFile fs "pg61.txt" file  >>= fun () ->
-              F.readFile fs "pg61.txt"));
-      "ORAMFSWriteFile_3ProjectGutenburgs_ReadOutFile1Correctly", `Slow,
+              F.writeFile fs "pg61.txt" file >>= fun () ->
+              F.readFile fs "pg61.txt" >>= fun returned ->
+              writeWholeFile "pg61.output" returned;
+              return (`Ok returned)));
+      (*"ORAMFSWriteFile_3ProjectGutenburgs_ReadOutFile1Correctly", `Slow,
         (fun () ->
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
@@ -133,7 +150,7 @@ let oram_fs_tests =
               F.writeFile fs "pg62.txt" file2  >>= fun () ->
               F.createFile fs "pg63.txt" >>= fun () ->
               F.writeFile fs "pg63.txt" file3  >>= fun () ->
-              F.readFile fs "pg63.txt"));
+              F.readFile fs "pg63.txt"));*)
     ]
 
 let () =

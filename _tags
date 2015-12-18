@@ -1,3 +1,179 @@
 true: thread
 # OASIS_START
+# DO NOT EDIT (digest: ef02f3ca73d11502a7d8604d3b54a1f9)
+# Ignore VCS directories, you can use the same kind of rule outside
+# OASIS_START/STOP if you want to exclude directories that contains
+# useless stuff for the build process
+true: annot, bin_annot
+<**/.svn>: -traverse
+<**/.svn>: not_hygienic
+".bzr": -traverse
+".bzr": not_hygienic
+".hg": -traverse
+".hg": not_hygienic
+".git": -traverse
+".git": not_hygienic
+"_darcs": -traverse
+"_darcs": not_hygienic
+# Library mirage_oram
+"src/mirage_oram.cmxs": use_mirage_oram
+<src/*.ml{,i,y}>: pkg_core_kernel
+<src/*.ml{,i,y}>: pkg_cstruct
+<src/*.ml{,i,y}>: pkg_lwt
+<src/*.ml{,i,y}>: pkg_lwt.syntax
+<src/*.ml{,i,y}>: pkg_mirage
+# Library mirage_btrees
+"src/bTrees/mirage_btrees.cmxs": use_mirage_btrees
+<src/bTrees/*.ml{,i,y}>: pkg_cstruct
+# Library mirage_block_fs
+"src/fs/mirage_block_fs.cmxs": use_mirage_block_fs
+<src/fs/*.ml{,i,y}>: pkg_core_extended
+<src/fs/*.ml{,i,y}>: pkg_cstruct
+<src/fs/*.ml{,i,y}>: pkg_lwt
+<src/fs/*.ml{,i,y}>: pkg_lwt.syntax
+<src/fs/*.ml{,i,y}>: pkg_mirage
+<src/fs/*.ml{,i,y}>: use_mirage_btrees
+# Library tests
+"tests/tests.cmxs": use_tests
+# Executable oram_tests
+<tests/oram_tests.{native,byte}>: pkg_alcotest
+<tests/oram_tests.{native,byte}>: pkg_core_kernel
+<tests/oram_tests.{native,byte}>: pkg_cstruct
+<tests/oram_tests.{native,byte}>: pkg_lwt
+<tests/oram_tests.{native,byte}>: pkg_lwt.syntax
+<tests/oram_tests.{native,byte}>: pkg_lwt.unix
+<tests/oram_tests.{native,byte}>: pkg_mirage
+<tests/oram_tests.{native,byte}>: pkg_mirage-block-unix
+<tests/oram_tests.{native,byte}>: use_mirage_oram
+<tests/oram_tests.{native,byte}>: use_tests
+# Executable stash_tests
+<tests/stash_tests.{native,byte}>: pkg_alcotest
+<tests/stash_tests.{native,byte}>: pkg_core_kernel
+<tests/stash_tests.{native,byte}>: pkg_cstruct
+<tests/stash_tests.{native,byte}>: pkg_lwt
+<tests/stash_tests.{native,byte}>: pkg_lwt.syntax
+<tests/stash_tests.{native,byte}>: pkg_lwt.unix
+<tests/stash_tests.{native,byte}>: pkg_mirage
+<tests/stash_tests.{native,byte}>: use_mirage_oram
+<tests/stash_tests.{native,byte}>: use_tests
+# Executable posmap_tests
+<tests/posmap_tests.{native,byte}>: pkg_alcotest
+<tests/posmap_tests.{native,byte}>: pkg_core_kernel
+<tests/posmap_tests.{native,byte}>: pkg_cstruct
+<tests/posmap_tests.{native,byte}>: pkg_lwt
+<tests/posmap_tests.{native,byte}>: pkg_lwt.syntax
+<tests/posmap_tests.{native,byte}>: pkg_lwt.unix
+<tests/posmap_tests.{native,byte}>: pkg_mirage
+<tests/posmap_tests.{native,byte}>: pkg_mirage-block-unix
+<tests/posmap_tests.{native,byte}>: use_mirage_oram
+<tests/posmap_tests.{native,byte}>: use_tests
+# Executable oblock_tests
+<tests/oblock_tests.{native,byte}>: pkg_alcotest
+<tests/oblock_tests.{native,byte}>: pkg_core_kernel
+<tests/oblock_tests.{native,byte}>: pkg_cstruct
+<tests/oblock_tests.{native,byte}>: pkg_lwt
+<tests/oblock_tests.{native,byte}>: pkg_lwt.syntax
+<tests/oblock_tests.{native,byte}>: pkg_lwt.unix
+<tests/oblock_tests.{native,byte}>: pkg_mirage
+<tests/oblock_tests.{native,byte}>: use_mirage_oram
+<tests/oblock_tests.{native,byte}>: use_tests
+# Executable node_tests
+<tests/bTreeTests/node_tests.{native,byte}>: pkg_alcotest
+<tests/bTreeTests/node_tests.{native,byte}>: pkg_cstruct
+<tests/bTreeTests/node_tests.{native,byte}>: pkg_lwt
+<tests/bTreeTests/node_tests.{native,byte}>: pkg_lwt.syntax
+<tests/bTreeTests/node_tests.{native,byte}>: pkg_lwt.unix
+<tests/bTreeTests/node_tests.{native,byte}>: use_mirage_btrees
+<tests/bTreeTests/node_tests.{native,byte}>: use_tests
+<tests/bTreeTests/*.ml{,i,y}>: pkg_alcotest
+<tests/bTreeTests/*.ml{,i,y}>: pkg_cstruct
+<tests/bTreeTests/*.ml{,i,y}>: pkg_lwt
+<tests/bTreeTests/*.ml{,i,y}>: pkg_lwt.syntax
+<tests/bTreeTests/*.ml{,i,y}>: pkg_lwt.unix
+<tests/bTreeTests/*.ml{,i,y}>: use_mirage_btrees
+<tests/bTreeTests/*.ml{,i,y}>: use_tests
+# Executable fs_tests
+<tests/fsTests/fsTests.{native,byte}>: pkg_alcotest
+<tests/fsTests/fsTests.{native,byte}>: pkg_core_extended
+<tests/fsTests/fsTests.{native,byte}>: pkg_cstruct
+<tests/fsTests/fsTests.{native,byte}>: pkg_lwt
+<tests/fsTests/fsTests.{native,byte}>: pkg_lwt.syntax
+<tests/fsTests/fsTests.{native,byte}>: pkg_lwt.unix
+<tests/fsTests/fsTests.{native,byte}>: pkg_mirage
+<tests/fsTests/fsTests.{native,byte}>: pkg_mirage-block-unix
+<tests/fsTests/fsTests.{native,byte}>: use_mirage_block_fs
+<tests/fsTests/fsTests.{native,byte}>: use_mirage_btrees
+<tests/fsTests/fsTests.{native,byte}>: use_tests
+# Executable inode_index_tests
+<tests/fsTests/inodeIndexTests.{native,byte}>: pkg_alcotest
+<tests/fsTests/inodeIndexTests.{native,byte}>: pkg_core_extended
+<tests/fsTests/inodeIndexTests.{native,byte}>: pkg_cstruct
+<tests/fsTests/inodeIndexTests.{native,byte}>: pkg_lwt
+<tests/fsTests/inodeIndexTests.{native,byte}>: pkg_lwt.syntax
+<tests/fsTests/inodeIndexTests.{native,byte}>: pkg_lwt.unix
+<tests/fsTests/inodeIndexTests.{native,byte}>: pkg_mirage
+<tests/fsTests/inodeIndexTests.{native,byte}>: pkg_mirage-block-unix
+<tests/fsTests/inodeIndexTests.{native,byte}>: use_mirage_block_fs
+<tests/fsTests/inodeIndexTests.{native,byte}>: use_mirage_btrees
+<tests/fsTests/inodeIndexTests.{native,byte}>: use_tests
+<tests/fsTests/*.ml{,i,y}>: pkg_mirage-block-unix
+# Executable inode_tests
+<tests/fsTests/inodeTests.{native,byte}>: pkg_alcotest
+<tests/fsTests/inodeTests.{native,byte}>: pkg_core_extended
+<tests/fsTests/inodeTests.{native,byte}>: pkg_cstruct
+<tests/fsTests/inodeTests.{native,byte}>: pkg_lwt
+<tests/fsTests/inodeTests.{native,byte}>: pkg_lwt.syntax
+<tests/fsTests/inodeTests.{native,byte}>: pkg_lwt.unix
+<tests/fsTests/inodeTests.{native,byte}>: pkg_mirage
+<tests/fsTests/inodeTests.{native,byte}>: use_mirage_block_fs
+<tests/fsTests/inodeTests.{native,byte}>: use_mirage_btrees
+<tests/fsTests/inodeTests.{native,byte}>: use_tests
+# Executable free_map_tests
+<tests/fsTests/free_map_tests.{native,byte}>: pkg_alcotest
+<tests/fsTests/free_map_tests.{native,byte}>: pkg_core_extended
+<tests/fsTests/free_map_tests.{native,byte}>: pkg_cstruct
+<tests/fsTests/free_map_tests.{native,byte}>: pkg_lwt
+<tests/fsTests/free_map_tests.{native,byte}>: pkg_lwt.syntax
+<tests/fsTests/free_map_tests.{native,byte}>: pkg_lwt.unix
+<tests/fsTests/free_map_tests.{native,byte}>: pkg_mirage
+<tests/fsTests/free_map_tests.{native,byte}>: use_mirage_block_fs
+<tests/fsTests/free_map_tests.{native,byte}>: use_mirage_btrees
+<tests/fsTests/free_map_tests.{native,byte}>: use_tests
+<tests/fsTests/*.ml{,i,y}>: pkg_alcotest
+<tests/fsTests/*.ml{,i,y}>: pkg_core_extended
+<tests/fsTests/*.ml{,i,y}>: pkg_cstruct
+<tests/fsTests/*.ml{,i,y}>: pkg_lwt
+<tests/fsTests/*.ml{,i,y}>: pkg_lwt.syntax
+<tests/fsTests/*.ml{,i,y}>: pkg_lwt.unix
+<tests/fsTests/*.ml{,i,y}>: pkg_mirage
+<tests/fsTests/*.ml{,i,y}>: use_mirage_block_fs
+<tests/fsTests/*.ml{,i,y}>: use_mirage_btrees
+<tests/fsTests/*.ml{,i,y}>: use_tests
+# Executable oram_fs_tests
+<tests/oramFsTests.{native,byte}>: pkg_alcotest
+<tests/oramFsTests.{native,byte}>: pkg_core_extended
+<tests/oramFsTests.{native,byte}>: pkg_core_kernel
+<tests/oramFsTests.{native,byte}>: pkg_cstruct
+<tests/oramFsTests.{native,byte}>: pkg_lwt
+<tests/oramFsTests.{native,byte}>: pkg_lwt.syntax
+<tests/oramFsTests.{native,byte}>: pkg_lwt.unix
+<tests/oramFsTests.{native,byte}>: pkg_mirage
+<tests/oramFsTests.{native,byte}>: pkg_mirage-block-unix
+<tests/oramFsTests.{native,byte}>: use_mirage_block_fs
+<tests/oramFsTests.{native,byte}>: use_mirage_btrees
+<tests/oramFsTests.{native,byte}>: use_mirage_oram
+<tests/oramFsTests.{native,byte}>: use_tests
+<tests/*.ml{,i,y}>: pkg_alcotest
+<tests/*.ml{,i,y}>: pkg_core_extended
+<tests/*.ml{,i,y}>: pkg_core_kernel
+<tests/*.ml{,i,y}>: pkg_cstruct
+<tests/*.ml{,i,y}>: pkg_lwt
+<tests/*.ml{,i,y}>: pkg_lwt.syntax
+<tests/*.ml{,i,y}>: pkg_lwt.unix
+<tests/*.ml{,i,y}>: pkg_mirage
+<tests/*.ml{,i,y}>: pkg_mirage-block-unix
+<tests/*.ml{,i,y}>: use_mirage_block_fs
+<tests/*.ml{,i,y}>: use_mirage_btrees
+<tests/*.ml{,i,y}>: use_mirage_oram
+<tests/*.ml{,i,y}>: use_tests
 # OASIS_STOP

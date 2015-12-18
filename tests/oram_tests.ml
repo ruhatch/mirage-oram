@@ -2,7 +2,7 @@ open Alcotest
 open Testable
 open Lwt
 
-module O = Oram.Make(Block)
+module O = Oram.Make(Oram.Make(PosMap.InMemory))(Block)
 
 let bd =
   match_lwt Block.connect "disk.img" with

@@ -11,13 +11,13 @@ let stash_tests =
       "StashAdd_ValidBlockToEmptyStash_StashLengthOne", `Quick,
         (fun _ ->
           let empty = Stash.create () in
-          let block = (1L, Bytes.create 1) in
+          let block = (1L, Cstruct.create 1) in
           Stash.add empty block;
           Alcotest.(check int) "" 1 (Stash.length empty));
       "StashFind_ExistsInStash_SomeBlock", `Quick,
         (fun _ ->
           let empty = Stash.create () in
-          let block = (1L, Bytes.create 1) in
+          let block = (1L, Cstruct.create 1) in
           Stash.add empty block;
           Alcotest.(check @@ option oblock) "" (Some block) (Stash.find_index empty 1L));
       "StashFind_NotInStash_None", `Quick,
