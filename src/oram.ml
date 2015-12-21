@@ -155,7 +155,7 @@ module Make (PF: PosMap.POSMAP)(B: BLOCK) = struct
     in loop t.height
 
   let access t op a data' =
-    (*Printf.printf "%s at block %Ld\n" (match op with | Read -> "Reading" | Write -> "Writing") a;*)
+    if t.offset = 0L then Printf.printf "%s at block %Ld\n" (match op with | Read -> "Reading" | Write -> "Writing") a;
     P.get t.posMap a >>= fun x ->
     (*Out_channel.output_string t.output @@ Printf.sprintf "Oram at offset %Ld accessing path to leaf %Ld" t.offset x;
     Out_channel.newline t.output;
@@ -175,7 +175,12 @@ module Make (PF: PosMap.POSMAP)(B: BLOCK) = struct
         Stash.add t.stash b4);
       let data = match Stash.find_index t.stash a with
         | Some (_,d) -> d
-        | None -> Cstruct.create t.info.sector_size
+        | None -> begin
+          match op with
+            | Read -> Printf.printf "Stash miss at address %Ld\n" a
+            | Write -> ()
+          end;
+          Cstruct.create t.info.sector_size
       in
       (*Printf.printf "Found data in the stash for address %Ld as %s\n" a data;*)
       begin match op with
@@ -202,6 +207,7 @@ module Make (PF: PosMap.POSMAP)(B: BLOCK) = struct
 
   let initialisePosmap t =
     let bound = Int64.(((t.info.size_sectors / 4L) + 1L) / 2L) in
+    Printf.printf "Size_sectors: %Ld\nBound: %Ld\n" t.info.size_sectors bound;
     let rec loop = function
       | 0L -> return (`Ok ())
       | x ->
@@ -214,7 +220,6 @@ module Make (PF: PosMap.POSMAP)(B: BLOCK) = struct
     in loop t.info.size_sectors
 
   let create ?(size = 0L) ?(offset = 0L) bd =
-    (* Calculate size based on height *)
     lwt info = B.get_info bd in
     let read_write = info.B.read_write in
     if info.B.sector_size > 8

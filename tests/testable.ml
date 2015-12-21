@@ -1,3 +1,5 @@
+open Lwt
+
 let int64 =
   let module M = struct
     type t = int64
@@ -60,3 +62,46 @@ let lwt_t (type a) elt =
   (module M: Alcotest.TESTABLE with type t = M.t)
 
 let oblock = Alcotest.(pair int64 cstruct)
+
+(* Helper modules and functions for testing *)
+
+module O = Oram.Make(Oram.Make(PosMap.InMemory))(Block)
+
+(* module O = Oram.Make(PosMap.InMemory)(Block) *)
+
+let ( >>= ) x f = x >>= function
+  | `Error e -> return (`Error e)
+  | `Ok x -> f x
+
+let readWholeFile name =
+  let file = Unix.openfile name [Unix.O_RDWR; Unix.O_CREAT] 0o664 in
+  let length = (Unix.fstat file).Unix.st_size in
+  let buff = Bytes.create length in
+  let rec loop off = function
+    | 0 -> buff
+    | n ->
+      let read = Unix.read file buff off n in
+      loop (off + read) (n - read)
+  in loop 0 length
+
+let writeWholeFile name contents =
+  let file = Unix.openfile name [Unix.O_RDWR; Unix.O_CREAT] 0o664 in
+  let length = Cstruct.len contents in
+  let buff = Bytes.create length in
+  Cstruct.blit_to_string contents 0 buff 0 length;
+  let rec loop off = function
+    | 0 -> ()
+    | n ->
+      let written = Unix.write file buff off n in
+      loop (off + written) (n - written)
+  in loop 0 length
+
+let newFile (oram : O.t) contents =
+  lwt info = O.get_info oram in
+  let sectorLength = (String.length contents - 1) / info.O.sector_size + 1 in
+  let file = Cstruct.create (sectorLength * info.O.sector_size) in
+  for i = 0 to Cstruct.len file - 1 do
+    Cstruct.set_uint8 file i 0
+  done;
+  Cstruct.blit_from_string contents 0 file 0 (String.length contents);
+  return (`Ok file)

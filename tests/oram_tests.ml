@@ -1,25 +1,28 @@
 open Alcotest
-open Testable
 open Lwt
+open Testable
 
-module O = Oram.Make(Oram.Make(PosMap.InMemory))(Block)
-
-let bd =
+(*let bd =
   match_lwt Block.connect "disk.img" with
     | `Ok bd ->
       begin match_lwt O.connect bd with
         | `Ok bd -> return bd
         | `Error x -> failwith "Failed to connect to ORAM"
       end
-    | `Error x -> failwith "Failed to connect to raw Block"
+    | `Error x -> failwith "Failed to connect to raw Block"*)
+
+let newORAM () =
+  Block.connect "disk.img" >>= fun bd ->
+  O.initialise bd >>= fun () ->
+  O.create bd
 
 let dummy_bucket =
-  bd >>= fun bd ->
+  newORAM () >>= fun bd ->
     lwt info = O.get_info bd in
-      return (OBlock.dummy info.O.sector_size,
+      return (`Ok (OBlock.dummy info.O.sector_size,
               OBlock.dummy info.O.sector_size,
               OBlock.dummy info.O.sector_size,
-              OBlock.dummy info.O.sector_size)
+              OBlock.dummy info.O.sector_size))
 
 let oram_tests =
     [
@@ -32,15 +35,58 @@ let oram_tests =
       "OramFloorLog_OneTwentyEight_Seven", `Quick,
         (fun () ->
           check int "" 7 (O.floor_log 128L));
-      "OramBlockInitialise_Initialised_BlockZeroZero", `Quick,
+      "OramBlockInitialise_Initialised_BlockZeroZero", `Slow,
         (fun () ->
-          (check (lwt_t bool)) ""
-            (fun () -> return_true)
-            (fun () -> bd >>= fun bd ->
-              match_lwt O.read_bucket bd 0L with
-                | `Ok ((-1L,_),(-1L,_),(-1L,_),(-1L,_)) -> return_true
-                | `Ok _ -> return_false
-                | `Error x -> return_false))
+          (check (lwt_t @@ result error bool)) ""
+            (fun () -> return (`Ok true))
+            (fun () -> newORAM () >>= fun bd ->
+              O.read_bucket bd 0L >>= fun bucket ->
+              match bucket with
+                | (-1L,_),(-1L,_),(-1L,_),(-1L,_) -> return (`Ok true)
+                | _ -> return (`Ok false)));
+      "ORAMWriteFile_EmptyString_ReadOutEmptyString", `Slow,
+        (fun () ->
+          check (lwt_t @@ result error cstruct) ""
+            (fun () ->
+              newORAM () >>= fun bd ->
+              newFile bd "" >>= fun file ->
+              return (`Ok (file)))
+            (fun () ->
+              newORAM () >>= fun bd ->
+              newFile bd "" >>= fun file ->
+              O.write bd 0L [file] >>= fun () ->
+              let buff = Cstruct.create (Cstruct.len file) in
+              O.read bd 0L [buff] >>= fun () ->
+              return (`Ok buff)));
+      "ORAMWriteFile_String_ReadOutString", `Slow,
+        (fun () ->
+          check (lwt_t @@ result error cstruct) ""
+            (fun () ->
+              newORAM () >>= fun bd ->
+              newFile bd "All work and no play makes Dave a dull boy" >>= fun file ->
+              return (`Ok (file)))
+            (fun () ->
+              newORAM () >>= fun bd ->
+              newFile bd "All work and no play makes Dave a dull boy" >>= fun file ->
+              O.write bd 0L [file] >>= fun () ->
+              let buff = Cstruct.create (Cstruct.len file) in
+              O.read bd 0L [buff] >>= fun () ->
+              return (`Ok buff)));
+      "ORAMWriteFile_ProjectGutenburg_ReadOutCorrectly", `Slow,
+        (fun () ->
+          let contents = readWholeFile "testFiles/pg61.txt" in
+          (check (lwt_t @@ result error cstruct)) ""
+            (fun () ->
+              newORAM () >>= fun bd ->
+              newFile bd contents >>= fun file ->
+              return (`Ok file))
+            (fun () ->
+              newORAM () >>= fun bd ->
+              newFile bd contents >>= fun file ->
+              O.write bd 0L [file] >>= fun () ->
+              let buff = Cstruct.create (Cstruct.len file) in
+              O.read bd 0L [buff] >>= fun () ->
+              return (`Ok buff)));
     ]
 
 let () =

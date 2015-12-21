@@ -49,7 +49,7 @@ Library tests
   Path: tests
   Build$:           flag(tests)
   Modules: Testable
-  BuildDepends: alcotest, lwt, lwt.unix, lwt.syntax, cstruct
+  BuildDepends: alcotest, lwt, lwt.unix, lwt.syntax, cstruct, mirage-block-unix, core_kernel
 
 Executable oram_tests
   Path:             tests
