@@ -5,25 +5,24 @@ let stash_tests =
       "StashAdd_DummyBlockToEmptyStash_EmptyStash", `Quick,
         (fun _ ->
           let empty = Stash.create () in
-          let dummy = OBlock.dummy 1 in
-          Stash.add empty dummy;
+          match OBlock.dummy 1 with
+            | (key, data) -> Stash.add empty ~key ~data;
           Alcotest.(check int) "" 0 (Stash.length empty));
       "StashAdd_ValidBlockToEmptyStash_StashLengthOne", `Quick,
         (fun _ ->
           let empty = Stash.create () in
-          let block = (1L, Cstruct.create 1) in
-          Stash.add empty block;
+          Stash.add empty ~key:1L ~data:(Cstruct.create 1);
           Alcotest.(check int) "" 1 (Stash.length empty));
       "StashFind_ExistsInStash_SomeBlock", `Quick,
         (fun _ ->
           let empty = Stash.create () in
-          let block = (1L, Cstruct.create 1) in
-          Stash.add empty block;
-          Alcotest.(check @@ option oblock) "" (Some block) (Stash.find_index empty 1L));
+          let data = Cstruct.create 1 in
+          Stash.add empty ~key:1L ~data;
+          Alcotest.(check @@ option cstruct) "" (Some data) (Stash.find empty 1L));
       "StashFind_NotInStash_None", `Quick,
         (fun _ ->
           let empty = Stash.create () in
-          Alcotest.(check @@ option oblock) "" None (Stash.find_index empty 1L));
+          Alcotest.(check @@ option cstruct) "" None (Stash.find empty 1L));
     ]
 
 let () =

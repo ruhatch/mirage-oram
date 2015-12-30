@@ -65,9 +65,13 @@ let oblock = Alcotest.(pair int64 cstruct)
 
 (* Helper modules and functions for testing *)
 
-module O = Oram.Make(Oram.Make(PosMap.InMemory))(Block)
+(* module O = Oram.Make(Oram.Make(Oram.Make(PosMap.InMemory)))(Block) *)
 
-(* module O = Oram.Make(PosMap.InMemory)(Block) *)
+(* module O = Oram.Make(Oram.Make(PosMap.InMemory))(Block) *)
+
+module O = Oram.Make(PosMap.InMemory)(Block)
+
+(* module O = Block *)
 
 let ( >>= ) x f = x >>= function
   | `Error e -> return (`Error e)

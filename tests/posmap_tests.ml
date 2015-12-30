@@ -3,6 +3,8 @@ open Testable
 open Lwt
 
 module P = PosMap.InMemory(Block)
+(* module P = Oram.Make(PosMap.InMemory)(Block) *)
+
 
 let ( >>= ) x f = x >>= function
   | `Error e -> return (`Error e)
@@ -10,7 +12,8 @@ let ( >>= ) x f = x >>= function
 
 let newPosMap size =
   Block.connect "disk.img" >>= fun bd ->
-  P.create ~size bd
+  (*P.initialise bd >>= fun () ->*)
+  P.create ~size ~offset:1L bd
 
 let posmap_tests = [
     (*)"PosMapIndices_Zero_ZeroZero", `Quick,
@@ -31,20 +34,20 @@ let posmap_tests = [
         (check (lwt_t @@ result error int64)) ""
           (fun () -> return (`Ok 100L))
           (fun () ->
-            newPosMap 0L >>= fun posmap ->
+            newPosMap 10000L >>= fun posmap ->
             P.set posmap 1L 100L >>= fun () ->
             P.get posmap 1L));
     (*)"PosMapGet_OutOfBounds_Error", `Quick,
       (fun () ->
         let posmap = P.create 100L in
         Alcotest.check_raises "Out of Bounds" (Invalid_argument "index out of bounds") (fun () -> ignore @@ P.get posmap 100L));*)
-    "PosMapLength_LessThanMax32_SameSize", `Quick,
+    (*)"PosMapLength_LessThanMax32_SameSize", `Quick,
       (fun () ->
         (check (lwt_t @@ result error int64)) ""
           (fun () -> return (`Ok 100L))
           (fun () ->
             newPosMap 100L >>= fun posmap ->
-            return (`Ok (P.length posmap))));
+            return (`Ok (P.length posmap))));*)
   ]
 
 let () =

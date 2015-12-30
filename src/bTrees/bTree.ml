@@ -124,7 +124,7 @@ module Make (A : ALLOCATOR) (S : STORE with type pointer = A.pointer) (N : Node.
     return (`Ok (newChild,newChildAddress))
 
   let rec insertNonfull t node nodeAddress key value =
-    Printf.printf "Inserting. Node is leaf? %b" (N.leaf node);
+    (*Printf.printf "Inserting. Node is leaf? %b\n" (N.leaf node);*)
     let i = ref (N.noKeys node) in
     if N.leaf node
     then (

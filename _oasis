@@ -23,6 +23,7 @@ Library mirage_oram
                     cstruct,
                     lwt,
                     lwt.syntax
+  NativeOpt: "-g"
 
 Library mirage_btrees
   Path:             src/bTrees
@@ -62,6 +63,7 @@ Executable oram_tests
                     mirage-block-unix,
                     lwt,
                     tests
+  NativeOpt: "-g"
 
 Executable stash_tests
   Path:             tests

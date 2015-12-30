@@ -97,15 +97,15 @@ module Make (B : BLOCK) = struct
     return (`Ok { superblock ; freeMap ; inodeIndex ; bd ; info })
 
   let createFile t name =
-    Printf.printf "*** CREATING FILE ***\n";
+    (*Printf.printf "*** CREATING FILE ***\n";*)
     let inode = Inode.create (t.info.B.sector_size / 8) in
     let inodeNum = hash name in
     let [diskAddr] = FreeMap.alloc t.freeMap 1 in
-    Printf.printf "About to insert key\n";
+    (*Printf.printf "About to insert key\n";*)
     I.insert t.inodeIndex inodeNum diskAddr >>= fun () ->
-    Printf.printf "Inserted key\n";
+    (*Printf.printf "Inserted key\n";*)
     B.write t.bd diskAddr [inode] >>= fun () ->
-    Printf.printf "Wrote inode to disk!\n";
+    (*Printf.printf "Wrote inode to disk!\n";*)
     flush_meta t
 
   (* Should probably remove inode and free memory if there is an error *)
@@ -118,11 +118,11 @@ module Make (B : BLOCK) = struct
       | Some diskAddr ->
         let inode = Inode.create (t.info.B.sector_size / 8) in
         B.read t.bd diskAddr [inode] >>= fun () ->
-        Printf.printf "Read inode: %s\n" (Cstruct.to_string inode);
+        (*Printf.printf "Read inode: %s\n" (Cstruct.to_string inode);*)
         return (`Ok inode)
 
   let flushInodeForFile t name inode =
-    Printf.printf "Writing inode: %s\n" (Cstruct.to_string inode);
+    (*Printf.printf "Writing inode: %s\n" (Cstruct.to_string inode);*)
     let inodeNum = hash name in
     I.find t.inodeIndex t.inodeIndex.I.root inodeNum >>= fun a ->
     match a with
@@ -140,7 +140,7 @@ module Make (B : BLOCK) = struct
     result*)
 
   let writeFile t name contents =
-    Printf.printf "*** WRITING FILE ***\n";
+    (*Printf.printf "*** WRITING FILE ***\n";*)
     inodeForFile t name >>= fun inode ->
     let inodeLength = Inode.noPtrs inode in
     let contentLength = (Cstruct.len contents - 1) / t.info.B.sector_size + 1 in
@@ -166,7 +166,7 @@ module Make (B : BLOCK) = struct
 
   (* Need length or EOF markers so that we don't need sector_size aligned files*)
   let readFile t name =
-    Printf.printf "*** READING FILE ***\n";
+    (*Printf.printf "*** READING FILE ***\n";*)
     inodeForFile t name >>= fun inode ->
     let inodeLength = Inode.noPtrs inode in
     let result = Cstruct.create (inodeLength * t.info.B.sector_size) in

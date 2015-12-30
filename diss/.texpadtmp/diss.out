@@ -3,29 +3,32 @@
 \BOOKMARK [1][-]{section.1.2}{Challenges}{chapter.1}% 3
 \BOOKMARK [1][-]{section.1.3}{Related Work}{chapter.1}% 4
 \BOOKMARK [0][-]{chapter.2}{Preparation}{}% 5
-\BOOKMARK [1][-]{section.2.1}{Introduction to ORAM}{chapter.2}% 6
-\BOOKMARK [1][-]{section.2.2}{Introduction to Inverted Indexes}{chapter.2}% 7
-\BOOKMARK [1][-]{section.2.3}{Requirements Analysis}{chapter.2}% 8
-\BOOKMARK [1][-]{section.2.4}{Choice of Tools}{chapter.2}% 9
-\BOOKMARK [1][-]{section.2.5}{Software Engineering Techniques}{chapter.2}% 10
-\BOOKMARK [0][-]{chapter.3}{Implementation}{}% 11
-\BOOKMARK [1][-]{section.3.1}{Path ORAM}{chapter.3}% 12
-\BOOKMARK [2][-]{subsection.3.1.1}{Basic Implementation}{section.3.1}% 13
-\BOOKMARK [2][-]{subsection.3.1.2}{Recursion}{section.3.1}% 14
-\BOOKMARK [2][-]{subsection.3.1.3}{Statelessness}{section.3.1}% 15
-\BOOKMARK [2][-]{subsection.3.1.4}{Optimisation}{section.3.1}% 16
-\BOOKMARK [1][-]{section.3.2}{Object Store}{chapter.3}% 17
-\BOOKMARK [2][-]{subsection.3.2.1}{General Design}{section.3.2}% 18
-\BOOKMARK [2][-]{subsection.3.2.2}{B-Trees}{section.3.2}% 19
-\BOOKMARK [1][-]{section.3.3}{Index}{chapter.3}% 20
-\BOOKMARK [1][-]{section.3.4}{Encryption}{chapter.3}% 21
-\BOOKMARK [2][-]{subsection.3.4.1}{Library}{section.3.4}% 22
-\BOOKMARK [0][-]{chapter.4}{Evaluation}{}% 23
-\BOOKMARK [1][-]{section.4.1}{Overall Results}{chapter.4}% 24
-\BOOKMARK [1][-]{section.4.2}{Unit Tests}{chapter.4}% 25
-\BOOKMARK [1][-]{section.4.3}{Performance Tests}{chapter.4}% 26
-\BOOKMARK [2][-]{subsection.4.3.1}{Microbenchmarks}{section.4.3}% 27
-\BOOKMARK [1][-]{section.4.4}{Security Analysis}{chapter.4}% 28
-\BOOKMARK [0][-]{chapter.5}{Conclusion}{}% 29
-\BOOKMARK [0][-]{chapter.5}{Bibliography}{}% 30
-\BOOKMARK [0][-]{appendix.A}{Project Proposal}{}% 31
+\BOOKMARK [1][-]{section.2.1}{Defining the Threat Model}{chapter.2}% 6
+\BOOKMARK [1][-]{section.2.2}{Introduction to ORAM}{chapter.2}% 7
+\BOOKMARK [1][-]{section.2.3}{Introduction to Inverted Indexes}{chapter.2}% 8
+\BOOKMARK [1][-]{section.2.4}{Requirements Analysis}{chapter.2}% 9
+\BOOKMARK [1][-]{section.2.5}{Choice of Tools}{chapter.2}% 10
+\BOOKMARK [1][-]{section.2.6}{Software Engineering Techniques}{chapter.2}% 11
+\BOOKMARK [0][-]{chapter.3}{Implementation}{}% 12
+\BOOKMARK [1][-]{section.3.1}{Path ORAM}{chapter.3}% 13
+\BOOKMARK [2][-]{subsection.3.1.1}{Stash}{section.3.1}% 14
+\BOOKMARK [2][-]{subsection.3.1.2}{Position Map}{section.3.1}% 15
+\BOOKMARK [2][-]{subsection.3.1.3}{Basic ORAM}{section.3.1}% 16
+\BOOKMARK [2][-]{subsection.3.1.4}{Recursion}{section.3.1}% 17
+\BOOKMARK [2][-]{subsection.3.1.5}{Statelessness}{section.3.1}% 18
+\BOOKMARK [2][-]{subsection.3.1.6}{Optimisation}{section.3.1}% 19
+\BOOKMARK [1][-]{section.3.2}{Object Store}{chapter.3}% 20
+\BOOKMARK [2][-]{subsection.3.2.1}{General Design}{section.3.2}% 21
+\BOOKMARK [2][-]{subsection.3.2.2}{B-Trees}{section.3.2}% 22
+\BOOKMARK [1][-]{section.3.3}{Index}{chapter.3}% 23
+\BOOKMARK [1][-]{section.3.4}{Encryption}{chapter.3}% 24
+\BOOKMARK [2][-]{subsection.3.4.1}{Library}{section.3.4}% 25
+\BOOKMARK [0][-]{chapter.4}{Evaluation}{}% 26
+\BOOKMARK [1][-]{section.4.1}{Overall Results}{chapter.4}% 27
+\BOOKMARK [1][-]{section.4.2}{Unit Tests}{chapter.4}% 28
+\BOOKMARK [1][-]{section.4.3}{Performance Tests}{chapter.4}% 29
+\BOOKMARK [2][-]{subsection.4.3.1}{Microbenchmarks}{section.4.3}% 30
+\BOOKMARK [1][-]{section.4.4}{Security Analysis}{chapter.4}% 31
+\BOOKMARK [0][-]{chapter.5}{Conclusion}{}% 32
+\BOOKMARK [0][-]{chapter.5}{Bibliography}{}% 33
+\BOOKMARK [0][-]{appendix.A}{Project Proposal}{}% 34

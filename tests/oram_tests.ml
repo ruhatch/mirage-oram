@@ -11,6 +11,8 @@ open Testable
       end
     | `Error x -> failwith "Failed to connect to raw Block"*)
 
+module O = Oram.Make(PosMap.InMemory)(Block)
+
 let newORAM () =
   Block.connect "disk.img" >>= fun bd ->
   O.initialise bd >>= fun () ->
@@ -43,7 +45,7 @@ let oram_tests =
               O.read_bucket bd 0L >>= fun bucket ->
               match bucket with
                 | (-1L,_),(-1L,_),(-1L,_),(-1L,_) -> return (`Ok true)
-                | _ -> return (`Ok false)));
+                | (a1,d1),(a2,d2),(a3,d3),(a4,d4) -> Printf.printf "Addresses returned: %Ld %Ld %Ld %Ld\n" a1 a2 a3 a4; return (`Ok false)));
       "ORAMWriteFile_EmptyString_ReadOutEmptyString", `Slow,
         (fun () ->
           check (lwt_t @@ result error cstruct) ""

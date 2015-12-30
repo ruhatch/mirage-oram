@@ -3,16 +3,6 @@ open V1_LWT
 open Core_kernel.Std
 open Lwt
 
-module type POSMAP = functor (B : BLOCK) -> sig
-
-  type t
-  val create : ?size:int64 -> ?offset:int64 -> B.t -> [`Ok of t | `Error of B.error] Lwt.t
-  val get : t -> int64 -> [`Ok of int64 | `Error of B.error] Lwt.t
-  val set : t -> int64 -> int64 -> [`Ok of unit | `Error of B.error] Lwt.t
-  val length : t -> int64
-
-end
-
 module InMemory (B : BLOCK) = struct
 
   type t = (int64, int64_elt, c_layout) Array2.t
@@ -40,6 +30,7 @@ module InMemory (B : BLOCK) = struct
     in
     let bound = Int64.(pow 2L (of_int height)) in
     let x = Int64.(4L * (2L * bound - 1L)) in
+    Printf.printf "Creating posmap of size %Ld\n" x;
     let (x1,x2) = indices x in
     let x1' = x1 + 1 in
     let x2' = match x1' with
@@ -47,10 +38,9 @@ module InMemory (B : BLOCK) = struct
       | x -> Option.value Int64.(to_int max_32) ~default:0
     in
     let empty = Array2.create Int64 c_layout x1' x2' in
-    (*let bound = Int64.(div (add 1L @@ div x 4L) 2L) in*)
-    for i = 0 to x1 - 1 do
-      for j = 0 to Array2.dim2 empty - 1 do
-        empty.{i,j} <- Random.int64 bound;
+    for i = 0 to x1' - 1 do
+      for j = 0 to x2' - 1 do
+        empty.{i,j} <- Random.int64 bound
       done
     done;
     return (`Ok empty)

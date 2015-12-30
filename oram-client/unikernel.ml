@@ -4,7 +4,7 @@ open V1_LWT
 
 module Main (C: CONSOLE)(B: BLOCK) = struct
 
-  module O = Oram.Make(B)
+  module O = Oram.Make(PosMap.InMemory)(B)
 
   let tests_started = ref 0
   let tests_passed = ref 0
@@ -49,7 +49,7 @@ module Main (C: CONSOLE)(B: BLOCK) = struct
     let rec loop = function
       | 0 -> []
       | n ->
-        let page = Io_page.(to_cstruct (get 1)) in
+        let page = Io_page.(to_cstruct (get 2)) in
         let phrase = sprintf "%d: All work and no play makes Dave a dull boy.\n" n in
         let sector = Cstruct.sub page 0 sector_size in
         fill_with_pattern sector phrase;
@@ -97,9 +97,6 @@ module Main (C: CONSOLE)(B: BLOCK) = struct
       incr tests_passed;
       return ()
 
-  let check_file_write b offset length =
-    
-
   let start console b =
     Printf.printf "Please enter a file name: ";
     let filename = read_line () in
@@ -107,32 +104,30 @@ module Main (C: CONSOLE)(B: BLOCK) = struct
     lwt info = B.get_info b in
     printf "sectors = %Ld\nread_write=%b\nsector_size=%d\n%!"
       info.B.size_sectors info.B.read_write info.B.sector_size;
-    match_lwt O.connect b with
-      | `Ok b ->
-        lwt info = O.get_info b in
-        printf "sectors = %Ld\nread_write=%b\nsector_size=%d\n%!"
-          info.O.size_sectors info.O.read_write info.O.sector_size;
-        let start_time = Unix.gettimeofday () in
+    O.create b >>= fun b ->
+    lwt info = O.get_info b in
+    printf "sectors = %Ld\nread_write=%b\nsector_size=%d\n%!"
+      info.O.size_sectors info.O.read_write info.O.sector_size;
+    let start_time = Unix.gettimeofday () in
 
-        lwt () = check_sector_write b "local" "51712" 0L 100 in
-        lwt () = check_sector_write b "local" "51712" (Int64.sub info.O.size_sectors 1L) 1 in
-        lwt () = check_sector_write b "local" "51712" 0L 200 in
-        lwt () = check_sector_write b "local" "51712" (Int64.sub info.O.size_sectors 2L) 2 in
-        lwt () = check_sector_write b "local" "51712" 0L 1200 in
-        lwt () = check_sector_write b "local" "51712" (Int64.sub info.O.size_sectors 12L) 12 in
+    lwt () = check_sector_write b "local" "51712" 0L 100 in
+    lwt () = check_sector_write b "local" "51712" (Int64.sub info.O.size_sectors 1L) 1 in
+    lwt () = check_sector_write b "local" "51712" 0L 200 in
+    lwt () = check_sector_write b "local" "51712" (Int64.sub info.O.size_sectors 2L) 2 in
+    lwt () = check_sector_write b "local" "51712" 0L 1200 in
+    lwt () = check_sector_write b "local" "51712" (Int64.sub info.O.size_sectors 12L) 12 in
 
-        lwt () = check_sector_read_failure b "local" "51712" info.O.size_sectors 1 in
-        lwt () = check_sector_read_failure b "local" "51712" (Int64.sub info.O.size_sectors 11L) 12 in
-        lwt () = check_sector_write_failure b "local" "51712" info.O.size_sectors 1 in
-        lwt () = check_sector_write_failure b "local" "51712" (Int64.sub info.O.size_sectors 11L) 12 in
-        lwt () = check_sector_read_failure b "local" "51712" info.O.size_sectors 1 in
-        lwt () = check_sector_read_failure b "local" "51712" (Int64.sub info.O.size_sectors 11L) 12 in
+    lwt () = check_sector_read_failure b "local" "51712" info.O.size_sectors 1 in
+    lwt () = check_sector_read_failure b "local" "51712" (Int64.sub info.O.size_sectors 11L) 12 in
+    lwt () = check_sector_write_failure b "local" "51712" info.O.size_sectors 1 in
+    lwt () = check_sector_write_failure b "local" "51712" (Int64.sub info.O.size_sectors 11L) 12 in
+    lwt () = check_sector_read_failure b "local" "51712" info.O.size_sectors 1 in
+    lwt () = check_sector_read_failure b "local" "51712" (Int64.sub info.O.size_sectors 11L) 12 in
 
-        printf "Test sequence finished in %f\n" (Unix.gettimeofday () -. start_time);
-        printf "Total tests started: %d\n" !tests_started;
-        printf "Total tests passed:  %d\n" !tests_passed;
-        printf "Total tests failed:  %d\n%!" !tests_failed;
-        OS.Time.sleep 5.
-      | `Error x -> return ()
+    printf "Test sequence finished in %f\n" (Unix.gettimeofday () -. start_time);
+    printf "Total tests started: %d\n" !tests_started;
+    printf "Total tests passed:  %d\n" !tests_passed;
+    printf "Total tests failed:  %d\n%!" !tests_failed;
+    OS.Time.sleep 5.
 
 end

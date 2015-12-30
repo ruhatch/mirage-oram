@@ -7,8 +7,8 @@ module F = Fs.Make(O)
 let newFs () =
   Block.connect "disk.img" >>= fun bd ->
   O.initialise bd >>= fun () ->
-  let size = Core_kernel.Std.Int64.(pow 2L 16L - 4L) in (* multiplication by 4 is put into sum *)
-  O.create ~size bd >>= fun bd ->
+  (*let size = Core_kernel.Std.Int64.((pow 2L 14L - 1L) / 2L) in*) (* multiplication by 4 is put into sum and taken out again for 4 times block size... *)
+  O.create bd >>= fun bd ->
   F.initialise bd
 
 let oram_fs_tests =
@@ -18,8 +18,7 @@ let oram_fs_tests =
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd "" >>= fun file ->
-              return (`Ok (file)))
+              newFile fs.F.bd "")
             (fun () ->
               newFs () >>= fun fs ->
               newFile fs.F.bd "" >>= fun file ->
@@ -31,8 +30,7 @@ let oram_fs_tests =
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd "All work and no play makes Dave a dull boy" >>= fun file ->
-              return (`Ok (file)))
+              newFile fs.F.bd "All work and no play makes Dave a dull boy")
             (fun () ->
               newFs () >>= fun fs ->
               newFile fs.F.bd "All work and no play makes Dave a dull boy" >>= fun file ->
@@ -45,29 +43,24 @@ let oram_fs_tests =
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd contents >>= fun file ->
-              writeWholeFile "pg61.input" file;
-              return (`Ok (file)))
+              newFile fs.F.bd contents)
             (fun () ->
               newFs () >>= fun fs ->
               newFile fs.F.bd contents >>= fun file ->
               F.createFile fs "pg61.txt" >>= fun () ->
               F.writeFile fs "pg61.txt" file >>= fun () ->
-              F.readFile fs "pg61.txt" >>= fun returned ->
-              writeWholeFile "pg61.output" returned;
-              return (`Ok returned)));
-      (*"ORAMFSWriteFile_3ProjectGutenburgs_ReadOutFile1Correctly", `Slow,
+              F.readFile fs "pg61.txt"));
+      "ORAMFSWriteFile_3ProjectGutenburgs_ReadOutFile1Correctly", `Slow,
         (fun () ->
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newFs () >>= fun fs ->
-              let file1 = newFile fs (readWholeFile "testFiles/pg61.txt") in
-              return (`Ok (file1)))
+              newFile fs.F.bd (readWholeFile "testFiles/pg61.txt"))
             (fun () ->
               newFs () >>= fun fs ->
-              let file1 = newFile fs (readWholeFile "testFiles/pg61.txt") in
-              let file2 = newFile fs (readWholeFile "testFiles/pg62.txt") in
-              let file3 = newFile fs (readWholeFile "testFiles/pg63.txt") in
+              newFile fs.F.bd (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
+              newFile fs.F.bd (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
+              newFile fs.F.bd (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
               F.createFile fs "pg61.txt" >>= fun () ->
               F.writeFile fs "pg61.txt" file1  >>= fun () ->
               F.createFile fs "pg62.txt" >>= fun () ->
@@ -80,13 +73,12 @@ let oram_fs_tests =
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newFs () >>= fun fs ->
-              let file2 = newFile fs (readWholeFile "testFiles/pg62.txt") in
-              return (`Ok (file2)))
+              newFile fs.F.bd (readWholeFile "testFiles/pg62.txt"))
             (fun () ->
               newFs () >>= fun fs ->
-              let file1 = newFile fs (readWholeFile "testFiles/pg61.txt") in
-              let file2 = newFile fs (readWholeFile "testFiles/pg62.txt") in
-              let file3 = newFile fs (readWholeFile "testFiles/pg63.txt") in
+              newFile fs.F.bd (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
+              newFile fs.F.bd (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
+              newFile fs.F.bd (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
               F.createFile fs "pg61.txt" >>= fun () ->
               F.writeFile fs "pg61.txt" file1  >>= fun () ->
               F.createFile fs "pg62.txt" >>= fun () ->
@@ -99,20 +91,19 @@ let oram_fs_tests =
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newFs () >>= fun fs ->
-              let file3 = newFile fs (readWholeFile "testFiles/pg63.txt") in
-              return (`Ok (file3)))
+              newFile fs.F.bd (readWholeFile "testFiles/pg63.txt"))
             (fun () ->
               newFs () >>= fun fs ->
-              let file1 = newFile fs (readWholeFile "testFiles/pg61.txt") in
-              let file2 = newFile fs (readWholeFile "testFiles/pg62.txt") in
-              let file3 = newFile fs (readWholeFile "testFiles/pg63.txt") in
+              newFile fs.F.bd (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
+              newFile fs.F.bd (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
+              newFile fs.F.bd (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
               F.createFile fs "pg61.txt" >>= fun () ->
               F.writeFile fs "pg61.txt" file1  >>= fun () ->
               F.createFile fs "pg62.txt" >>= fun () ->
               F.writeFile fs "pg62.txt" file2  >>= fun () ->
               F.createFile fs "pg63.txt" >>= fun () ->
               F.writeFile fs "pg63.txt" file3  >>= fun () ->
-              F.readFile fs "pg63.txt"));*)
+              F.readFile fs "pg63.txt"));
     ]
 
 let () =

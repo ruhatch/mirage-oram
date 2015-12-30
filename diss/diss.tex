@@ -119,7 +119,21 @@ extent for a comparable purpose.
 
 \section{Motivation}
 
+Cloud computing is becoming ubiquitous, with more than an exabyte of data estimated to be stored in the cloud. For large businesses, a private cloud can be a cost effective way to keep data isolated, but as public cloud services become ever cheaper, even these businesses could be forced to succumb to market pressures and move to the public cloud. With so much important data held by only a few major cloud providers, trust becomes a major issue.
+
+Encryption appears to be the solution to our trust issues; if the providers cannot read the plain-text of our data then surely it is secure? This appears to hold in general, but in the important application of query-based searching, we have a problem: using current methods of homomorphic encryption to perform search over encrypted documents can leak up to 80\% of queries \cite{islam2012access}. Knowledge about the queries made to a data set, along with the amount of documents returned by each query could lead to some dangerous inferences. As a motivating example, discovering that a query such as $\langle name,~disease\rangle$ made to a medical database returned results would allow an adversary to uncover information about a patients medical status, breaching patient confidentiality.
+
+What allowed the authors of \cite{islam2012access} to infer search queries, was knowledge about the documents returned by any specific query. Thus, in order to protect against this kind of attack we need to have some way of preventing the server from knowing which documents it is actually returning in response to any query. Oblivious Random-Access Memory (ORAM) gives us exactly what we want. When using ORAM, not only are two accesses made to exactly the same piece of data computationally indistinguishable to the server, but so too are any two access patterns of the same length.
+
+This project aims to demonstrate that, using a particular ORAM protocol Path ORAM \cite{stefanov2013path}, it is possible to build a system that allows us to search over a set of encrypted documents without leaking the resulting access pattern, protecting the content of the search queries and therefore the confidentiality of the documents.
+
 \section{Challenges}
+
+The first major challenge that faces any security related project is adequately defining the threat model. In order to be able to reason about and evaluate the security properties of the system, we need to know exactly what we assume an adversary to be capable of. Once we have done this we must show that within these capabilities, the security properties that we desire the system to have remain intact. The threat model will be defined in \S\ref{sec:threatmodel}.
+
+By virtue of being stored in the cloud, we should be able to access our data at any time, from any place, while still maintaining the desired security properties. We also want to be tolerant of network connection errors and client-side crashes. Thus, another challenge is to make the system completely stateless.
+
+In order to make statelessness more efficient, it is necessary to augment ORAM with recursion (\S\ref{sec:oramintro}), which reduces the amount of transient client-side storage. This enables us to efficiently store the client's state between accesses. Recursion introduces the challenge of choosing how many levels to use. Each extra level of recursion reduces the size of the client's state, but also incurs a time and space overhead. This is explored briefly in \cite{stefanov2013path}, but we will attempt to have the system automatically choose parameters for the recursion based on the size and block size of the underlying storage used by the system.
 
 \section{Related Work}
 
@@ -137,7 +151,11 @@ extent for a comparable purpose.
 
 % Talk about MirageOS and building on top of it
 
+\section{Defining the Threat Model}
+\label{sec:threatmodel}
+
 \section{Introduction to ORAM}
+\label{sec:oramintro}
 
 % Talk about Path ORAM
 
@@ -161,11 +179,22 @@ extent for a comparable purpose.
 
 \chapter{Implementation}
 
+This chapter describes the process that took the designs and algorithms of the previous chapter and turned them into a functioning system. As it is the core of the project, the implementation of Path ORAM is discussed first (\S\ref{sec:pathORAM}), followed by the object store (\S\ref{sec:objectStore}), the index (\S\ref{sec:index}) and finally encryption (\S\ref{sec:encryption}).
+
 % Describe what was actually implemented
 
 \section{Path ORAM}
+\label{sec:pathORAM}
 
-\subsection{Basic Implementation}
+The structure of Path ORAM is described abstractly in \cite{stefanov2013path}, in terms of the core data structures
+
+\subsection{Stash}
+
+
+
+\subsection{Position Map}
+
+\subsection{Basic ORAM}
 
 \subsection{Recursion}
 
@@ -173,15 +202,22 @@ extent for a comparable purpose.
 
 \subsection{Optimisation}
 
+\begin{enumerate}
+	\item Talk about optimising the block size through design space exploration
+\end{enumerate}
+
 \section{Object Store}
+\label{sec:objectStore}
 
 \subsection{General Design}
 
 \subsection{B-Trees}
 
 \section{Index}
+\label{sec:index}
 
 \section{Encryption}
+\label{sec:encryption}
 
 \subsection{Library}
 

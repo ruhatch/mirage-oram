@@ -1,7 +1,7 @@
 open V1_LWT
 
 module Make :
-  functor (P : PosMap.POSMAP) -> functor (B : BLOCK) ->
+  functor (P : PosMapIntf.POSMAP) -> functor (B : BLOCK) ->
     sig
 
       include BLOCK
@@ -21,7 +21,7 @@ module Make :
 
       type bucket = OBlock.t * OBlock.t * OBlock.t * OBlock.t
 
-      val bucket_address : int64 -> int -> int64
+      val bucket_address : t -> int64 -> int -> int64
 
       val write_bucket : t -> int64 -> bucket -> [`Ok of unit | `Error of error] Lwt.t
 
