@@ -1,0 +1,1 @@
+module InMemory : PosMapIntf.POSMAP
