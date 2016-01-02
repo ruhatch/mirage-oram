@@ -1,7 +1,10 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Libraries used by Mirage ORAM}}{17}{figure.2.1}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Tools used in the development of Mirage ORAM}}{17}{figure.2.2}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Empirical results for maximum persistent stash size}}{20}{figure.3.1}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {A.1}{\ignorespaces The Application Stack: We can use any underlying BLOCK implementation and we can add/remove ORAM, Encryption or Search modules as we please}}{23}{figure.A.1}
+\contentsline {figure}{\numberline {A.1}{\ignorespaces The Application Stack: We can use any underlying BLOCK implementation and we can add/remove ORAM, Encryption or Search modules as we please}}{33}{figure.A.1}
