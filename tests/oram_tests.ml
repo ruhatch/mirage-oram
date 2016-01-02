@@ -43,9 +43,10 @@ let oram_tests =
             (fun () -> return (`Ok true))
             (fun () -> newORAM () >>= fun bd ->
               O.read_bucket bd 0L >>= fun bucket ->
-              match bucket with
+              return (`Ok (List.for_all (fun (a,d) -> a = -1L) bucket))));
+              (*match bucket with
                 | (-1L,_),(-1L,_),(-1L,_),(-1L,_) -> return (`Ok true)
-                | (a1,d1),(a2,d2),(a3,d3),(a4,d4) -> Printf.printf "Addresses returned: %Ld %Ld %Ld %Ld\n" a1 a2 a3 a4; return (`Ok false)));
+                | (a1,d1),(a2,d2),(a3,d3),(a4,d4) -> Printf.printf "Addresses returned: %Ld %Ld %Ld %Ld\n" a1 a2 a3 a4; return (`Ok false)));*)
       "ORAMWriteFile_EmptyString_ReadOutEmptyString", `Slow,
         (fun () ->
           check (lwt_t @@ result error cstruct) ""

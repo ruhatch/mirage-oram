@@ -1,6 +1,7 @@
 % Template for a Computer Science Tripos Part II project dissertation
 \documentclass[12pt,a4paper,twoside,openright]{report}
 \usepackage[pdfborder={0 0 0}]{hyperref}    % turns references into hyperlinks
+\usepackage[nameinlink]{cleveref}
 \usepackage[margin=25mm]{geometry}  % adjusts page layout
 \usepackage{graphicx}  % allows inclusion of PDF, PNG and JPG images
 \usepackage{verbatim}
@@ -8,6 +9,7 @@
 \usepackage{todonotes}
 \usepackage{algpseudocode}
 \usepackage{algorithm}
+\usepackage{tabularx}
 
 \raggedbottom                           % try to avoid widows and orphans
 \sloppy
@@ -18,6 +20,11 @@
                                         % more readable
                                         
 \newcommand{\mytodo}{\todo[inline, color=green!40]}
+
+% Change macros for autoref
+%\def\sectionautorefname{\S\hskip -1pt}
+%\def\subsectionautorefname{\S}
+%\def\algorithmautorefname{Algorithm}
 
 \begin{document}
 
@@ -137,11 +144,11 @@ This project aims to demonstrate that, using a particular ORAM protocol Path ORA
 
 \section{Challenges}
 
-The first major challenge that faces any security related project is adequately defining the threat model. In order to be able to reason about and evaluate the security properties of the system, we need to know exactly what we assume an adversary to be capable of. Once we have done this we must show that within these capabilities, the security properties that we desire the system to have remain intact. The threat model will be defined in \S\ref{sec:threatmodel}.
+The first major challenge that faces any security related project is adequately defining the threat model. In order to be able to reason about and evaluate the security properties of the system, we need to know exactly what we assume an adversary to be capable of. Once we have done this we must show that within these capabilities, the security properties that we desire the system to have remain intact. The threat model will be defined in \cref{sec:threatmodel}.
 
 By virtue of being stored in the cloud, we should be able to access our data at any time, from any place, while still maintaining the desired security properties. We also want to be tolerant of network connection errors and client-side crashes. Thus, another challenge is to make the system completely stateless.
 
-In order to make statelessness more efficient, it is necessary to augment ORAM with recursion (\S\ref{sec:oramintro}), which reduces the amount of transient client-side storage. This enables us to efficiently store the client's state between accesses. Recursion introduces the challenge of choosing how many levels to use. Each extra level of recursion reduces the size of the client's state, but also incurs a time and space overhead. This is explored briefly in \cite{stefanov2013path}, but we will attempt to have the system automatically choose parameters for the recursion based on the size and block size of the underlying storage used by the system.
+In order to make statelessness more efficient, it is necessary to augment ORAM with recursion (\cref{sec:oramintro}), which reduces the amount of transient client-side storage. This enables us to efficiently store the client's state between accesses. Recursion introduces the challenge of choosing how many levels to use. Each extra level of recursion reduces the size of the client's state, but also incurs a time and space overhead. This is explored briefly in \cite{stefanov2013path}, but we will attempt to have the system automatically choose parameters for the recursion based on the size and block size of the underlying storage used by the system.
 
 Finally in order for the system to perform query-based search over encrypted documents we need to implement an object store, an information retrieval module and an encryption module. These modules will be rudimentary, as the main focus of the project is the implementation and optimisation of the ORAM module, but all of them have inherent design and implementation challenges that will be need to be addressed.
 
@@ -177,7 +184,7 @@ We can also extend the model to one where both the attacker and the server freel
 
 Path ORAM is defined in terms of a client and a server, where the client wishes to store data on the server. The data is split into blocks and each block is tagged with a sequence number or address, its position if the data were to be stored sequentially. On the server the data is stored in a binary tree of height $L$, where each node in the tree is a bucket with size $Z$, containing up to $Z$ data blocks. The client requires two local data structures. The stash is a sort of working memory; as data is read from the server it is put into the stash and it is then written back to the server later on. The position map associates with each address a number between $0$ and $2^L-1$, which corresponds to a leaf in the tree. The protocol maintains the invariant that, at anytime, a block with position $x$ in the position map is either in the stash, or in a bucket along the path from the root of the tree to the $x^{th}$ leaf.
 
-This is achieved using Algorithm \ref{alg:access}, which is split into four main steps:
+This is achieved using \cref{alg:access}, which is split into four main steps:
 
 \begin{description}
 	\item[Remap Block] The current position of the block $\mathsf{a}$ is read and then a new position is calculated uniformly at random
@@ -274,9 +281,9 @@ OCaml's static typing system is also indispensable for ensuring correctness of p
 
 \mytodo{Add a small amount of discussion to this section}
 
-\begin{figure}[h]
-\begin{center}
-\begin{tabular}{|l|l|p{0.5\linewidth}|l|}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|l|}
 \hline
 \textit{Library} & \textit{Version} & \textit{Purpose} & \textit{License} \\
 \hline \hline
@@ -290,18 +297,17 @@ Cstruct & 1.7.1 & Data Structure & ISC \\
 \hline
 Alcotest & 0.4.6 & Unit Testing & ISC \\
 \hline
-\end{tabular}
-\end{center}
+\end{tabularx}
 \caption{Libraries used by Mirage ORAM}
-\label{fig:libraries}
-\end{figure}
+\label{tab:libraries}
+\end{table}
 
 \subsection{Development Environment}
 
 \mytodo{Add a small amount of discussion to this section}
 
-\begin{figure}[h]
-\begin{center}
+\begin{table}[h]
+\centering
 \begin{tabular}{|l|l|l|l|}
 \hline
 \textit{Tool} & \textit{Version} & \textit{Purpose} & \textit{License} \\
@@ -315,10 +321,9 @@ OPAM & 1.2.2 & Package Manager & GPLv3 \\
 OASIS & 0.4.5 & Build Tool & LGPL-2.1 \\
 \hline
 \end{tabular}
-\end{center}
 \caption{Tools used in the development of Mirage ORAM}
-\label{fig:devtools}
-\end{figure}
+\label{tab:devtools}
+\end{table}
 
 % Do a table of tools used including OPAM, OASIS, git, Make, Atom, etc.
 
@@ -344,21 +349,21 @@ The next chapter will show how all of this information was used to achieve the a
 
 \chapter{Implementation}
 
-This chapter describes the process that took the designs and algorithms of the previous chapter and turned them into a functioning system. As it is the core of the project, the implementation of Path ORAM is discussed first (\S\ref{sec:pathORAM}), followed by the object store (\S\ref{sec:objectStore}), the search module (\S\ref{sec:searchmodule}) and finally encryption (\S\ref{sec:encryption}).
+This chapter describes the process that took the designs and algorithms of the previous chapter and turned them into a functioning system. As it is the core of the project, the implementation of Path ORAM is discussed first (\cref{sec:pathORAM}), followed by the object store (\cref{sec:objectStore}), the search module (\cref{sec:searchmodule}) and finally encryption (\cref{sec:encryption}).
 
 % Describe what was actually implemented
 
 \section{Path ORAM}
 \label{sec:pathORAM}
 
-The structure of Path ORAM is described abstractly in \S\ref{sec:oramintro}, in terms of the core data structures and the access algorithm. In this section we discuss how those data structures were realised and the design decisions involved in the implementation.
+The structure of Path ORAM is described abstractly in \cref{sec:oramintro}, in terms of the core data structures and the access algorithm. In this section we discuss how those data structures were realised and the design decisions involved in the implementation.
 
 \subsection{Inherent Constraints}
 \label{subsec:constraints}
 
 By virtue of writing an implementation to satisfy an existing module signature, there are a number of constraints put on the design of our system.
 
-The first major constraint is the use of the Cstruct library, discussed in \S\ref{subsec:libraries}. The underlying block device requires a buffer of type \texttt{Cstruct.t} to read to/write from and in order to satisfy the \texttt{BLOCK} module signature, ORAM needs to return data as a \texttt{Cstruct.t}. Thus, to avoid unnecessary conversions, we will pass our data around in this form.
+The first major constraint is the use of the Cstruct library, discussed in \cref{subsec:libraries}. The underlying block device requires a buffer of type \texttt{Cstruct.t} to read to/write from and in order to satisfy the \texttt{BLOCK} module signature, ORAM needs to return data as a \texttt{Cstruct.t}. Thus, to avoid unnecessary conversions, we will pass our data around in this form.
 
 Another constraint is the usage of \texttt{int64} as the type of addresses in \texttt{BLOCK}'s, \texttt{read} and \texttt{write} operations. Again, to avoid unnecessary (and potentially unsafe) work converting between types, we will use \texttt{int64}s wherever necessary.
 
@@ -366,12 +371,12 @@ Another constraint is the usage of \texttt{int64} as the type of addresses in \t
 
 The stash stores blocks of data temporarily before they are written back into ORAM. It needs to support operations of insertion, lookup based on address and removal. For this job I chose an \texttt{int64}-keyed hash table from Jane Street's Core library, with \texttt{Cstruct.t} values. This was put into its own module, abstracting away the underlying type, meaning that we could swap implementations of the Stash module without breaking the core code of the ORAM module.
 
-The hash table gives us constant time for the operations of insertion, lookup and removal, making it ideal for our needs. The hash table implementation takes an initial size as a parameter, and expands when necessary. This would add a large overhead, because we would have to copy the entire contents of the stash. However, as shown in \cite{stefanov2013path}, we require exactly $Z\log_2N$ transient storage, where $N$ is the size of the ORAM in blocks, and on top of that, we require a constant amount of space for persistent stash storage. Figure \ref{tab:stashsizes} shows the maximum stash size required depending on the security parameter, $\lambda$, and the bucket size $Z$. A stash with security parameter $\lambda$ has probability $2^{-\lambda}$ of exceeding this stash size.
+The hash table gives us constant time for the operations of insertion, lookup and removal, making it ideal for our needs. The hash table implementation takes an initial size as a parameter, and expands when necessary. This would add a large overhead, because we would have to copy the entire contents of the stash. However, as shown in \cite{stefanov2013path}, we require exactly $Z\log_2N$ transient storage, where $N$ is the size of the ORAM in blocks, and on top of that, we require a constant amount of space for persistent stash storage. \Cref{tab:stashsizes} shows the maximum stash size required depending on the security parameter, $\lambda$, and the bucket size $Z$. A stash with security parameter $\lambda$ has probability $2^{-\lambda}$ of exceeding this stash size.
 
-For the purposes of this project, we will parameterise in both bucket size and security parameter, allowing us to discover empirically the values that optimise the construction. In order to achieve statelessness, we need to be able to write the stash to disk, so there is going to be a trade-off between maximum stash size and security parameter. A larger maximum stash size increases bandwidth, but a security parameter set too low will not allow us to allocate the storage space for the stash in advance.
+In order to achieve statelessness, we need to be able to write the stash to disk, so there is going to be a trade-off between maximum stash size and security parameter. A larger maximum stash size increases bandwidth, but a security parameter set too low will not allow us to allocate the storage space for the stash in advance. For the purposes of this project, we will parameterise in both bucket size and security parameter, allowing us to discover empirically the values that optimise the construction.
 
-\begin{figure}
-\begin{center}
+\begin{table}
+\centering
 \begin{tabular}{|l|l|l|l|}
 	\hline
 	& \multicolumn{3}{c|}{Bucket Size ($Z$)} \\
@@ -387,14 +392,13 @@ For the purposes of this project, we will parameterise in both bucket size and s
 	256 & 303 & 218 & 186 \\
 	\hline
 \end{tabular}
-\end{center}
 \caption{Empirical results for maximum persistent stash size}
 \label{tab:stashsizes}
-\end{figure}
+\end{table}
 
 \subsection{Position Map}
 
-The position map associates a leaf position with each address of the data. As mentioned in \S\ref{subsec:constraints}, we are constrained to using \texttt{int64} addresses, thus we need to be able to support a position map that is indexed by 64-bit integers. OCaml provides us with a Bigarray module, but the size of these arrays is specified using the OCaml \texttt{int} type. This type actually uses only 63 bits on a 64-bit machine and 31 on a 32-bit machine. Both of these types are also signed, so we need to represent a type that can range up to $2^{63} - 1$, using a type that can only go up to $2^{30} - 1$ on a 32-bit machine.
+The position map associates a leaf position with each address of the data. As mentioned in \cref{subsec:constraints}, we are constrained to using \texttt{int64} addresses, thus we need to be able to support a position map that is indexed by 64-bit integers. OCaml provides us with a Bigarray module, but the size of these arrays is specified using the OCaml \texttt{int} type. This type actually uses only 63 bits on a 64-bit machine and 31 on a 32-bit machine. Both of these types are also signed, so we need to represent a type that can range up to $2^{63} - 1$, using a type that can only go up to $2^{30} - 1$ on a 32-bit machine.
 
 In order to do this we need to use 3-dimensional arrays. We take an \texttt{int64} value and split its bits into a 4-bit value and 2 30-bit values. The 4-bit value is the most significant bits, and will therefore be 0 unless we store more than $2^{60}$ blocks. The 30-bit values are guaranteed to be converted into positive \texttt{int}s, which we can then use to address two dimensions of the array. We have to perform some input sanitation to make sure that the 4-bit value (and therefore the 64-bit value) is positive.
 
@@ -429,6 +433,8 @@ Now the only remaining problem is creating the position map. Algorithm \ref{alg:
 \end{algorithm}
 
 \subsection{Basic ORAM}
+
+Now that we have the client-side data structures, all that remains is to implement \cref{alg:access}, including the subroutines \textsc{ReadBucket} and \textsc{WriteBucket}.
 
 \mytodo{Explain the implementation of the ORAM module}
 \mytodo{Discuss the design decisions involved in the ORAM Module}

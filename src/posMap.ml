@@ -20,17 +20,17 @@ module InMemory (B : BLOCK) = struct
       | x -> loop (acc + 1) Int64.(x / 2L)
     in loop 0 x
 
-  let create ?(size=0L) ?(offset=0L) bd =
+  let create ?(size=0L) ?(offset=0L) ?(bucketSize = 4L) bd =
     lwt info = B.get_info bd in
     let height =
       if size = 0L
         (* This shouldn't happen, but should check anyway *)
-        then floor_log Int64.(info.B.size_sectors / 4L + 1L) - 1
-        else floor_log Int64.(size / 4L + 1L) - 1
+        then floor_log Int64.(info.B.size_sectors / bucketSize + 1L) - 1
+        else floor_log Int64.(size / bucketSize + 1L) - 1
     in
     let bound = Int64.(pow 2L (of_int height)) in
-    let x = Int64.(4L * (2L * bound - 1L)) in
-    Printf.printf "Creating posmap of size %Ld\n" x;
+    let x = Int64.(bucketSize * (2L * bound - 1L)) in
+    Printf.printf "Created posmap of size %Ld\n" x;
     let (x1,x2) = indices x in
     let x1' = x1 + 1 in
     let x2' = match x1' with

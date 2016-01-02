@@ -27,6 +27,7 @@ module Make (PF: PosMapIntf.POSMAP)(B: BLOCK) = struct
   type t = {
     info : info;
     height : int;
+    bucketSize : int64;
     stash : Stash.t;
     posMap : P.t;
     bd : B.t;
@@ -40,7 +41,7 @@ module Make (PF: PosMapIntf.POSMAP)(B: BLOCK) = struct
     | Read
     | Write
 
-  type bucket = OBlock.t * OBlock.t * OBlock.t * OBlock.t
+  type bucket = OBlock.t list
 
   let ( >>= ) x f = x >>= function
     | `Error e -> return (`Error e)
@@ -82,7 +83,7 @@ module Make (PF: PosMapIntf.POSMAP)(B: BLOCK) = struct
     let output = Out_channel.create filename in
     output*)
 
-  let connect bd =
+  (*let connect bd =
     initialise bd >>= fun () ->
       lwt info = B.get_info bd in
       let read_write = info.B.read_write in
@@ -95,7 +96,7 @@ module Make (PF: PosMapIntf.POSMAP)(B: BLOCK) = struct
         (*let output = newLog () in*)
         (*Random.self_init ();*)
         return (`Ok { info = { read_write; sector_size; size_sectors } ; height ; stash ; posMap ; bd ; offset = 0L (*); output*) })
-      else return (`Error `Disconnected)
+      else return (`Error `Disconnected)*)
 
   let disconnect t =
     B.disconnect t.bd
@@ -108,18 +109,19 @@ module Make (PF: PosMapIntf.POSMAP)(B: BLOCK) = struct
       | y ->
         if Int64.bit_and (Int64.shift_right x (y + (t.height - l) - 1)) 1L = 1L
           (* temporarily added multiplication of sixteen to offsets *)
-          then loop Int64.(2L * acc + 4096L) (y - 1)
-          else loop Int64.(2L * acc + 2048L) (y - 1)
+          then loop Int64.(2L * acc + (t.bucketSize * 1024L)) (y - 1)
+          else loop Int64.(2L * acc + (t.bucketSize * 512L)) (y - 1)
     in loop 0L l
 
-  let write_bucket t a (b1,b2,b3,b4) =
+  let write_bucket t a bs =
+    let buffers = List.map ~f:OBlock.to_cstruct bs in
     (*if t.offset = 0L
       then Printf.printf "Writing bucket at physical address %Ld\n" Int64.(a + t.offset);*)
-    let buf1 = OBlock.to_cstruct b1 in
+    (*let buf1 = OBlock.to_cstruct b1 in
     let buf2 = OBlock.to_cstruct b2 in
     let buf3 = OBlock.to_cstruct b3 in
-    let buf4 = OBlock.to_cstruct b4 in
-    B.write t.bd Int64.(a + t.offset) [ buf1 ; buf2 ; buf3 ; buf4 ]
+    let buf4 = OBlock.to_cstruct b4 in*)
+    B.write t.bd Int64.(a + t.offset) buffers (*[ buf1 ; buf2 ; buf3 ; buf4 ]*)
 
   let write_path t x bs =
     let rec loop bs = function
@@ -139,12 +141,13 @@ module Make (PF: PosMapIntf.POSMAP)(B: BLOCK) = struct
   let read_bucket t a =
     (*if t.offset = 0L then Printf.printf "Reading bucket at physical address %Ld\n" Int64.(a + t.offset);*)
     let sector_size = t.info.sector_size + 8 in
-    let buf1 = Cstruct.create sector_size in
+    let buffers = List.map ~f:(fun _ -> Cstruct.create sector_size) (List.range 0 (Option.value (Int64.to_int t.bucketSize) ~default:4)) in
+    (*let buf1 = Cstruct.create sector_size in
     let buf2 = Cstruct.create sector_size in
     let buf3 = Cstruct.create sector_size in
-    let buf4 = Cstruct.create sector_size in
-    B.read t.bd Int64.(a + t.offset) [ buf1 ; buf2 ; buf3 ; buf4 ] >>= fun () ->
-    return (`Ok (OBlock.of_cstruct buf1, OBlock.of_cstruct buf2, OBlock.of_cstruct buf3, OBlock.of_cstruct buf4))
+    let buf4 = Cstruct.create sector_size in*)
+    B.read t.bd Int64.(a + t.offset) buffers (*[ buf1 ; buf2 ; buf3 ; buf4 ]*) >>= fun () ->
+    return (`Ok (List.map ~f:OBlock.of_cstruct buffers)(*(OBlock.of_cstruct buf1, OBlock.of_cstruct buf2, OBlock.of_cstruct buf3, OBlock.of_cstruct buf4)*))
 
   let read_path t x =
     let rec loop = function
@@ -167,11 +170,10 @@ module Make (PF: PosMapIntf.POSMAP)(B: BLOCK) = struct
   let buildBucket t choices =
     let rec loop left acc rest =
       match left, acc, rest with
-      | 0, [b1;b2;b3;b4], rest -> ((b1,b2,b3,b4), rest)
-      | 0, _, _ -> failwith "Some error that shouldn't happen"
-      | n, acc, [] -> loop (n - 1) (OBlock.dummy t.info.sector_size :: acc) []
-      | n, acc, ((_, (a,d)) :: xs) -> Stash.remove t.stash a; loop (n - 1) ((a,d) :: acc) xs
-    in loop 4 [] choices
+      | 0L, bs, rest -> (bs, rest)
+      | n, acc, [] -> loop Int64.(n - 1L) (OBlock.dummy t.info.sector_size :: acc) []
+      | n, acc, ((_, (a,d)) :: xs) -> Stash.remove t.stash a; loop Int64.(n - 1L) ((a,d) :: acc) xs
+    in loop t.bucketSize [] choices
 
   let rec buildPath t acc stash x = function
     | 0 ->
@@ -189,19 +191,17 @@ module Make (PF: PosMapIntf.POSMAP)(B: BLOCK) = struct
     (*Out_channel.output_string t.output @@ Printf.sprintf "Oram at offset %Ld accessing path to leaf %Ld" t.offset x;
     Out_channel.newline t.output;
     Out_channel.flush t.output;*)
-    let newLeaf = Random.int64 Int64.(((t.info.size_sectors / 4L) + 1L) / 2L) in
+    let newLeaf = Random.int64 Int64.(((t.info.size_sectors / t.bucketSize) + 1L) / 2L) in
     P.set t.posMap a newLeaf >>= fun () ->
     (*P.get t.posMap a >>= fun newLeaf' ->
     if t.offset = 0L then Printf.printf "Attempted to remap block %Ld to position %Ld and it is at %Ld\n" a newLeaf newLeaf';*)
     read_path t x >>= fun bs ->
-    List.iter bs ~f:(fun ((a1,d1), (a2,d2), (a3,d3), (a4,d4)) ->
-      (*match b1, b2, b3, b4 with
-        | (a1,_), (a2,_), (a3,_), (a4,_) ->
-          Printf.printf "Added blocks with the following addresses to the stash: %Ld %Ld %Ld %Ld\n" a1 a2 a3 a4;*)
+    List.iter bs ~f:(List.iter ~f:(fun (a, d) -> Stash.add t.stash ~key:a ~data:d));
+      (*fun ((a1,d1), (a2,d2), (a3,d3), (a4,d4)) ->
       Stash.add t.stash ~key:a1 ~data:d1;
       Stash.add t.stash ~key:a2 ~data:d2;
       Stash.add t.stash ~key:a3 ~data:d3;
-      Stash.add t.stash ~key:a4 ~data:d4);
+      Stash.add t.stash ~key:a4 ~data:d4);*)
     (*if t.offset > 0L
       then (
         Printf.printf "After reading path, stash contains addresses:";
@@ -216,7 +216,6 @@ module Make (PF: PosMapIntf.POSMAP)(B: BLOCK) = struct
         end;
         Cstruct.create t.info.sector_size
     in
-    (*Printf.printf "Found data in the stash for address %Ld as %s\n" a (Cstruct.to_string data);*)
     begin match op with
       | Write -> (*Hash_set.remove t.stash (a, data);*)
                  begin match data' with
@@ -277,7 +276,7 @@ module Make (PF: PosMapIntf.POSMAP)(B: BLOCK) = struct
         loop Int64.(x - 1L)
     in loop t.info.size_sectors
 
-  let create ?(size = 0L) ?(offset = 0L) bd =
+  let create ?(size = 0L) ?(offset = 0L) ?(bucketSize = 4L) bd =
     lwt info = B.get_info bd in
     let read_write = info.B.read_write in
     if info.B.sector_size > 8
@@ -289,23 +288,24 @@ module Make (PF: PosMapIntf.POSMAP)(B: BLOCK) = struct
         let height =
           if size = 0L
             (* If size is unspecified, then assume non-recursive, so fill whole ORAM *)
-            then floor_log Int64.(info.B.size_sectors / 2048L + 1L) - 1 (* sixteen temporary for testing block size *)
+            then floor_log Int64.(info.B.size_sectors / (512L * bucketSize) + 1L) - 1 (* sixteen temporary for testing block size *)
             else if offset > 0L
               (* Otherwise if posmap oram, then reduce size *)
-              then floor_log Int64.(size / 4L + 1L) + 5 - b
+              then floor_log Int64.(size / bucketSize + 1L) + 5 - b
               (* If not posmap, then calculate height normally, but from given size *)
-              else floor_log Int64.(size / 4L + 1L) - 1
+              else floor_log Int64.(size / bucketSize + 1L) - 1
         in
-        let size_sectors = Int64.(4L * (pow 2L (of_int height + 1L) - 1L)) in
+        let size_sectors = Int64.(bucketSize * (pow 2L (of_int height + 1L) - 1L)) in
+        Printf.printf "Created ORAM with size %Ld\n" size_sectors;
         (* Initialise ORAM and stash space *)
         (* Create stash *)
         let stash = Stash.create () in
         (* Create posMap *)
-        P.create ~size:size_sectors ~offset:Int64.(offset + size_sectors) bd >>= fun posMap ->
-        let t = { info = { read_write; sector_size; size_sectors } ; height ; stash ; posMap ; bd ; offset = Int64.(offset * 512L) (*); output*) } in
+        P.create ~size:size_sectors ~offset:Int64.(offset + size_sectors) ~bucketSize bd >>= fun posMap ->
+        let t = { info = { read_write; sector_size; size_sectors } ; height ; bucketSize ; stash ; posMap ; bd ; offset = Int64.(offset * 512L) (*); output*) } in
         (if offset > 0L
         then
-          let height' = floor_log Int64.(size / 4L + 1L) - 1 in
+          let height' = floor_log Int64.(size / bucketSize + 1L) - 1 in
           let bound = Int64.(pow 2L (of_int height')) in
           initialisePosmap t bound
         else return (`Ok ())) >>= fun () ->

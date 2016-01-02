@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.10.18)  2 JAN 2016 11:48
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.10.18)  2 JAN 2016 18:33
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -128,6 +128,21 @@ Package: rerunfilecheck 2011/04/15 v1.7 Rerun checks for auxiliary files (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 282.
 )
 \Hy@SectionHShift=\skip43
+) (/usr/local/texlive/2014/texmf-dist/tex/latex/cleveref/cleveref.sty
+Package: cleveref 2013/12/28 v0.19 Intelligent cross-referencing
+Package cleveref Info: `hyperref' support loaded on input line 2230.
+LaTeX Info: Redefining \cref on input line 2230.
+LaTeX Info: Redefining \Cref on input line 2230.
+LaTeX Info: Redefining \crefrange on input line 2230.
+LaTeX Info: Redefining \Crefrange on input line 2230.
+LaTeX Info: Redefining \cpageref on input line 2230.
+LaTeX Info: Redefining \Cpageref on input line 2230.
+LaTeX Info: Redefining \cpagerefrange on input line 2230.
+LaTeX Info: Redefining \Cpagerefrange on input line 2230.
+LaTeX Info: Redefining \labelcref on input line 2230.
+LaTeX Info: Redefining \labelcpageref on input line 2230.
+Package cleveref Info: include cross-reference names in hyperlinks on input line 7476.
+Package cleveref Info: include cross-reference names in hyperlinks on input line 7493.
 ) (/usr/local/texlive/2014/texmf-dist/tex/latex/geometry/geometry.sty
 Package: geometry 2010/09/12 v5.6 Page Geometry
 \Gm@cnth=\count98
@@ -209,7 +224,8 @@ Package: pgfsys 2013/11/30 v3.0.0 (rcs-revision 1.47)
  (/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex
 \pgfkeys@pathtoks=\toks21
 \pgfkeys@temptoks=\toks22
- (/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/utilities/pgfkeysfiltered.code.tex
+
+(/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/utilities/pgfkeysfiltered.code.tex
 \pgfkeys@tmptoks=\toks23
 ))
 \pgf@x=\dimen119
@@ -229,8 +245,7 @@ Package: pgfsys 2013/11/30 v3.0.0 (rcs-revision 1.47)
 \t@pgf@toka=\toks24
 \t@pgf@tokb=\toks25
 \t@pgf@tokc=\toks26
-
-(/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
+ (/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
 File: pgf.cfg 2008/05/14  (rcs-revision 1.7)
 )
 Driver file for pgf: pgfsys-pdftex.def
@@ -275,12 +290,12 @@ File: pgfcorepoints.code.tex 2013/10/07  (rcs-revision 1.27)
 File: pgfcorepathconstruct.code.tex 2013/10/07  (rcs-revision 1.29)
 \pgf@path@lastx=\dimen142
 \pgf@path@lasty=\dimen143
-) (/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathusage.code.tex
+)
+(/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathusage.code.tex
 File: pgfcorepathusage.code.tex 2013/12/13  (rcs-revision 1.23)
 \pgf@shorten@end@additional=\dimen144
 \pgf@shorten@start@additional=\dimen145
-)
-(/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescopes.code.tex
+) (/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescopes.code.tex
 File: pgfcorescopes.code.tex 2013/10/09  (rcs-revision 1.44)
 \pgfpic=\box28
 \pgf@hbox=\box29
@@ -329,15 +344,15 @@ Package: pgfcomp-version-0-65 2007/07/03 v3.0.0 (rcs-revision 1.7)
 \pgf@nodesepend=\dimen153
 ) (/usr/local/texlive/2014/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-1-18.sty
 Package: pgfcomp-version-1-18 2007/07/23 v3.0.0 (rcs-revision 1.1)
-)) (/usr/local/texlive/2014/texmf-dist/tex/latex/pgf/utilities/pgffor.sty (/usr/local/texlive/2014/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty (/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex)) (/usr/local/texlive/2014/texmf-dist/tex/latex/pgf/math/pgfmath.sty (/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)) (/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/utilities/pgffor.code.tex
+)) (/usr/local/texlive/2014/texmf-dist/tex/latex/pgf/utilities/pgffor.sty (/usr/local/texlive/2014/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty (/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex)) (/usr/local/texlive/2014/texmf-dist/tex/latex/pgf/math/pgfmath.sty (/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex))
+(/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/utilities/pgffor.code.tex
 Package: pgffor 2013/12/13 v3.0.0 (rcs-revision 1.25)
  (/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)
 \pgffor@iter=\dimen154
 \pgffor@skip=\dimen155
 \pgffor@stack=\toks30
 \pgffor@toks=\toks31
-))
-(/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tikz.code.tex
+)) (/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tikz.code.tex
 Package: tikz 2013/12/13 v3.0.0 (rcs-revision 1.142)
  (/usr/local/texlive/2014/texmf-dist/tex/generic/pgf/libraries/pgflibraryplothandlers.code.tex
 File: pgflibraryplothandlers.code.tex 2013/08/31 v3.0.0 (rcs-revision 1.20)
@@ -413,6 +428,23 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 )
 \@float@every@algorithm=\toks34
 \c@algorithm=\count134
+) (/usr/local/texlive/2014/texmf-dist/tex/latex/tools/tabularx.sty
+Package: tabularx 2014/05/13 v2.10 `tabularx' package (DPC)
+ (/usr/local/texlive/2014/texmf-dist/tex/latex/tools/array.sty
+Package: array 2008/09/09 v2.4c Tabular extension package (FMi)
+\col@sep=\dimen165
+\extrarowheight=\dimen166
+\NC@list=\toks35
+\extratabsurround=\skip50
+\backup@length=\skip51
+)
+\TX@col@width=\dimen167
+\TX@old@table=\dimen168
+\TX@old@col=\dimen169
+\TX@target=\dimen170
+\TX@delta=\dimen171
+\TX@cols=\count135
+\TX@ftn=\toks36
 ) (/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.aux
 
 LaTeX Warning: Label `islam2012access' multiply defined.
@@ -432,32 +464,32 @@ LaTeX Warning: Label `stefanov2013path' multiply defined.
 )
 \openout1 = `diss.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
 \AtBeginShipoutBox=\box39
-Package hyperref Info: Link coloring OFF on input line 22.
+Package hyperref Info: Link coloring OFF on input line 29.
  (/usr/local/texlive/2014/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
  (/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
-\c@section@level=\count135
+\c@section@level=\count136
 )
-LaTeX Info: Redefining \ref on input line 22.
-LaTeX Info: Redefining \pageref on input line 22.
-LaTeX Info: Redefining \nameref on input line 22.
+LaTeX Info: Redefining \ref on input line 29.
+LaTeX Info: Redefining \pageref on input line 29.
+LaTeX Info: Redefining \nameref on input line 29.
  (/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.out) (/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.out)
 \@outlinefile=\write4
 \openout4 = `diss.out'.
@@ -499,17 +531,17 @@ LaTeX Info: Redefining \nameref on input line 22.
 
 (/usr/local/texlive/2014/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count136
-\scratchdimen=\dimen165
+\scratchcounter=\count137
+\scratchdimen=\dimen172
 \scratchbox=\box40
-\nofMPsegments=\count137
-\nofMParguments=\count138
-\everyMPshowfont=\toks35
-\MPscratchCnt=\count139
-\MPscratchDim=\dimen166
-\MPnumerator=\count140
-\makeMPintoPDFobject=\count141
-\everyMPtoPDFconversion=\toks36
+\nofMPsegments=\count138
+\nofMParguments=\count139
+\everyMPshowfont=\toks37
+\MPscratchCnt=\count140
+\MPscratchDim=\dimen173
+\MPnumerator=\count141
+\makeMPintoPDFobject=\count142
+\everyMPtoPDFconversion=\toks38
 ) (/usr/local/texlive/2014/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
  (/usr/local/texlive/2014/texmf-dist/tex/latex/oberdiek/grfext.sty
@@ -521,20 +553,20 @@ Package grfext Info: Graphics extension search list:
  (/usr/local/texlive/2014/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 )) ABD: EveryShipout initializing macros
-\docmute@nestinglevel=\count142
+\docmute@nestinglevel=\count143
  [1
 
 {/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2
 
 ]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <14.4> on input line 52.
+(Font)              <14.4> on input line 59.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 52.
+(Font)              <7> on input line 59.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 66.
+(Font)              <5> on input line 73.
 
-Overfull \hbox (12.2457pt too wide) in paragraph at lines 52--68
+Overfull \hbox (12.2457pt too wide) in paragraph at lines 59--75
 []
  []
 
@@ -565,30 +597,19 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 
  [10]
 Chapter 1.
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 140.
-(/usr/local/texlive/2014/texmf-dist/tex/latex/base/omscmr.fd
-File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
-)
-LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 140.
- [11
+[11
 
 ]
-Package hyperref Info: bookmark level for unknown todo defaults to 0 on input line 150.
+Package hyperref Info: bookmark level for unknown todo defaults to 0 on input line 157.
  [12]
 Chapter 2.
 [13
 
 ]
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 192.
+Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 199.
  [14] [15]
-Underfull \hbox (badness 2080) in paragraph at lines 283--283
-[]\OT1/cmr/m/n/12 System Com-po-nent In-ter-face Def-i-ni-tions,
- []
-
-
-Overfull \hbox (19.0426pt too wide) in paragraph at lines 279--294
- [] 
+Underfull \hbox (badness 3557) in paragraph at lines 300--300
+[]|\OT1/cmr/m/n/12 System Com-po-nent In-ter-face Def-i-ni-
  []
 
 
@@ -597,25 +618,25 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[16] [17pdfTeX warning (ext4): destination with the same identifier (name{figure.2.1}) has been already used, duplicate ignored
+[16] [17pdfTeX warning (ext4): destination with the same identifier (name{table.2.1}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.345 \chapter
-              {Implementation}pdfTeX warning (ext4): destination with the same identifier (name{figure.2.2}) has been already used, duplicate ignored
+l.350 \chapter
+              {Implementation}pdfTeX warning (ext4): destination with the same identifier (name{table.2.2}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.345 \chapter
+l.350 \chapter
               {Implementation}] [18
 
 ]
 Chapter 3.
-[19] [20pdfTeX warning (ext4): destination with the same identifier (name{figure.3.1}) has been already used, duplicate ignored
+[19] [20pdfTeX warning (ext4): destination with the same identifier (name{table.3.1}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.402 
+l.406 
       ] [21] [22] [23] [24
 
 ]
@@ -640,7 +661,14 @@ Appendix A.
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
 l.121 
-      ] [34] [35] [36] (/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.bbl [37] [38
+      ] [34] [35] [36]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 246.
+ (/usr/local/texlive/2014/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 246.
+ (/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.bbl [37] [38
 
 ]pdfTeX warning (ext4): destination with the same identifier (name{cite.islam2012access}) has been already used, duplicate ignored
 <to be read again> 
@@ -668,32 +696,32 @@ l.22 \bibitem{shi2011oblivious}
                    \relax 
 l.27 \bibitem{stefanov2013path}
                                )) [39]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 544.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 544.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 550.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 550.
  (/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 544.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 544.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 550.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 550.
 Package rerunfilecheck Info: File `diss.out' has not changed.
 (rerunfilecheck)             Checksum: <no file>.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 544.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 550.
  ) 
 Here is how much of TeX's memory you used:
- 16775 strings out of 493117
- 316838 string characters out of 6135432
- 389032 words of memory out of 5000000
- 19777 multiletter control sequences out of 15000+600000
+ 18379 strings out of 493117
+ 351096 string characters out of 6135432
+ 431453 words of memory out of 5000000
+ 21372 multiletter control sequences out of 15000+600000
  13258 words of font info for 48 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 62i,11n,80p,1091b,602s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 62i,11n,80p,1091b,604s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/latxfont/line10.pfb>
-Output written on /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.pdf (39 pages, 275985 bytes).
+Output written on /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.pdf (39 pages, 275829 bytes).
 PDF statistics:
- 672 PDF objects out of 1000 (max. 8388607)
- 606 compressed objects within 7 object streams
+ 671 PDF objects out of 1000 (max. 8388607)
+ 605 compressed objects within 7 object streams
  171 named destinations out of 1000 (max. 500000)
  381 words of extra memory for PDF output out of 10000 (max. 10000000)
 
