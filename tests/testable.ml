@@ -1,4 +1,5 @@
 open Lwt
+open Alcotest
 
 let int64 =
   let module M = struct
@@ -7,6 +8,16 @@ let int64 =
     let equal = (=)
   end in
   (module M: Alcotest.TESTABLE with type t = M.t)
+
+let tuple3 (type a) (type b) (type c) (a:a testable) (b:b testable) (c:c testable): (a * b * c) testable =
+  let module A = (val a) in
+  let module B = (val b) in
+  let module C = (val c) in
+  (module struct
+    type t = a * b * c
+    let equal (a1, b1, c1) (a2, b2, c2) = A.equal a1 a2 && B.equal b1 b2 && C.equal c1 c2
+    let pp ppf (a, b, c) = A.pp ppf a; Format.pp_print_cut ppf (); B.pp ppf b; Format.pp_print_cut ppf (); C.pp ppf c
+  end)
 
 let cstruct =
   let module M = struct

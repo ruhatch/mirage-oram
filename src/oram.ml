@@ -2,8 +2,9 @@ open Lwt
 open Printf
 open V1_LWT
 open Core_kernel.Std
+open PosMapIntf
 
-module Make (PF: PosMapIntf.POSMAP)(B: BLOCK) = struct
+module Make (PF: PosMapF)(B: BLOCK) = struct
 
   module P = PF(B)
 
@@ -296,7 +297,6 @@ module Make (PF: PosMapIntf.POSMAP)(B: BLOCK) = struct
               else floor_log Int64.(size / bucketSize + 1L) - 1
         in
         let size_sectors = Int64.(bucketSize * (pow 2L (of_int height + 1L) - 1L)) in
-        Printf.printf "Created ORAM with size %Ld\n" size_sectors;
         (* Initialise ORAM and stash space *)
         (* Create stash *)
         let stash = Stash.create () in

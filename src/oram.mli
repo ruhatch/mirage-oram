@@ -1,16 +1,20 @@
 open V1_LWT
+open PosMapIntf
 
 module Make :
-  functor (P : PosMapIntf.POSMAP) -> functor (B : BLOCK) ->
+  functor (P : PosMapF) -> functor (B : BLOCK) ->
     sig
 
+      type t
+
       include BLOCK
+      with type t := t
       with type id = string
 
-      val create : ?size:int64 -> ?offset:int64 -> ?bucketSize:int64 -> B.t -> [`Ok of t | `Error of B.error] Lwt.t
-      val get : t -> int64 -> [`Ok of int64 | `Error of B.error] Lwt.t
-      val set : t -> int64 -> int64 -> [`Ok of unit | `Error of B.error] Lwt.t
-      val length : t -> int64
+      include PosMap
+      with type t := t
+      and type block := B.t
+      and type error := B.error
 
       val initialise : B.t -> [`Ok of unit | `Error of error] Lwt.t
       (*val connect : B.t -> [`Ok of t | `Error of error] Lwt.t*)
