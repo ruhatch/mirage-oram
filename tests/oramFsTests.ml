@@ -2,15 +2,6 @@ open Alcotest
 open Lwt
 open Testable
 
-module F = Fs.Make(O)
-
-let newFs () =
-  Block.connect "disk.img" >>= fun bd ->
-  O.initialise bd >>= fun () ->
-  (*let size = Core_kernel.Std.Int64.((pow 2L 14L - 1L) / 2L) in*) (* multiplication by 4 is put into sum and taken out again for 4 times block size... *)
-  O.create bd >>= fun bd ->
-  F.initialise bd
-
 let oram_fs_tests =
     [
       "ORAMFSWriteFile_EmptyString_ReadOutEmptyString", `Slow,

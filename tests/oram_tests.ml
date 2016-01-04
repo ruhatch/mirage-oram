@@ -2,30 +2,6 @@ open Alcotest
 open Lwt
 open Testable
 
-(*let bd =
-  match_lwt Block.connect "disk.img" with
-    | `Ok bd ->
-      begin match_lwt O.connect bd with
-        | `Ok bd -> return bd
-        | `Error x -> failwith "Failed to connect to ORAM"
-      end
-    | `Error x -> failwith "Failed to connect to raw Block"*)
-
-module O = Oram.Make(PosMap.InMemory)(Block)
-
-let newORAM () =
-  Block.connect "disk.img" >>= fun bd ->
-  O.initialise bd >>= fun () ->
-  O.create bd
-
-let dummy_bucket =
-  newORAM () >>= fun bd ->
-    lwt info = O.get_info bd in
-      return (`Ok (OBlock.dummy info.O.sector_size,
-              OBlock.dummy info.O.sector_size,
-              OBlock.dummy info.O.sector_size,
-              OBlock.dummy info.O.sector_size))
-
 let oram_tests =
     [
       "OramFloorLog_One_Zero", `Quick,
@@ -42,11 +18,8 @@ let oram_tests =
           (check (lwt_t @@ result error bool)) ""
             (fun () -> return (`Ok true))
             (fun () -> newORAM () >>= fun bd ->
-              O.read_bucket bd 0L >>= fun bucket ->
+              O.readBucket bd 0L >>= fun bucket ->
               return (`Ok (List.for_all (fun (a,d) -> a = -1L) bucket))));
-              (*match bucket with
-                | (-1L,_),(-1L,_),(-1L,_),(-1L,_) -> return (`Ok true)
-                | (a1,d1),(a2,d2),(a3,d3),(a4,d4) -> Printf.printf "Addresses returned: %Ld %Ld %Ld %Ld\n" a1 a2 a3 a4; return (`Ok false)));*)
       "ORAMWriteFile_EmptyString_ReadOutEmptyString", `Slow,
         (fun () ->
           check (lwt_t @@ result error cstruct) ""

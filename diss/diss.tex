@@ -11,6 +11,10 @@
 \usepackage{algorithm}
 \usepackage{tabularx}
 
+%%%%%%% Using Minted Package for Code Listings %%%%%%%
+\usepackage[outputdir=.texpadtmp]{minted}
+\usemintedstyle{colorful}
+
 \raggedbottom                           % try to avoid widows and orphans
 \sloppy
 \clubpenalty1000%
@@ -21,15 +25,9 @@
                                         
 \newcommand{\mytodo}{\todo[inline, color=green!40]}
 
-% Change macros for autoref
-%\def\sectionautorefname{\S\hskip -1pt}
-%\def\subsectionautorefname{\S}
-%\def\algorithmautorefname{Algorithm}
-
 \begin{document}
 
 \bibliographystyle{plain}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Title
@@ -402,7 +400,7 @@ The position map associates a leaf position with each address of the data. As me
 
 In order to do this we need to use 3-dimensional arrays. We take an \texttt{int64} value and split its bits into a 4-bit value and 2 30-bit values. The 4-bit value is the most significant bits, and will therefore be 0 unless we store more than $2^{60}$ blocks. The 30-bit values are guaranteed to be converted into positive \texttt{int}s, which we can then use to address two dimensions of the array. We have to perform some input sanitation to make sure that the 4-bit value (and therefore the 64-bit value) is positive.
 
-Now the only remaining problem is creating the position map. Algorithm \ref{alg:posmapdims} shows how we translate from a desired \texttt{int64} size to the dimensions of a three dimensional array. After splitting the \texttt{int64} as described above, we must add one to the first two dimensions, because we always want them to be at least of size 1. If a higher dimension is greater than 1, then all lower dimensions become their maximum value, in this case $2^{30}-1$. We can now create an array using these values that is guaranteed to be at least the size that we require on both 32-bit and 64-bit machines.
+Now the only remaining problem is creating the position map. \Cref{alg:posmapdims} shows how we translate from a desired \texttt{int64} size to the dimensions of a three dimensional array. After splitting the \texttt{int64} as described above, we must add one to the first two dimensions, because we always want them to be at least of size 1. If a higher dimension is greater than 1, then all lower dimensions become their maximum value, in this case $2^{30}-1$. We can now create an array using these values that is guaranteed to be at least the size that we require on both 32-bit and 64-bit machines.
 
 \begin{algorithm}
 \caption{Calculate the dimensions of a 3D array given total desired size}
@@ -432,18 +430,75 @@ Now the only remaining problem is creating the position map. Algorithm \ref{alg:
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Basic ORAM}
+\subsection{Basic ORAM Module}
 
-Now that we have the client-side data structures, all that remains is to implement \cref{alg:access}, including the subroutines \textsc{ReadBucket} and \textsc{WriteBucket}.
+We want ORAM to be able to replace any existing block device in any Mirage program. In order to do this we need access to the methods of the underlying block device as well as the block device itself. Thus, we need to build an ORAM functor, that takes a module satisfying the \texttt{BLOCK} interface, shown in \cref{lst:blocksig}, and gives us a new module satisfying the same interface.
 
-\mytodo{Explain the implementation of the ORAM module}
-\mytodo{Discuss the design decisions involved in the ORAM Module}
+In order to get access to this underlying device, we need a \texttt{create} method, which takes a block device as input and returns something of type \texttt{Oram.Make(B).t}, shown in \cref{lst:orammaketype}. This type contains the ORAM parameters such as \texttt{bucketSize} and \texttt{offset}, structural information such as the \texttt{height} of the ORAM and the \texttt{numLeaves}, and pointers to the stash, position map, and underlying block device. The parameters are all passed in as input to the \texttt{create} method, along with the block device. Then, the \texttt{create} method calculates new structural information. The height of the ORAM is calculated as $\lfloor \log_2N\rfloor - 1$
+
+\begin{listing}[h]
+\caption{The type of an ORAM device \texttt{ORAM.Make(B).t}}
+\label{lst:orammaketype}
+\inputminted[firstline=27, lastline=38]{ocaml}{../src/oram.ml}
+\end{listing}
+
+
+\begin{listing}
+\caption{Mirage BLOCK module signature}
+\label{lst:blocksig}
+\vskip 10pt
+\begin{minted}[breaklines]{ocaml}
+module type BLOCK = sig
+
+  type page_aligned_buffer = Cstruct.t
+
+  type +'a io = 'a Lwt.t
+
+  type t
+
+  type error = [
+    | `Unknown of string (** an undiagnosed error *)
+    | `Unimplemented     (** operation not yet implemented in the code *)
+    | `Is_read_only      (** you cannot write to a read/only instance *)
+    | `Disconnected      (** the device has been previously disconnected *)
+  ]
+
+  type id
+
+  val disconnect: t -> unit io
+
+  type info = {
+    read_write: bool;    (** True if we can write, false if read/only *)
+    sector_size: int;    (** Octets per sector *)
+    size_sectors: int64; (** Total sectors per device *)
+  }
+
+  val get_info: t -> info io
+
+  val read: t -> int64 -> page_aligned_buffer list -> [ `Error of error | `Ok of unit ] io
+
+  val write: t -> int64 -> page_aligned_buffer list -> [ `Error of error | `Ok of unit ] io
+
+end
+\end{minted}
+\end{listing}
+
+\subsection{Access Algorithm}
+
+Now that we have the client-side data structures and our ORAM module, all that remains is to implement \cref{alg:access}, including the subroutines \textsc{ReadBucket} and \textsc{WriteBucket}. \Cref{lst:access} shows the implementation of the \textsc{Access} function, which can be directly correlated with \cref{alg:access}. 
+
+\begin{listing}[h]
+	\caption{Implementation of \cref{alg:access}}
+	\label{lst:access}
+	\inputminted[firstline=196, lastline=220]{ocaml}{../src/oram.ml}
+\end{listing}
+
 \mytodo{Talk about optimising the path building algorithm}
 
 \subsection{Recursion}
 
-\mytodo{Explain the implementation of the PosMap module}
-\mytodo{Discuss the design decisions involved in the PosMap Module}
+\mytodo{Explain the implementation of recursion using PosMapIntf}
+\mytodo{Discuss the design decisions involved in the implementation of recursion}
 \mytodo{In particular talk about/show maths involved in automatically determining optimal size/number of levels of recursion}
 
 \subsection{Statelessness}

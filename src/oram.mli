@@ -16,7 +16,8 @@ module Make :
       and type block := B.t
       and type error := B.error
 
-      val initialise : B.t -> [`Ok of unit | `Error of error] Lwt.t
+      (* Don't expose the initialise method *)
+      (*val initialise : B.t -> [`Ok of unit | `Error of error] Lwt.t*)
       (*val connect : B.t -> [`Ok of t | `Error of error] Lwt.t*)
 
       (* Lower level functions - exposed for testing purposes *)
@@ -25,14 +26,14 @@ module Make :
 
       type bucket = OBlock.t list
 
-      val bucket_address : t -> int64 -> int -> int64
+      val bucketAddress : t -> int64 -> int -> int64
 
-      val write_bucket : t -> int64 -> bucket -> [`Ok of unit | `Error of error] Lwt.t
+      val writeBucket : t -> int64 -> bucket -> [`Ok of unit | `Error of error] Lwt.t
 
-      val write_path : t -> int64 -> bucket list -> [`Ok of unit | `Error of error] Lwt.t
+      val writePath : t -> int64 -> bucket list -> [`Ok of unit | `Error of error] Lwt.t
 
-      val read_bucket : t -> int64 -> [`Ok of bucket | `Error of error] Lwt.t
+      val readBucket : t -> int64 -> [`Ok of bucket | `Error of error] Lwt.t
 
-      val read_path : t -> int64 -> [`Ok of bucket list | `Error of error] Lwt.t
+      val readPath : t -> int64 -> [`Ok of bucket list | `Error of error] Lwt.t
 
     end

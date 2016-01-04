@@ -84,6 +84,8 @@ module O = Oram.Make(PosMap.InMemory)(Block)
 
 (* module O = Block *)
 
+module F = Fs.Make(O)
+
 let ( >>= ) x f = x >>= function
   | `Error e -> return (`Error e)
   | `Ok x -> f x
@@ -120,3 +122,11 @@ let newFile (oram : O.t) contents =
   done;
   Cstruct.blit_from_string contents 0 file 0 (String.length contents);
   return (`Ok file)
+
+let newORAM () =
+  Block.connect "disk.img" >>= fun bd ->
+  O.create bd
+
+let newFs () =
+  newORAM () >>= fun bd ->
+  F.initialise bd

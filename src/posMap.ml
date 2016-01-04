@@ -23,14 +23,8 @@ module InMemory (B : BLOCK) = struct
       | x -> loop (acc + 1) Int64.(x / 2L)
     in loop 0 x
 
-  let create ?(size=0L) ?(offset=0L) ?(bucketSize = 4L) bd =
-    lwt info = B.get_info bd in
-    let height =
-      if size = 0L
-        (* This shouldn't happen, but should check anyway *)
-        then floor_log Int64.(info.B.size_sectors / bucketSize + 1L) - 1
-        else floor_log Int64.(size / bucketSize + 1L) - 1
-    in
+  let create ?(size=0L) ?(blockSize = 0x40000) ?(bucketSize = 4L) ?(offset=0L) bd =
+    let height = floor_log Int64.(size / bucketSize + 1L) - 1 in
     let bound = Int64.(pow 2L (of_int height)) in
     let a = Int64.(bucketSize * (2L * bound - 1L)) in
     let (x, y, z) = indices a in

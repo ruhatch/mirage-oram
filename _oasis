@@ -50,7 +50,7 @@ Library tests
   Path: tests
   Build$:           flag(tests)
   Modules: Testable
-  BuildDepends: alcotest, lwt, lwt.unix, lwt.syntax, cstruct, mirage-block-unix, core_kernel
+  BuildDepends: alcotest, lwt, lwt.unix, lwt.syntax, cstruct, mirage-block-unix, core_kernel, mirage-block-fs
 
 Executable oram_tests
   Path:             tests
@@ -63,7 +63,6 @@ Executable oram_tests
                     mirage-block-unix,
                     lwt,
                     tests
-  NativeOpt: "-g"
 
 Executable stash_tests
   Path:             tests
