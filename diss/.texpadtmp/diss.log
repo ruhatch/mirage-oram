@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2016.1.4)  4 JAN 2016 11:07
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2016.1.4)  11 JAN 2016 08:11
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -708,56 +708,58 @@ Chapter 3.
                                                   \fi \fi 
 l.404 
       ]
-Package hyperref Info: bookmark level for unknown listing defaults to 0 on input line 440.
- (./.texpadtmp/_minted-diss/0DA9F9638ECB0E82DCE124A2B552FA2E0438B337C3448CDF87D621938C174BA3.pygtex
 LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <12> not available
-(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 29.
-)
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 442.
+ [21]
+Package hyperref Info: bookmark level for unknown listing defaults to 0 on input line 452.
+ (./.texpadtmp/_minted-diss/83DAEB1E6F7829E1D1D7B1A1FA34B7E10438B337C3448CDF87D621938C174BA3.pygtex)
 \openout4 = `diss.pyg'.
 
-(./.texpadtmp/_minted-diss/B0D16569E56B4397E2E05019A45AD189DC67E8E086D2EC8D138354ABC09D0BEC.pygtex)
+ (./.texpadtmp/_minted-diss/B0D16569E56B4397E2E05019A45AD189DC67E8E086D2EC8D138354ABC09D0BEC.pygtex)
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[21] (./.texpadtmp/_minted-diss/0DA9F9638ECB0E82DCE124A2B552FA2E0438B337C3448CDF87D621938C174BA3.pygtex)
+[22]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[22] [23] [24] [25] [26
+[23] [24pdfTeX warning (ext4): destination with the same identifier (name{figure.3.1}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.596 
+      ] [25] [26] [27] [28
 
 ]
 Chapter 4.
-[27] [28
+[29] [30
 
 ]
 Chapter 5.
-(/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.bbl [29] [30
+(/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.bbl [31] [32
 
 ]
 Missing character: There is no Â in font cmti12!
 Missing character: There is no € in font cmti12!
 Missing character: There is no Â in font cmti12!
 Missing character: There is no ™ in font cmti12!
-) [31] [32
+) [33] [34
 
 ]
 Appendix A.
-(./proposal.tex [33] [34] [35pdfTeX warning (ext4): destination with the same identifier (name{figure.A.1}) has been already used, duplicate ignored
+(./proposal.tex [35] [36] [37pdfTeX warning (ext4): destination with the same identifier (name{figure.A.1}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
 l.121 
-      ] [36] [37] [38]
+      ] [38] [39] [40]
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 246.
  (/usr/local/texlive/2015/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 246.
- (/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.bbl [39] [40
+ (/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.bbl [41] [42
 
 ]pdfTeX warning (ext4): destination with the same identifier (name{cite.islam2012access}) has been already used, duplicate ignored
 <to be read again> 
@@ -787,33 +789,33 @@ l.27 \bibitem{stefanov2013path}
                                ))
 runsystem(rm ".texpadtmp//diss.pyg")...executed.
 
- [41]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 605.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 605.
+ [43]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 702.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 702.
  (/Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 605.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 605.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 702.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 702.
 Package rerunfilecheck Info: File `diss.out' has not changed.
 (rerunfilecheck)             Checksum: <no file>.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 605.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 702.
  ) 
 Here is how much of TeX's memory you used:
- 20556 strings out of 493089
- 393189 string characters out of 6134843
- 513423 words of memory out of 5000000
- 23508 multiletter control sequences out of 15000+600000
+ 20566 strings out of 493089
+ 393212 string characters out of 6134843
+ 512422 words of memory out of 5000000
+ 23520 multiletter control sequences out of 15000+600000
  13867 words of font info for 50 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 62i,11n,80p,1091b,628s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/latxfont/line10.pfb>
-Output written on /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.pdf (41 pages, 301261 bytes).
+ 62i,11n,80p,1440b,628s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/latxfont/line10.pfb>
+Output written on /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.pdf (43 pages, 312238 bytes).
 PDF statistics:
- 696 PDF objects out of 1000 (max. 8388607)
- 626 compressed objects within 7 object streams
+ 710 PDF objects out of 1000 (max. 8388607)
+ 637 compressed objects within 7 object streams
  175 named destinations out of 1000 (max. 500000)
  389 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -67,11 +67,20 @@ module Make (B : BLOCK) = struct
     let secondary = primary lxor (primary lsr 21) lxor (primary lsr 17) lxor (primary lsr 48) in
     secondary land 65535
 
+  let rec writeFreeMap t = function
+    | 0 -> return (`Ok ())
+    | n ->
+      let buffer = Cstruct.sub t.freeMap ((n - 1) * t.info.B.sector_size) t.info.B.sector_size in
+      B.write t.bd (Int64.of_int n) [buffer] >>= fun _ ->
+      writeFreeMap t (n - 1)
+
   (* Flush freeMap to disk *)
   (* Flush inodeIndex rootAddress to disk *)
   (* Everything else can be reconstructed *)
   let flush_meta t =
-    B.write t.bd 0L [t.superblock]
+    B.write t.bd 0L [t.superblock] >>= fun () ->
+    let freeMapSize = Int64.to_int (Cstruct.BE.get_uint64 t.superblock 8) in
+    writeFreeMap t freeMapSize
 
   (* Extract info from block device *)
   (* Create relevant data structures of right size *)
@@ -79,8 +88,15 @@ module Make (B : BLOCK) = struct
   let initialise bd =
     lwt info = B.get_info bd in
     let superblock = Cstruct.create info.B.sector_size in
-    let freeMap = FreeMap.create (Int64.to_int info.B.size_sectors) in (* Unsafe, need to change the structure of the freeMap *)
+    (* Instead, calculate the size necessary and store it in the superblock, it's not going to change *)
+    let freeMapSize = Int64.(to_int @@ add (div (sub info.B.size_sectors 1L) (of_int (info.B.sector_size * 8))) 1L) in
+    (* if info.B.sector_size * 8 < Int64.to_int info.B.size_sectors
+      then return (`Error (`Unknown (Printf.sprintf "Block size %d to small to store FreeMap of size %Ld" info.B.sector_size info.B.size_sectors)))
+      else return (`Ok ()) >>= fun () -> *)
+    let freeMap = FreeMap.create freeMapSize info.B.sector_size in
     I.create freeMap bd info.B.sector_size >>= fun inodeIndex ->
+    Cstruct.BE.set_uint64 superblock 0 inodeIndex.I.rootAddress;
+    Cstruct.BE.set_uint64 superblock 8 (Int64.of_int freeMapSize);
     let t = { superblock ; freeMap ; inodeIndex ; bd ; info } in
     flush_meta t >>= fun () ->
     return (`Ok t)
@@ -89,7 +105,8 @@ module Make (B : BLOCK) = struct
   (* Read root of index from memory and construct InodeIndex *)
   let connect bd =
     lwt info = B.get_info bd in
-    let freeMap = FreeMap.create (Int64.to_int info.B.size_sectors) in (* Actually need to read freeMap from memory *)
+    let freeMap = Cstruct.create info.B.sector_size in
+    B.read bd 1L [freeMap] >>= fun () ->
     let superblock = Cstruct.create info.B.sector_size in
     B.read bd 0L [superblock] >>= fun () ->
     let rootAddress = Cstruct.BE.get_uint64 superblock 0 in
@@ -100,12 +117,15 @@ module Make (B : BLOCK) = struct
     (*Printf.printf "*** CREATING FILE ***\n";*)
     let inode = Inode.create (t.info.B.sector_size / 8) in
     let inodeNum = hash name in
-    let [diskAddr] = FreeMap.alloc t.freeMap 1 in
-    (*Printf.printf "About to insert key\n";*)
+    begin match FreeMap.alloc t.freeMap 1 with
+      | [diskAddr] -> return (`Ok diskAddr)
+      | _ -> return (`Error (`Unknown "Wrong number of blocks allocated"))
+    end >>= fun diskAddr ->
+    (* Printf.printf "About to insert key\n"; *)
     I.insert t.inodeIndex inodeNum diskAddr >>= fun () ->
-    (*Printf.printf "Inserted key\n";*)
+    (* Printf.printf "Inserted key\n"; *)
     B.write t.bd diskAddr [inode] >>= fun () ->
-    (*Printf.printf "Wrote inode to disk!\n";*)
+    (* Printf.printf "Wrote inode to disk!\n"; *)
     flush_meta t
 
   (* Should probably remove inode and free memory if there is an error *)
@@ -129,15 +149,6 @@ module Make (B : BLOCK) = struct
       | None -> return (`Error (`Unknown "File not found"))
       | Some diskAddr ->
         B.write t.bd diskAddr [inode]
-
-  (*let read_file t name =
-    let inode = inodeForFile t name in
-    let inodeLength = Inode.length inode in
-    let result = Cstruct.create (inodeLength * t.info.sector_size) in
-    for i = 0 to inodeLength - 1 do
-      B.read t.bd (Inode.getPtr inode i) [(Cstruct.sub result (i * t.info.sector_size) t.info.sector_size)];
-    done;
-    result*)
 
   let writeFile t name contents =
     (*Printf.printf "*** WRITING FILE ***\n";*)

@@ -7,6 +7,12 @@ module InMemory (B : BLOCK) = struct
 
   type t = (int64, int64_elt, c_layout) Array3.t
 
+  type parameters = {
+    bucketSize : int64;
+    offset : int64;
+    desiredBlockSize : int;
+  }
+
   type block = B.t
 
   type error = B.error

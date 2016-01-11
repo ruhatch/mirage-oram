@@ -21,27 +21,27 @@
 \contentsline {subsection}{\numberline {3.1.1}Inherent Constraints}{19}{subsection.3.1.1}
 \contentsline {subsection}{\numberline {3.1.2}Stash}{19}{subsection.3.1.2}
 \contentsline {subsection}{\numberline {3.1.3}Position Map}{20}{subsection.3.1.3}
-\contentsline {subsection}{\numberline {3.1.4}Basic ORAM Module}{21}{subsection.3.1.4}
-\contentsline {subsection}{\numberline {3.1.5}Access Algorithm}{21}{subsection.3.1.5}
-\contentsline {subsection}{\numberline {3.1.6}Recursion}{22}{subsection.3.1.6}
-\contentsline {subsection}{\numberline {3.1.7}Statelessness}{22}{subsection.3.1.7}
-\contentsline {subsection}{\numberline {3.1.8}Optimisation}{22}{subsection.3.1.8}
-\contentsline {subsection}{\numberline {3.1.9}Integrity Verification}{22}{subsection.3.1.9}
-\contentsline {section}{\numberline {3.2}Object Store}{23}{section.3.2}
-\contentsline {subsection}{\numberline {3.2.1}General Design}{23}{subsection.3.2.1}
-\contentsline {subsection}{\numberline {3.2.2}FreeMap}{23}{subsection.3.2.2}
-\contentsline {subsection}{\numberline {3.2.3}B-Trees}{23}{subsection.3.2.3}
-\contentsline {section}{\numberline {3.3}Search Module}{23}{section.3.3}
-\contentsline {subsection}{\numberline {3.3.1}Inverted Index}{23}{subsection.3.3.1}
-\contentsline {subsection}{\numberline {3.3.2}Keyword Search API}{23}{subsection.3.3.2}
-\contentsline {section}{\numberline {3.4}Encryption}{23}{section.3.4}
-\contentsline {subsection}{\numberline {3.4.1}Library}{23}{subsection.3.4.1}
-\contentsline {chapter}{\numberline {4}Evaluation}{27}{chapter.4}
-\contentsline {section}{\numberline {4.1}Overall Results}{27}{section.4.1}
-\contentsline {section}{\numberline {4.2}Unit Tests}{27}{section.4.2}
-\contentsline {section}{\numberline {4.3}Performance Tests}{27}{section.4.3}
-\contentsline {subsection}{\numberline {4.3.1}Microbenchmarks}{27}{subsection.4.3.1}
-\contentsline {section}{\numberline {4.4}Security Analysis}{27}{section.4.4}
-\contentsline {chapter}{\numberline {5}Conclusion}{29}{chapter.5}
-\contentsline {chapter}{Bibliography}{29}{chapter.5}
-\contentsline {chapter}{\numberline {A}Project Proposal}{33}{appendix.A}
+\contentsline {subsection}{\numberline {3.1.4}Creating ORAM}{21}{subsection.3.1.4}
+\contentsline {subsection}{\numberline {3.1.5}Accessing ORAM}{23}{subsection.3.1.5}
+\contentsline {subsection}{\numberline {3.1.6}Recursion}{24}{subsection.3.1.6}
+\contentsline {subsection}{\numberline {3.1.7}Statelessness}{25}{subsection.3.1.7}
+\contentsline {subsection}{\numberline {3.1.8}Optimisation}{25}{subsection.3.1.8}
+\contentsline {subsection}{\numberline {3.1.9}Integrity Verification}{25}{subsection.3.1.9}
+\contentsline {section}{\numberline {3.2}Object Store}{25}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}General Design}{25}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}FreeMap}{25}{subsection.3.2.2}
+\contentsline {subsection}{\numberline {3.2.3}B-Trees}{25}{subsection.3.2.3}
+\contentsline {section}{\numberline {3.3}Search Module}{26}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Inverted Index}{26}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.3.2}Keyword Search API}{26}{subsection.3.3.2}
+\contentsline {section}{\numberline {3.4}Encryption}{26}{section.3.4}
+\contentsline {subsection}{\numberline {3.4.1}Library}{26}{subsection.3.4.1}
+\contentsline {chapter}{\numberline {4}Evaluation}{29}{chapter.4}
+\contentsline {section}{\numberline {4.1}Overall Results}{29}{section.4.1}
+\contentsline {section}{\numberline {4.2}Unit Tests}{29}{section.4.2}
+\contentsline {section}{\numberline {4.3}Performance Tests}{29}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}Microbenchmarks}{29}{subsection.4.3.1}
+\contentsline {section}{\numberline {4.4}Security Analysis}{29}{section.4.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{31}{chapter.5}
+\contentsline {chapter}{Bibliography}{31}{chapter.5}
+\contentsline {chapter}{\numberline {A}Project Proposal}{35}{appendix.A}

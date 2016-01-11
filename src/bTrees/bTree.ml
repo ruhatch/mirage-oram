@@ -66,6 +66,8 @@ module Make (A : ALLOCATOR) (S : STORE with type pointer = A.pointer) (N : Node.
 
   let return = S.return
 
+  type pointer = A.pointer
+
   type t = {
     allocator : A.t;
     store : S.t;

@@ -19,6 +19,8 @@ module Make :
       (* Don't expose the initialise method *)
       (*val initialise : B.t -> [`Ok of unit | `Error of error] Lwt.t*)
       (*val connect : B.t -> [`Ok of t | `Error of error] Lwt.t*)
+      val fakeReconnect : t -> B.t -> [`Ok of t | `Error of error] Lwt.t
+      val disconnect : t -> unit Lwt.t
 
       (* Lower level functions - exposed for testing purposes *)
 
@@ -26,14 +28,14 @@ module Make :
 
       type bucket = OBlock.t list
 
-      val bucketAddress : t -> int64 -> int -> int64
+      val calculateAddressOfBucket : t -> int64 -> int -> int64
 
       val writeBucket : t -> int64 -> bucket -> [`Ok of unit | `Error of error] Lwt.t
 
-      val writePath : t -> int64 -> bucket list -> [`Ok of unit | `Error of error] Lwt.t
+      val writePathToLeaf : t -> int64 -> bucket list -> [`Ok of unit | `Error of error] Lwt.t
 
       val readBucket : t -> int64 -> [`Ok of bucket | `Error of error] Lwt.t
 
-      val readPath : t -> int64 -> [`Ok of bucket list | `Error of error] Lwt.t
+      val readPathToLeaf : t -> int64 -> [`Ok of bucket list | `Error of error] Lwt.t
 
     end

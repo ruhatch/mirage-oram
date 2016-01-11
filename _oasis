@@ -23,7 +23,6 @@ Library mirage_oram
                     cstruct,
                     lwt,
                     lwt.syntax
-  NativeOpt: "-g"
 
 Library mirage_btrees
   Path:             src/bTrees
@@ -38,13 +37,13 @@ Library mirage_block_fs
   Modules:          Fs,
                     InodeIndex,
                     Inode,
-                    FreeMap
+                    FreeMap,
+                    Bitarray
   BuildDepends:     mirage,
                     cstruct,
                     lwt,
                     lwt.syntax,
-                    mirage-btrees,
-                    core_extended
+                    mirage-btrees
 
 Library tests
   Path: tests
@@ -140,6 +139,17 @@ Executable inode_tests
                     alcotest,
                     tests
 
+Executable bitarray_tests
+  Path:             tests/fsTests
+  MainIs:           bitarrayTests.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-block-fs,
+                    core_kernel,
+                    alcotest,
+                    tests
+
 Executable free_map_tests
   Path:             tests/fsTests
   MainIs:           free_map_tests.ml
@@ -210,6 +220,12 @@ Test inode_tests
   Run$:             flag(tests)
   TestTools:        inode_tests
   Command:          $inode_tests
+  WorkingDirectory: tests
+
+Test bitarray_tests
+  Run$:             flag(tests)
+  TestTools:        bitarray_tests
+  Command:          $bitarray_tests
   WorkingDirectory: tests
 
 Test free_map_tests

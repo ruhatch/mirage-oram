@@ -226,7 +226,7 @@ Clearly after this, either it was possible to write a block into the stash along
 \end{algorithmic}
 \end{algorithm}
 
-The security of this operation comes from the fact that positions are assigned uniformly at random. If we consider the sequence of accesses, $$\mathbf{p} = (\mathsf{position}_M[\mathsf{a}_M], \mathsf{position}_{M-1}[\mathsf{a}_{M-1}], \dots, \mathsf{position}_1[\mathsf{a}_1])$$, any two accesses to the same address will be statistically independent and trivially so will two accesses to different addresses. Thus, by an application of Bayes' rule, $$\Pr(\mathbf{p}) = \prod\limits^{M}_{j=1}\Pr(\mathsf{position}_j[\mathsf{a}_j]) = (\frac{1}{2^L})^M$$ and the access pattern is indistinguishable from a random sequence of bit strings.
+The security of this operation comes from the fact that positions are assigned uniformly at random. If we consider the sequence of accesses, $$\mathbf{p} = (\mathsf{position}_M[\mathsf{a}_M], \mathsf{position}_{M-1}[\mathsf{a}_{M-1}], \dots, \mathsf{position}_1[\mathsf{a}_1]),$$ any two accesses to the same address will be statistically independent and trivially so will two accesses to different addresses. Thus, by an application of Bayes' rule, $$\Pr(\mathbf{p}) = \prod\limits^{M}_{j=1}\Pr(\mathsf{position}_j[\mathsf{a}_j]) = \left(\frac{1}{2^L}\right)^M$$ and the access pattern is indistinguishable from a random sequence of bit strings.
 
 \mytodo{Give a quick introduction to recursive oram and statelessness}
 
@@ -430,16 +430,28 @@ Now the only remaining problem is creating the position map. \Cref{alg:posmapdim
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Basic ORAM Module}
+\subsection{Creating ORAM}
 
 We want ORAM to be able to replace any existing block device in any Mirage program. In order to do this we need access to the methods of the underlying block device as well as the block device itself. Thus, we need to build an ORAM functor, that takes a module satisfying the \texttt{BLOCK} interface, shown in \cref{lst:blocksig}, and gives us a new module satisfying the same interface.
 
-In order to get access to this underlying device, we need a \texttt{create} method, which takes a block device as input and returns something of type \texttt{Oram.Make(B).t}, shown in \cref{lst:orammaketype}. This type contains the ORAM parameters such as \texttt{bucketSize} and \texttt{offset}, structural information such as the \texttt{height} of the ORAM and the \texttt{numLeaves}, and pointers to the stash, position map, and underlying block device. The parameters are all passed in as input to the \texttt{create} method, along with the block device. Then, the \texttt{create} method calculates new structural information. The height of the ORAM is calculated as $\lfloor \log_2N\rfloor - 1$
+In order to get access to this underlying device, we need a \texttt{create} method, which takes a block device as input and returns something of type \texttt{Oram.Make(B).t}, shown in \cref{lst:orammaketype}. This type contains the ORAM parameters such as \texttt{bucketSize} and \texttt{offset}, structural information such as the \texttt{height} of the ORAM and the \texttt{numLeaves}, and pointers to the stash, position map, and underlying block device. 
 
-\begin{listing}[h]
+The following parameters are passed as input to the \texttt{create} method, along with the block device:
+
+\begin{description}
+  \item[\texttt{size}] The desired size of the ORAM in blocks
+  \item[\texttt{blockSize}] The desired size of a single block in bytes
+  \item[\texttt{bucketSize}] The number of blocks in a bucket
+\end{description}
+
+Using these, the \texttt{create} method can calculate new structural information. First we need to calculate the number of sectors required for a block as $$\mathtt{sectorsPerBlock} = \frac{\mathtt{blockSize} - 1}{\mathtt{sector\_size}} + 1,$$ which rounds up the number of sectors so we can always fit the desired block size. Next, we calculate the sector size of the ORAM as $$\mathtt{sector\_size} = \mathtt{sector\_size} \times \mathtt{sectorsPerBlock} - 8,$$ which is the block size, minus 8 bytes for the address, which needs to be stored along with the data. Now we can calculate the height of the ORAM, but we need to consider two cases. If the desired size of the ORAM is specified, then we simply calculate the height as $$\mathtt{height} = \left\lfloor \log_2\left(\frac{\mathtt{size}}{\mathtt{bucketSize}} + 1\right)\right\rfloor - 1.$$ This comes from rearranging the equation for the size of the binary tree, $2^{\mathtt{height} + 1} - 1$, introducing the floor operator so that the resulting binary tree is less than or equal to the desired size. If the size is unspecified, we assume that we should fill as much of the device as possible, so we calculate $$\mathtt{size} = \frac{\mathtt{size\_sectors}}{\mathtt{sectorsPerBlock}}$$ and then perform the same calculation as above with this new value. Finally we calculate, \texttt{numLeaves} and a new value for \texttt{size\_sectors} trivially.
+
+This is all of the structural information we require, so now we only have a couple of things left to do. We must create instances of the client-side data structures and we must initialise the ORAM space. The first simply calls the creation functions of the associated data structures. The second loops through the block device, writing dummy blocks to every location. Dummy blocks have address -1, and are ignored by the access protocol. Now we can return everything that we have as an instance of \texttt{ORAM.Make(B).t}.
+
+\begin{listing}[H]
 \caption{The type of an ORAM device \texttt{ORAM.Make(B).t}}
 \label{lst:orammaketype}
-\inputminted[firstline=27, lastline=38]{ocaml}{../src/oram.ml}
+\inputminted[firstline=27, lastline=39]{ocaml}{../src/oram.ml}
 \end{listing}
 
 
@@ -483,30 +495,115 @@ end
 \end{minted}
 \end{listing}
 
-\subsection{Access Algorithm}
+\subsection{Accessing ORAM}
 
-Now that we have the client-side data structures and our ORAM module, all that remains is to implement \cref{alg:access}, including the subroutines \textsc{ReadBucket} and \textsc{WriteBucket}. \Cref{lst:access} shows the implementation of the \textsc{Access} function, which can be directly correlated with \cref{alg:access}. 
+Now that we have the client-side data structures and our ORAM module, we can almost implement \cref{alg:access}. Before we can though, we need the surrounding plumbing. The \texttt{BLOCK} interface functions \texttt{read} and \texttt{write} input/output data as a list of \texttt{Cstruct.t}s, so they must split this into chunks before calling \texttt{access} on each one. On the other side of access, we need the subroutines \textsc{ReadBucket} and \textsc{WriteBucket}, which access the underlying block storage.
 
-\begin{listing}[h]
-	\caption{Implementation of \cref{alg:access}}
-	\label{lst:access}
-	\inputminted[firstline=196, lastline=220]{ocaml}{../src/oram.ml}
-\end{listing}
+It is the second two of these plumbing functions that have a much more interesting role. They are actually responsible for maintaining the logical binary tree structure. There are no physical pointers, but instead the structure is built purely through calculating the appropriate address of a bucket. The bucket on the path to leaf $x$ at level $l$ is calculated using \cref{alg:bucketaddress}.
 
-\mytodo{Talk about optimising the path building algorithm}
+\begin{algorithm}[H]
+  \begin{algorithmic}
+    \Function{BucketAddress}{$x$,$l$}
+      \State $address \gets 0$
+      \For{$i = 0;~i < l;~i++$}
+        \If{$x >> (i + \mathtt{height} - l)~\&\&~1 = 1$}
+          \State $address \gets (2 \times address) + (\mathtt{bucketSize} \times \mathtt{sectorsPerBlock} \times 2)$
+        \Else
+          \State $address \gets (2 \times address) + (\mathtt{bucketSize} \times \mathtt{sectorsPerBlock})$
+        \EndIf
+      \EndFor
+      \State \Return $address$
+    \EndFunction
+  \end{algorithmic}
+  \caption{Calculating the address of the bucket at level $l$ on the path to leaf $x$}
+  \label{alg:bucketaddress}
+\end{algorithm}
+
+This is most easily explained using \cref{fig:bucketaddress}. Here we can see the nodes labelled in order of their position in memory. The leaves are also labelled, but the binary representations of these labels are actually more important. The binary representation, read from left to right, tells us how to reach the leaf. To get to leaf 5, with binary representation 101, we go right, left, right. When we go left, we double the label on the node and add one, and when we go right, we add two. Multiplying this node label by the block size and the bucket size gives us the physical address of the node. So for a node at level $l$, we only compare the first $l$ bits, following the procedure above.
+
+\begin{figure}[h]
+  \centering
+  \begin{picture}(310,160)
+    \put(140,140){\framebox(30,20){0}}
+    \put(155,140){\vector(4,-1){78}}
+    \put(155,140){\vector(-4,-1){78}}
+    \put(197,135){1}
+    \put(60,100){\framebox(30,20){1}}
+    \put(75,100){\vector(2,-1){38}}
+    \put(75,100){\vector(-2,-1){38}}
+    \put(220,100){\framebox(30,20){2}}
+    \put(235,100){\vector(2,-1){38}}
+    \put(198,95){0}
+    \put(235,100){\vector(-2,-1){38}}
+    \put(20,60){\framebox(30,20){3}}
+    \put(35,60){\vector(1,-1){19}}
+    \put(35,60){\vector(-1,-1){19}}
+    \put(100,60){\framebox(30,20){4}}
+    \put(115,60){\vector(1,-1){19}}
+    \put(115,60){\vector(-1,-1){19}}
+    \put(180,60){\framebox(30,20){5}}
+    \put(195,60){\vector(1,-1){19}}
+    \put(195,60){\vector(-1,-1){19}}
+    \put(215,50){1}
+    \put(260,60){\framebox(30,20){6}}
+    \put(275,60){\vector(1,-1){19}}
+    \put(275,60){\vector(-1,-1){19}}
+    \put(0,20){\framebox(30,20){7}}
+    \put(40,20){\framebox(30,20){8}}
+    \put(80,20){\framebox(30,20){9}}
+    \put(120,20){\framebox(30,20){10}}
+    \put(160,20){\framebox(30,20){11}}
+    \put(200,20){\framebox(30,20){12}}
+    \put(240,20){\framebox(30,20){13}}
+    \put(280,20){\framebox(30,20){14}}
+    \put(12,0){0}
+    \put(52,0){1}
+    \put(92,0){2}
+    \put(132,0){3}
+    \put(172,0){4}
+    \put(212,0){5}
+    \put(252,0){6}
+    \put(292,0){7}
+  \end{picture}
+  \caption{Visualisation of \cref{alg:bucketaddress}}
+  \label{fig:bucketaddress}
+\end{figure}
+
+So we can now input/output data from the outside and the underlying block device. This leaves most of \cref{alg:access} fairly trivial to implement. Remapping the blocks requires a simple call to a pseudo-random function, reading in the path just adds the contents of each bucket to the stash, and writing new data is as simple as setting a value in the stash. The only interesting part left is lines 11-16. This is where we decide which blocks should be put into the path.
+
+The naive implementation of this, and that suggested by \cref{alg:access}, loops through the stash and finds blocks such that the bucket at level $l$ on the path to leaf $\mathsf{position[a']}$ is the same as the bucket at level $l$ on the path to leaf $x$. There are two small optimisations we can make here. The first is to perform the position lookup only once, attaching positions to the blocks in a temporary data structure, avoiding repeated work at each level. The second avoids calculating the bucket addresses entirely. We can do this by noting that in order for the paths to two leaves to intersect at level $l$, the leaves must have the same first $l$ bits. Thus, we can simply perform a right bit shift on both $x$ and $\mathsf{position[a']}$ of $\mathtt{height} - l$ bits, and check for equality.
+
+So at this point we have a functioning ORAM functor, that can be used to augment a block device in any Mirage program. In \cref{subsec:recursion,subsec:statelessness,subsec:oramoptimisation} we look at optimisations and extensions to this ORAM construction, before moving onto to the further aims of the project.
+
+%\begin{listing}[h]
+%	\caption{Implementation of \cref{alg:access}}
+%	\label{lst:access}
+%	\inputminted[firstline=183, lastline=207]{ocaml}{../src/oram.ml}
+%\end{listing}
 
 \subsection{Recursion}
+\label{subsec:recursion}
 
-\mytodo{Explain the implementation of recursion using PosMapIntf}
-\mytodo{Discuss the design decisions involved in the implementation of recursion}
+THIS SHOULD PROBABLY BE MOVED TO CHAPTER 2
+
+In our current construction, the position map takes $O(n)$ storage space on the client, and the stash $O(\log N)$. Adding recursion to ORAM allows us to reduce the size of the overall client storage to $O(\log N)$, by reducing the space required for the position map to $O(1)$, while maintaining $O(\log N)$ for the stash (actually now multiple stashes). This is useful to us, because it allows us to implement statelessness. We can now write the client-side storage to the server after each call, and read it back again before the next one, without increasing the asymptotic bandwidth.
+
+NOW WE'RE TALKING ABOUT THE IMPLEMENTATION, SO THIS SHOULD STAY
+
+The essence of recursive ORAM, is that the position map of one ORAM is another ORAM. Thus, we can extend our original ORAM functor, parameterising it in the implementation of the position map. To do this we use a single interface, that is satisfied by both the in memory position map and the ORAM module. We can apply this new ORAM functor with the in memory position map module to get our original construction. However, we can now take this further, applying the functor again with the result of the first application, and this can be done to an arbitrary depth. Recursion has been made easy using the power of OCaml's module system.
+
+There is of course hidden complexity here. How do we create a recursive ORAM? We definitely can't assume that the data ORAM can use the whole of the disk anymore, so we will have to do some calculations. How do we initialise recursive ORAM? How do we actually use ORAM as a position map? We will examine all of these now.
+
 \mytodo{In particular talk about/show maths involved in automatically determining optimal size/number of levels of recursion}
 
 \subsection{Statelessness}
+\label{subsec:statelessness}
 
 \mytodo{Do implementation of Statelessness!}
 \mytodo{Explain the implementation of Statelessness}
 
 \subsection{Optimisation}
+\label{subsec:oramoptimisation}
 
 \mytodo{Talk about optimising the block size through design space exploration}
 \mytodo{Talk about other optimisations that we're made as they come up}

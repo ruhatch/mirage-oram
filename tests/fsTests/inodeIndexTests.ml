@@ -5,24 +5,26 @@ open Lwt
 
 module I = Make(Block)
 
-let bd =
-  match_lwt Block.connect "disk.img" with
-    | `Ok bd -> return bd
-    | `Error x -> failwith "Failed to connect to raw Block"
-
-let info = bd >>= fun bd -> Block.get_info bd
-
-let freeMap = info >>= fun info -> return (FreeMap.create info.Block.sector_size)
-
-let newIndex () =
-  freeMap >>= fun freeMap ->
-  bd >>= fun bd ->
-  info >>= fun info ->
-  I.create freeMap bd info.Block.sector_size
-
 let ( >>= ) x f = x >>= function
   | `Error e -> return (`Error e)
   | `Ok x -> f x
+
+let bd = Block.connect "disk.img"
+
+let info bd =
+  bind (Block.get_info bd) (fun info -> return (`Ok info))
+
+let freeMap info =
+  let freeMapSize = Int64.(to_int @@ add (div (sub info.Block.size_sectors 1L) (of_int (info.Block.sector_size * 8))) 1L) in
+  Printf.printf "Creating freeMap with size %d\n" freeMapSize;
+  return (`Ok (FreeMap.create freeMapSize info.Block.sector_size))
+
+let newIndex () =
+  bd >>= fun bd ->
+  info bd >>= fun info ->
+  freeMap info >>= fun freeMap ->
+  Printf.printf "FreeMap values at 0 1 2 3 4 are %b %b %b %b %b\n" (FreeMap.get freeMap 0) (FreeMap.get freeMap 1) (FreeMap.get freeMap 2) (FreeMap.get freeMap 3) (FreeMap.get freeMap 4);
+  I.create freeMap bd info.Block.sector_size
 
 (* Some of these tests are kind of random and should really be located in other places *)
 
@@ -31,12 +33,12 @@ let inode_index_tests =
       "InodeIndexCreate_NewIndex_RootAddressThree", `Quick,
         (fun () ->
           check (lwt_t @@ result error int64) ""
-            (fun () -> return (`Ok 3L))
+            (fun () -> return (`Ok 26L))
             (fun () -> newIndex () >>= fun inodeIndex -> return (`Ok inodeIndex.I.rootAddress)));
       "InodeIndexCreate_NewIndex_RootContainsPageSize", `Quick,
         (fun () ->
           check (lwt_t @@ result error int) ""
-            (fun () -> bind info (fun info -> return (`Ok info.Block.sector_size)))
+            (fun () -> bd >>= fun bd -> info bd >>= fun info -> return (`Ok info.Block.sector_size))
             (fun () -> newIndex () >>= fun inodeIndex -> return (`Ok (Node.Node.pageSize inodeIndex.I.root))));
       "InodeIndexCreate_NewIndex_RootNoKeysZero", `Quick,
         (fun () ->
