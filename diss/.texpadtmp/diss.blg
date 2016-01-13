@@ -2,54 +2,54 @@ This is BibTeX, Version 0.99d (TeX Live 2015)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.aux
 The style file: plain.bst
-Illegal, another \bibstyle command---line 190 of file /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.aux
+Illegal, another \bibstyle command---line 191 of file /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.aux
  : \bibstyle
  :          {plain}
 I'm skipping whatever remains of this command
-Illegal, another \bibdata command---line 202 of file /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.aux
+Illegal, another \bibdata command---line 203 of file /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.aux
  : \bibdata
  :         {refs}
 I'm skipping whatever remains of this command
 Database file #1: ../refs.bib
-You've used 5 entries,
+You've used 6 entries,
             2118 wiz_defined-function locations,
-            527 strings with 5268 characters,
-and the built_in function-call counts, 2134 in all, are:
-= -- 200
-> -- 135
+            534 strings with 5411 characters,
+and the built_in function-call counts, 2455 in all, are:
+= -- 228
+> -- 158
 < -- 2
-+ -- 53
-- -- 48
-* -- 154
-:= -- 358
-add.period$ -- 16
-call.type$ -- 5
-change.case$ -- 39
++ -- 62
+- -- 56
+* -- 177
+:= -- 415
+add.period$ -- 19
+call.type$ -- 6
+change.case$ -- 46
 chr.to.int$ -- 0
-cite$ -- 5
-duplicate$ -- 78
-empty$ -- 141
-format.name$ -- 48
-if$ -- 443
+cite$ -- 6
+duplicate$ -- 90
+empty$ -- 163
+format.name$ -- 56
+if$ -- 508
 int.to.chr$ -- 0
-int.to.str$ -- 5
-missing$ -- 5
-newline$ -- 28
-num.names$ -- 10
-pop$ -- 44
+int.to.str$ -- 6
+missing$ -- 7
+newline$ -- 33
+num.names$ -- 12
+pop$ -- 54
 preamble$ -- 1
-purify$ -- 34
+purify$ -- 40
 quote$ -- 0
-skip$ -- 58
+skip$ -- 64
 stack$ -- 0
-substring$ -- 98
-swap$ -- 25
+substring$ -- 103
+swap$ -- 26
 text.length$ -- 2
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 20
+type$ -- 22
 warning$ -- 0
-while$ -- 17
-width$ -- 6
-write$ -- 56
+while$ -- 19
+width$ -- 7
+write$ -- 67
 (There were 2 error messages)

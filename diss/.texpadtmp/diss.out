@@ -27,10 +27,10 @@
 \BOOKMARK [2][-]{subsection.3.1.7}{Statelessness}{section.3.1}% 27
 \BOOKMARK [2][-]{subsection.3.1.8}{Optimisation}{section.3.1}% 28
 \BOOKMARK [2][-]{subsection.3.1.9}{Integrity Verification}{section.3.1}% 29
-\BOOKMARK [1][-]{section.3.2}{Object Store}{chapter.3}% 30
+\BOOKMARK [1][-]{section.3.2}{File System}{chapter.3}% 30
 \BOOKMARK [2][-]{subsection.3.2.1}{General Design}{section.3.2}% 31
-\BOOKMARK [2][-]{subsection.3.2.2}{FreeMap}{section.3.2}% 32
-\BOOKMARK [2][-]{subsection.3.2.3}{B-Trees}{section.3.2}% 33
+\BOOKMARK [2][-]{subsection.3.2.2}{The Inode Index}{section.3.2}% 32
+\BOOKMARK [2][-]{subsection.3.2.3}{The Free Map}{section.3.2}% 33
 \BOOKMARK [1][-]{section.3.3}{Search Module}{chapter.3}% 34
 \BOOKMARK [2][-]{subsection.3.3.1}{Inverted Index}{section.3.3}% 35
 \BOOKMARK [2][-]{subsection.3.3.2}{Keyword Search API}{section.3.3}% 36

@@ -127,84 +127,86 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1.9}Integrity Verification}{25}{subsection.3.1.9}}
 \@writefile{tdo}{\contentsline {todo}{If had time to do integrity verification then include here otherwise discuss why I chose not to include it}{25}{section*.23}}
 \pgfsyspdfmark {pgfid15}{19562754}{28582280}
-\@writefile{toc}{\contentsline {section}{\numberline {3.2}Object Store}{25}{section.3.2}}
-\newlabel{sec:objectStore}{{3.2}{25}{Object Store}{section.3.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.2}File System}{25}{section.3.2}}
+\newlabel{sec:objectStore}{{3.2}{25}{File System}{section.3.2}{}}
 \newlabel{sec:objectStore@cref}{{[section][2][3]3.2}{25}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}General Design}{25}{subsection.3.2.1}}
-\@writefile{tdo}{\contentsline {todo}{Talk about design of Superblock, FreeMap, InodeIndex, Inodes, etc}{25}{section*.24}}
-\pgfsyspdfmark {pgfid16}{19562754}{21258067}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}FreeMap}{25}{subsection.3.2.2}}
-\@writefile{tdo}{\contentsline {todo}{Build a Cstruct based FreeMap}{25}{section*.25}}
-\pgfsyspdfmark {pgfid17}{19562754}{16829466}
-\@writefile{tdo}{\contentsline {todo}{Talk about the implementation of the FreeMap}{25}{section*.26}}
-\pgfsyspdfmark {pgfid18}{19562754}{15490348}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}B-Trees}{25}{subsection.3.2.3}}
-\@writefile{tdo}{\contentsline {todo}{Talk about the implementation of B-Trees}{25}{section*.27}}
-\pgfsyspdfmark {pgfid19}{19562754}{11245247}
-\@writefile{toc}{\contentsline {section}{\numberline {3.3}Search Module}{26}{section.3.3}}
-\newlabel{sec:searchmodule}{{3.3}{26}{Search Module}{section.3.3}{}}
-\newlabel{sec:searchmodule@cref}{{[section][3][3]3.3}{26}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}Inverted Index}{26}{subsection.3.3.1}}
-\@writefile{tdo}{\contentsline {todo}{Build Inverted Index}{26}{section*.28}}
-\pgfsyspdfmark {pgfid20}{19562754}{46722679}
-\@writefile{tdo}{\contentsline {todo}{Talk about the implementation of the Inverted Index}{26}{section*.29}}
-\pgfsyspdfmark {pgfid21}{19562754}{45460019}
-\@writefile{tdo}{\contentsline {todo}{Talk about the time constraints and the possible extensions that could otherwise be implemented}{26}{section*.30}}
-\pgfsyspdfmark {pgfid22}{19562754}{43598249}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.2}Keyword Search API}{26}{subsection.3.3.2}}
-\@writefile{tdo}{\contentsline {todo}{Design and implement a search API}{26}{section*.31}}
-\pgfsyspdfmark {pgfid23}{19562754}{38646996}
-\@writefile{tdo}{\contentsline {todo}{Discuss the design/complexity trade-offs made}{26}{section*.32}}
-\pgfsyspdfmark {pgfid24}{19562754}{37264186}
-\@writefile{tdo}{\contentsline {todo}{Discuss extensions to the search API that would be implemented in a more advanced IR system}{26}{section*.33}}
-\pgfsyspdfmark {pgfid25}{19562754}{35358724}
-\@writefile{toc}{\contentsline {section}{\numberline {3.4}Encryption}{26}{section.3.4}}
-\newlabel{sec:encryption}{{3.4}{26}{Encryption}{section.3.4}{}}
-\newlabel{sec:encryption@cref}{{[section][4][3]3.4}{26}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.1}Library}{26}{subsection.3.4.1}}
-\@writefile{tdo}{\contentsline {todo}{Give an overview of the encryption library and talk about why it is better than rolling my own}{26}{section*.34}}
-\pgfsyspdfmark {pgfid26}{19562754}{27435401}
-\@writefile{tdo}{\contentsline {todo}{Discuss the integration of the encryption library into the system}{26}{section*.35}}
-\pgfsyspdfmark {pgfid27}{19562754}{25573631}
-\@writefile{lol}{\contentsline {listing}{\numberline {2}{\ignorespaces Mirage BLOCK module signature}}{27}{listing.2}}
-\newlabel{lst:blocksig}{{2}{27}{Creating ORAM}{listing.2}{}}
-\newlabel{lst:blocksig@cref}{{[listing][2][]2}{27}}
-\@writefile{toc}{\contentsline {chapter}{\numberline {4}Evaluation}{29}{chapter.4}}
+\citation{CLRS09}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}The Inode Index}{26}{subsection.3.2.2}}
+\newlabel{subsec:inodeindex}{{3.2.2}{26}{The Inode Index}{subsection.3.2.2}{}}
+\newlabel{subsec:inodeindex@cref}{{[subsection][2][3,2]3.2.2}{26}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}The Free Map}{26}{subsection.3.2.3}}
+\newlabel{subsec:freemap}{{3.2.3}{26}{The Free Map}{subsection.3.2.3}{}}
+\newlabel{subsec:freemap@cref}{{[subsection][3][3,2]3.2.3}{26}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces Getting and setting individual bits in a byte array}}{27}{algorithm.4}}
+\newlabel{alg:bitgetset}{{4}{27}{The Free Map}{algorithm.4}{}}
+\newlabel{alg:bitgetset@cref}{{[algorithm][4][]4}{27}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.3}Search Module}{27}{section.3.3}}
+\newlabel{sec:searchmodule}{{3.3}{27}{Search Module}{section.3.3}{}}
+\newlabel{sec:searchmodule@cref}{{[section][3][3]3.3}{27}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}Inverted Index}{27}{subsection.3.3.1}}
+\@writefile{tdo}{\contentsline {todo}{Build Inverted Index}{27}{section*.24}}
+\pgfsyspdfmark {pgfid16}{19562754}{19690062}
+\@writefile{tdo}{\contentsline {todo}{Talk about the implementation of the Inverted Index}{27}{section*.25}}
+\pgfsyspdfmark {pgfid17}{19562754}{18427402}
+\@writefile{tdo}{\contentsline {todo}{Talk about the time constraints and the possible extensions that could otherwise be implemented}{27}{section*.26}}
+\pgfsyspdfmark {pgfid18}{19562754}{16565632}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.2}Keyword Search API}{27}{subsection.3.3.2}}
+\@writefile{tdo}{\contentsline {todo}{Design and implement a search API}{27}{section*.27}}
+\pgfsyspdfmark {pgfid19}{19562754}{11614379}
+\@writefile{tdo}{\contentsline {todo}{Discuss the design/complexity trade-offs made}{27}{section*.28}}
+\pgfsyspdfmark {pgfid20}{19562754}{10231569}
+\@writefile{tdo}{\contentsline {todo}{Discuss extensions to the search API that would be implemented in a more advanced IR system}{27}{section*.29}}
+\pgfsyspdfmark {pgfid21}{19562754}{8326107}
+\@writefile{toc}{\contentsline {section}{\numberline {3.4}Encryption}{28}{section.3.4}}
+\newlabel{sec:encryption}{{3.4}{28}{Encryption}{section.3.4}{}}
+\newlabel{sec:encryption@cref}{{[section][4][3]3.4}{28}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.1}Library}{28}{subsection.3.4.1}}
+\@writefile{tdo}{\contentsline {todo}{Give an overview of the encryption library and talk about why it is better than rolling my own}{28}{section*.30}}
+\pgfsyspdfmark {pgfid22}{19562754}{45940069}
+\@writefile{tdo}{\contentsline {todo}{Discuss the integration of the encryption library into the system}{28}{section*.31}}
+\pgfsyspdfmark {pgfid23}{19562754}{44078299}
+\@writefile{lol}{\contentsline {listing}{\numberline {2}{\ignorespaces Mirage BLOCK module signature}}{29}{listing.2}}
+\newlabel{lst:blocksig}{{2}{29}{Creating ORAM}{listing.2}{}}
+\newlabel{lst:blocksig@cref}{{[listing][2][]2}{29}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {4}Evaluation}{31}{chapter.4}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {section}{\numberline {4.1}Overall Results}{29}{section.4.1}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.2}Unit Tests}{29}{section.4.2}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.3}Performance Tests}{29}{section.4.3}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.1}Microbenchmarks}{29}{subsection.4.3.1}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.4}Security Analysis}{29}{section.4.4}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}Overall Results}{31}{section.4.1}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.2}Unit Tests}{31}{section.4.2}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.3}Performance Tests}{31}{section.4.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.1}Microbenchmarks}{31}{subsection.4.3.1}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.4}Security Analysis}{31}{section.4.4}}
 \bibdata{refs}
-\@writefile{toc}{\contentsline {chapter}{\numberline {5}Conclusion}{31}{chapter.5}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}Conclusion}{33}{chapter.5}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {chapter}{Bibliography}{31}{chapter.5}}
-\bibcite{islam2012access}{1}
-\bibcite{moataz2015resizable}{2}
-\bibcite{ren2014unified}{3}
-\bibcite{shi2011oblivious}{4}
-\bibcite{stefanov2013path}{5}
+\@writefile{toc}{\contentsline {chapter}{Bibliography}{33}{chapter.5}}
+\bibcite{CLRS09}{1}
+\bibcite{islam2012access}{2}
+\bibcite{moataz2015resizable}{3}
+\bibcite{ren2014unified}{4}
+\bibcite{shi2011oblivious}{5}
+\bibcite{stefanov2013path}{6}
 \bibstyle{plain}
-\@writefile{toc}{\contentsline {chapter}{\numberline {A}Project Proposal}{35}{appendix.A}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {A}Project Proposal}{37}{appendix.A}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
 \citation{islam2012access}
 \citation{stefanov2013path}
-\@writefile{lof}{\contentsline {figure}{\numberline {A.1}{\ignorespaces The Application Stack: We can use any underlying BLOCK implementation and we can add/remove ORAM, Encryption or Search modules as we please}}{37}{figure.A.1}}
-\newlabel{miragestack}{{A.1}{37}{The Application Stack: We can use any underlying BLOCK implementation and we can add/remove ORAM, Encryption or Search modules as we please}{figure.A.1}{}}
-\newlabel{miragestack@cref}{{[figure][1][2147483647,1]A.1}{37}}
+\@writefile{lof}{\contentsline {figure}{\numberline {A.1}{\ignorespaces The Application Stack: We can use any underlying BLOCK implementation and we can add/remove ORAM, Encryption or Search modules as we please}}{39}{figure.A.1}}
+\newlabel{miragestack}{{A.1}{39}{The Application Stack: We can use any underlying BLOCK implementation and we can add/remove ORAM, Encryption or Search modules as we please}{figure.A.1}{}}
+\newlabel{miragestack@cref}{{[figure][1][2147483647,1]A.1}{39}}
 \citation{ren2014unified}
 \citation{shi2011oblivious}
 \citation{moataz2015resizable}
 \bibdata{refs}
-\bibcite{islam2012access}{1}
-\bibcite{moataz2015resizable}{2}
-\bibcite{ren2014unified}{3}
-\bibcite{shi2011oblivious}{4}
-\bibcite{stefanov2013path}{5}
+\bibcite{CLRS09}{1}
+\bibcite{islam2012access}{2}
+\bibcite{moataz2015resizable}{3}
+\bibcite{ren2014unified}{4}
+\bibcite{shi2011oblivious}{5}
+\bibcite{stefanov2013path}{6}
 \gdef\minted@oldcachelist{,
   default.pygstyle,
   colorful.pygstyle,

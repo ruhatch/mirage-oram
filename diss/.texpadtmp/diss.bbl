@@ -1,5 +1,10 @@
 \begin{thebibliography}{1}
 
+\bibitem{CLRS09}
+Thomas~H. Cormen, Charles~E. Leiserson, Ronald~L. Rivest, and Clifford Stein.
+\newblock {\em {I}ntroduction to {A}lgorithms}.
+\newblock The MIT Press, 3rd edition, 2009.
+
 \bibitem{islam2012access}
 MS~Islam, Mehmet Kuzu, and Murat Kantarcioglu.
 \newblock Access pattern disclosure on searchable encryption: Ramification,

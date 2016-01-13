@@ -25,8 +25,6 @@ module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
     size_sectors: int64;
   }
 
-  type parameters = PositionMap.parameters
-
   type structuralInfo = {
     height : int;
     numLeaves : int64;
@@ -36,7 +34,9 @@ module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
   type t = {
     info : info;
     structuralInfo : structuralInfo;
-    parameters : parameters;
+    bucketSize : int64;
+    offset : int64;
+    desiredBlockSize : int;
     stash : Stash.t;
     positionMap : PositionMap.t;
     blockDevice : BlockDevice.t;
@@ -52,12 +52,6 @@ module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
   type bucket = OBlock.t list
 
   let sizeOfAddressInBytes = 8
-
-  let (defaultParameters : PositionMap.parameters) = {
-    bucketSize = 4L ;
-    offset = 0L ;
-    desiredBlockSize = 0x40000
-  }
 
   let ( >>= ) x f = x >>= function
     | `Error e -> return (`Error e)
@@ -111,13 +105,13 @@ module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
       | 0 -> acc
       | y ->
         if Int64.bit_and (Int64.shift_right leaf (y + (t.structuralInfo.height - level) - 1)) 1L = 1L
-          then loop Int64.(2L * acc + (t.parameters.bucketSize * (of_int t.structuralInfo.sectorsPerBlock) * 2L)) (y - 1)
-          else loop Int64.(2L * acc + (t.parameters.bucketSize * (of_int t.structuralInfo.sectorsPerBlock))) (y - 1)
+          then loop Int64.(2L * acc + (t.bucketSize * (of_int t.structuralInfo.sectorsPerBlock) * 2L)) (y - 1)
+          else loop Int64.(2L * acc + (t.bucketSize * (of_int t.structuralInfo.sectorsPerBlock))) (y - 1)
     in loop 0L level
 
   let writeBucket t address bucket =
     let buffers = List.map ~f:OBlock.to_cstruct bucket in
-    BlockDevice.write t.blockDevice Int64.(address + t.parameters.offset) buffers
+    BlockDevice.write t.blockDevice Int64.(address + t.offset) buffers
 
   let writePathToLeaf t leaf path =
     let rec loop path = function
@@ -137,12 +131,12 @@ module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
 
   let createBuffersForBucket t =
     let sector_size = t.info.sector_size + 8 in
-    let zeroToBucketSize = List.range 0 (Option.value (Int64.to_int t.parameters.bucketSize) ~default:4) in
+    let zeroToBucketSize = List.range 0 (Option.value (Int64.to_int t.bucketSize) ~default:4) in
     List.map ~f:(fun _ -> Cstruct.create sector_size) zeroToBucketSize
 
   let readBucket t address =
     let buffersForBucket = createBuffersForBucket t in
-    BlockDevice.read t.blockDevice Int64.(address + t.parameters.offset) buffersForBucket >>= fun () ->
+    BlockDevice.read t.blockDevice Int64.(address + t.offset) buffersForBucket >>= fun () ->
     let bucket = List.map ~f:OBlock.of_cstruct buffersForBucket in
     return (`Ok bucket)
 
@@ -164,7 +158,7 @@ module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
       | 0L, bs, rest -> (bs, rest)
       | n, acc, [] -> loop Int64.(n - 1L) (OBlock.dummy t.info.sector_size :: acc) []
       | n, acc, ((_, (a,d)) :: xs) -> Stash.remove t.stash a; loop Int64.(n - 1L) ((a,d) :: acc) xs
-    in loop t.parameters.bucketSize [] choices
+    in loop t.bucketSize [] choices
 
   let buildPathToLeaf t leaf =
     let stashList = Stash.to_alist t.stash in
@@ -221,10 +215,10 @@ module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
     done;
     let rec loop = function
       | 0L -> return (`Ok ())
-      | x -> BlockDevice.write t.blockDevice Int64.(t.parameters.offset + (x - 1L) * (of_int t.structuralInfo.sectorsPerBlock)) [dummy_struct] >>= fun () -> loop Int64.(x - 1L)
+      | x -> BlockDevice.write t.blockDevice Int64.(t.offset + (x - 1L) * (of_int t.structuralInfo.sectorsPerBlock)) [dummy_struct] >>= fun () -> loop Int64.(x - 1L)
     in
     loop t.info.size_sectors >>= fun () ->
-    if t.parameters.offset > 0L
+    if t.offset > 0L
       then (
         let b = Float.(to_int (log (of_int t.info.sector_size * 8.) / log 2.)) in
         let height' = t.structuralInfo.height - 6 + b in
@@ -242,49 +236,50 @@ module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
         loop t.info.size_sectors
       ) else return (`Ok ())
 
-  let calculateHeightToFillBlockDevice info sectorsPerBlock parameters =
-    floor_log Int64.(info.BlockDevice.size_sectors / ((of_int sectorsPerBlock) * parameters.bucketSize) + 1L) - 1
+  let calculateHeightToFillBlockDevice info sectorsPerBlock bucketSize =
+    floor_log Int64.(info.BlockDevice.size_sectors / ((of_int sectorsPerBlock) * bucketSize) + 1L) - 1
 
-  let calculateHeightOfPositionMap desiredSizeInSectors sector_size parameters =
+  let calculateHeightOfPositionMap desiredSizeInSectors sector_size bucketSize =
     let reductionFactor = Float.(to_int (log (of_int sector_size * 8.) / log 2.)) in
-    floor_log Int64.(desiredSizeInSectors / parameters.bucketSize + 1L) + 5 - reductionFactor
+    floor_log Int64.(desiredSizeInSectors / bucketSize + 1L) + 5 - reductionFactor
 
-  let calculateHeightOfDataORAM desiredSizeInSectors parameters =
-    floor_log Int64.(desiredSizeInSectors / parameters.bucketSize + 1L) - 1
+  let calculateHeightOfDataORAM desiredSizeInSectors bucketSize =
+    floor_log Int64.(desiredSizeInSectors / bucketSize + 1L) - 1
 
-  let calculateHeight desiredSizeInSectors info sectorsPerBlock sector_size parameters =
+  let calculateHeight desiredSizeInSectors info sectorsPerBlock sector_size bucketSize offset =
     if desiredSizeInSectors = 0L
-      then calculateHeightToFillBlockDevice info sectorsPerBlock parameters
-      else if parameters.offset > 0L
-        then calculateHeightOfPositionMap desiredSizeInSectors sector_size parameters
-        else calculateHeightOfDataORAM desiredSizeInSectors parameters
+      then calculateHeightToFillBlockDevice info sectorsPerBlock bucketSize
+      else if offset > 0L
+        then calculateHeightOfPositionMap desiredSizeInSectors sector_size bucketSize
+        else calculateHeightOfDataORAM desiredSizeInSectors bucketSize
 
-  let createInstanceOfType desiredSizeInSectors parameters blockDevice =
+  let createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSize offset blockDevice =
     lwt info = BlockDevice.get_info blockDevice in
     let read_write = info.BlockDevice.read_write in
-    let sectorsPerBlock = (parameters.desiredBlockSize - 1) / info.BlockDevice.sector_size + 1 in
+    let sectorsPerBlock = (desiredBlockSize - 1) / info.BlockDevice.sector_size + 1 in
+    let blockOffset = Int64.(offset * (of_int sectorsPerBlock)) in
     let sector_size = sectorsPerBlock * info.BlockDevice.sector_size - sizeOfAddressInBytes in
     (* should in fact save log size_sectors space for the stash *)
-    let height = calculateHeight desiredSizeInSectors info sectorsPerBlock sector_size parameters in
+    let height = calculateHeight desiredSizeInSectors info sectorsPerBlock sector_size bucketSize blockOffset in
     let numLeaves = Int64.(pow 2L (of_int height)) in
-    let size_sectors = Int64.(parameters.bucketSize * (2L * numLeaves - 1L)) in
+    let size_sectors = Int64.(bucketSize * (2L * numLeaves - 1L)) in
     let stash = Stash.create () in
-    PositionMap.create ~desiredSizeInSectors:size_sectors ~parameters:{parameters with offset = Int64.(parameters.offset + size_sectors)} blockDevice >>= fun positionMap ->
+    PositionMap.create ~desiredSizeInSectors:size_sectors ~bucketSize ~desiredBlockSize ~offset:Int64.(blockOffset + size_sectors) blockDevice >>= fun positionMap ->
     let t = {
       info = { read_write; sector_size; size_sectors } ;
       structuralInfo = { height ; numLeaves ; sectorsPerBlock } ;
-      parameters = { parameters with offset = Int64.(offset * (of_int sectorsPerBlock)) } ;
+      bucketSize ; desiredBlockSize ; offset = blockOffset ;
       stash ; positionMap ; blockDevice
     }
     in
     return (`Ok t)
 
-  let create ?(desiredSizeInSectors = 0L) ?(parameters = defaultParameters) blockDevice =
+  let create ?(desiredSizeInSectors = 0L) ?(bucketSize = 4L) ?(desiredBlockSize = 0x40000) ?(offset = 0L) blockDevice =
     Random.self_init ();
     lwt info = BlockDevice.get_info blockDevice in
     if info.BlockDevice.sector_size > sizeOfAddressInBytes
       then (
-        createInstanceOfType desiredSizeInSectors parameters blockDevice >>= fun t ->
+        createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSize offset blockDevice >>= fun t ->
         initialise t >>= fun () ->
         return (`Ok t)
       ) else return (`Error (`Unknown "Sector size too small to fit address"))
@@ -298,7 +293,7 @@ module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
         let dataToWrite = Cstruct.sub buffer offsetInBuffer t.info.sector_size in
         access t Write Int64.(startAddress + (of_int sectorAddressInBuffer)) (Some dataToWrite) >>= fun _ ->
         writeSectors (sectorAddressInBuffer - 1)
-    in loop (bufferLengthInSectors - 1)
+    in writeSectors (bufferLengthInSectors - 1)
 
   let rec write t startAddress = function
     | [] -> return (`Ok ())
@@ -307,7 +302,7 @@ module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
         then return (`Error (`Unknown "End of file"))
         else
           writeBuffer t startAddress buffer >>= fun () ->
-          let startAddressOfNextBuffer = Int64.(startAddress + (of_int b.Cstruct.len / (of_int t.info.sector_size))) in
+          let startAddressOfNextBuffer = Int64.(startAddress + (of_int buffer.Cstruct.len / (of_int t.info.sector_size))) in
           write t startAddressOfNextBuffer buffers
 
   let readBuffer t startAddress buffer =
@@ -334,7 +329,7 @@ module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
     let sizeOfPositionInBytes = 8 in
     let positionsPerSector = Int64.of_int (t.info.sector_size / sizeOfPositionInBytes) in
     let sectorAddressInPositionMap = Int64.(sectorAddress / positionsPerSector) in
-    let offsetInSector = sizeOfPositionInBytes * Option.value Int64.(to_int (rem x chi)) ~default:0 in
+    let offsetInSector = sizeOfPositionInBytes * Option.value Int64.(to_int (rem sectorAddress positionsPerSector)) ~default:0 in
     access t Read sectorAddressInPositionMap None >>= fun sectorRead ->
     let leaf = Cstruct.BE.get_uint64 sectorRead offsetInSector in
     return (`Ok leaf)
@@ -343,7 +338,7 @@ module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
     let sizeOfPositionInBytes = 8 in
     let positionsPerSector = Int64.of_int (t.info.sector_size / sizeOfPositionInBytes) in
     let sectorAddressInPositionMap = Int64.(sectorAddress / positionsPerSector) in
-    let offsetInSector = sizeOfPositionInBytes * Option.value Int64.(to_int (rem x chi)) ~default:0 in
+    let offsetInSector = sizeOfPositionInBytes * Option.value Int64.(to_int (rem sectorAddress positionsPerSector)) ~default:0 in
     access t Read sectorAddressInPositionMap None >>= fun dataRead ->
     Cstruct.BE.set_uint64 dataRead offsetInSector newLeaf;
     access t Write sectorAddressInPositionMap (Some dataRead) >>= fun _ ->

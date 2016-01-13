@@ -6,11 +6,6 @@
 
   Could even do this as a BTree if we need
 
-
-    0000000001110101 && 1111111101111
-
-  = ! ( 1111111110001010 || 0000000010000 )
-
 *)
 
 type t = Cstruct.t
@@ -40,9 +35,10 @@ let get t i =
 let set t i b =
   let block = Cstruct.get_uint8 t (i / 8) in
   let j = 7 - i mod 8 in
-  let block' = match b with
-    | false -> lnot ((lnot block) lor (1 lsl j))
-    | true -> block lor (1 lsl j)
+  let block' =
+    if b
+      then block lor (1 lsl j)
+      else lnot ((lnot block) lor (1 lsl j))
   in
   Cstruct.set_uint8 t (i / 8) block'
 

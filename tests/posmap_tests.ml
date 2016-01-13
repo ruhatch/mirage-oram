@@ -9,10 +9,10 @@ let ( >>= ) x f = x >>= function
   | `Error e -> return (`Error e)
   | `Ok x -> f x
 
-let newPosMap size =
+let newPosMap desiredSizeInSectors =
   Block.connect "disk.img" >>= fun bd ->
   (*P.initialise bd >>= fun () ->*)
-  P.create ~size ~offset:1L bd
+  P.create ~desiredSizeInSectors ~offset:1L bd
 
 let posmap_tests = [
     "PosMapIndices_Zero_ZeroZero", `Quick,

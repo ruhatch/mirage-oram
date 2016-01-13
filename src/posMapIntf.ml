@@ -7,13 +7,7 @@ module type PosMap = sig
   type block
   type error
 
-  type parameters = {
-    bucketSize : int64;
-    offset : int64;
-    desiredBlockSize : int;
-  }
-
-  val create : ?desiredSizeInSectors:int64 -> ?parameters:parameters -> block -> [`Ok of t | `Error of error] Lwt.t
+  val create : ?desiredSizeInSectors:int64 -> ?bucketSize:int64 -> ?desiredBlockSize:int -> ?offset:int64 -> block -> [`Ok of t | `Error of error] Lwt.t
   val get : t -> int64 -> [`Ok of int64 | `Error of error] Lwt.t
   val set : t -> int64 -> int64 -> [`Ok of unit | `Error of error] Lwt.t
   val length : t -> int64
@@ -22,6 +16,8 @@ end
 
 module type PosMapF = functor (B : BLOCK) -> sig
 
-  include PosMap with type block := B.t and type error := B.error
+  include PosMap
+  with type block := B.t
+  and type error := B.error
 
 end

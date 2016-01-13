@@ -503,6 +503,7 @@ It is the second two of these plumbing functions that have a much more interesti
 
 \begin{algorithm}[H]
   \begin{algorithmic}
+  \vskip 10pt
     \Function{BucketAddress}{$x$,$l$}
       \State $address \gets 0$
       \For{$i = 0;~i < l;~i++$}
@@ -514,6 +515,7 @@ It is the second two of these plumbing functions that have a much more interesti
       \EndFor
       \State \Return $address$
     \EndFunction
+  \vskip 10pt
   \end{algorithmic}
   \caption{Calculating the address of the bucket at level $l$ on the path to leaf $x$}
   \label{alg:bucketaddress}
@@ -523,7 +525,7 @@ This is most easily explained using \cref{fig:bucketaddress}. Here we can see th
 
 \begin{figure}[h]
   \centering
-  \begin{picture}(310,160)
+    \begin{picture}(310,160)
     \put(140,140){\framebox(30,20){0}}
     \put(155,140){\vector(4,-1){78}}
     \put(155,140){\vector(-4,-1){78}}
@@ -612,21 +614,61 @@ There is of course hidden complexity here. How do we create a recursive ORAM? We
 
 \mytodo{If had time to do integrity verification then include here otherwise discuss why I chose not to include it}
 
-\section{Object Store}
+\section{File System}
 \label{sec:objectStore}
+
+In order to perform search over documents, we need some way of actually storing those documents. This section describes the design and implementation of a basic file system that satisfies the requirements of the project.
 
 \subsection{General Design}
 
-\mytodo{Talk about design of Superblock, FreeMap, InodeIndex, Inodes, etc}
+The most common way of building a file system on top of a block device is through the use of inodes. An inode contains meta-information about a file along with pointers to the actual data blocks. For the purposes of this project, an inode will simply be one sector of the block device, containing the length of the file, followed by the list of pointers. In a system with more complex needs the inode would contain more information, such as modification/access timestamps, file permissions, etc., but we simply want to be able to read and write documents.
 
-\subsection{FreeMap}
+We need to be able to access the inode for a particular file quickly, so we should store its location in an index. We could perform lookup based on the actual filename, but the names have variable lengths, therefore, because we want to store the index, it is better to lookup based on the hash of the filename. \Cref{subsec:inodeindex} describes the implementation of the Inode Index.
 
-\mytodo{Build a Cstruct based FreeMap}
-\mytodo{Talk about the implementation of the FreeMap}
+We also need to allocate space on the block device for inode index blocks, for inode blocks and for data blocks. So we need a map that tells us which blocks on the device are free and allows us to update it as new blocks are needed. \Cref{subsec:freemap} describes the implementation of the Free Map.
 
-\subsection{B-Trees}
+We could now build a working file system, but we want it to be stateless. In order to do that, we need to store enough information to be able to reconstruct its in-memory representation. All we actually need to store is the root address of the Inode Index and the length of the Free Map. These two alone allow us to locate the data structures on disk when reconnecting to the block device. We store these two pieces of information at address 0 in what we call the Superblock.
 
-\mytodo{Talk about the implementation of B-Trees}
+\subsection{The Inode Index}
+\label{subsec:inodeindex}
+
+We need a data structure that associates keys, in the form of file hashes, with values, in the form of pointers to inodes. We want to support operations of insertion, lookup and deletion efficiently, but we also want to store the data structure on disk. This leads us naturally to an implementation using B-Trees.\footnote{The algorithms for B-Tree operations were adapted from \cite{CLRS09}}
+
+B-Trees are a generalisation of self-balancing binary search trees, where each node can have more than one child. If a node has $n$ children, then it stores $n-1$ keys. It is guaranteed that $$ \forall k \in child_m, j \in child_{m+1} . k < key_m < j, $$ that is, a key is greater than all the keys to its left and less than all the keys to its right. 
+
+B-Trees are an efficient on-disk data structure, because we can use the whole of a disk sector for one node. This gives us an extremely high branching factor, reducing the depth of the tree and therefore the number of disk sectors that we need to access in any single operation. On creation of the file system, we calculate the branching factor of the tree in order to fill as much of each sector as possible with useful information.
+
+\subsection{The Free Map}
+\label{subsec:freemap}
+
+In order to allocate space efficiently, we can simply use an array of bits the size of the block device. We again want to have an on-disk data structure, or at least one that can easily be flushed to disk regularly. It was therefore beneficial to write my own bit array based on \texttt{Cstruct}s, rather than using a library implementation. This gives us the ability to write the whole structure directly onto the disk using the block device methods, without any cumbersome translation.
+
+The \texttt{Cstruct} library performs data access in bytes. This leads us to \cref{alg:bitgetset} for getting and setting individual bits. To get the $n^{th}$ bit, we must get the $\frac{n}{8}^{th}$ byte and extract it from there. To do this, we calculate the index of the bit in the byte, shift a 1 to that position, and perform an and, masking that bit. Setting is a similar operation, but seeks to preserve the surrounding bits. To set a 1, we calculate the index of the bit in the byte, shift a 1 to that position, and perform an or, preserving all other bits. Setting a 0 is slightly trickier. We want to perform an and with a bit string that is 0 at the desired position and 1 everywhere else, but shifting fills empty bits with 0s. We can however use De Morgan's Law $$ a~\&\&~b = \neg (\neg a~||~\neg b) $$ to convert this to an operation involving a bit string that has a 1 at the desired position and 0s everywhere else.
+
+\begin{algorithm}[H]
+\caption{Getting and setting individual bits in a byte array}
+\label{alg:bitgetset}
+\begin{algorithmic}
+\vskip 10pt
+\Function{GetBit}{$\mathsf{index}$}
+  \State $byte \gets \mathsf{byteArray[index]}$
+  \State $shift \gets 7 - \mathsf{index} \bmod 8$
+  \State \Return $byte >> shift~\&\&~1$
+\EndFunction
+\vskip 10pt
+\Function{SetBit}{$\mathsf{index,boolean}$}
+  \State $byte \gets \mathsf{byteArray[index]}$
+  \State $shift \gets 7 - \mathsf{index} \bmod 8$
+  \If{$\mathsf{boolean}$}
+    \State $byte \gets byte~||~1 << shift$
+  \Else
+    \State $byte \gets \neg (\neg byte~||~1 << shift)$
+  \EndIf
+  \State $\mathsf{byteArray[index]} \gets byte$
+\EndFunction
+\vskip 10pt
+\end{algorithmic}
+\end{algorithm}
 
 \section{Search Module}
 \label{sec:searchmodule}
@@ -665,6 +707,8 @@ There is of course hidden complexity here. How do we create a recursive ORAM? We
 
 % Etc.
 
+% Use QuickCheck to build randomised testing
+
 % ### Performance ###
 
 % Evaluate the performance of the code and do it with different configurations, varying functors used, size of input, potentially simulated network latency etc.
@@ -672,6 +716,8 @@ There is of course hidden complexity here. How do we create a recursive ORAM? We
 % ### Security ###
 
 % Use statistical methods to show that access pattern is easily visible to Bob before applying ORAM to the system and the show statistical evidence the access pattern is hidden after applying ORAM
+
+% Show specifically that with the entire access pattern, the server can infer which documents are returned by each query, and could therefore perform the attack described by Islam et al.
 
 \section{Overall Results}
 

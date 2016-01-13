@@ -2,44 +2,17 @@
 
   Simple Filesystem
 
-  Sector 0 : Superblock (contains rootAddress for the InodeIndex and maybe some other stuff...we'll see)
+  Sector 0 : Superblock (contains the root address for the InodeIndex and the size of the FreeMap)
   Sector 1 : FreeMap (Bitarray of free memory locations)
-  Sector 2 : InodeIndex (Mappings from inode numbers to disk addresses)
       .
       .
       .
-  Sector n : Other files!
-
-  We need to decide on how many sectors to use for InodeIndex
-
-  If sector size is x bytes, then can address x / 8 inodes in one sector
-
-  Each inode can then adress x / 8 locations, giving x^2 / 64
-  addressible locations per sector of index
-
-  If disk is of size b sectors,
-  then to cover whole disk, we need
-  64 * b / x ^ 2 sectors of InodeIndex
-
-  For disk of size 2GB and 512B sector size,
-  this gives 954 sectors of InodeIndex...
-
-  However on a disk of 256MB, this is only 123 sectors
-
-  We would want to selectively load the index from memory probably, not the whole thing...
-  Or in fact load the whole thing, but just store the individual lines when they change!
-
-  File names also present an issue
-
-  If we have ~7000 inodes each with a 32B filename, that is ~400 sectors dedicated to filenames
-
-  Scanning this would be a hassle probably
-
-  But lets do this inefficiently at first and we can rethink later
-
-  This is sounding a lot like one of those vEB trees or something similar...
-
-  It's a B-Tree! Think about building the whole filesystem as a FreeMap and a B-Tree
+  Sector n : FreeMap
+  Sector n + 1 : InodeIndex Root
+      .
+      .
+      .
+  Sector m : Other Blocks
 
 *)
 
@@ -74,25 +47,15 @@ module Make (B : BLOCK) = struct
       B.write t.bd (Int64.of_int n) [buffer] >>= fun _ ->
       writeFreeMap t (n - 1)
 
-  (* Flush freeMap to disk *)
-  (* Flush inodeIndex rootAddress to disk *)
-  (* Everything else can be reconstructed *)
   let flush_meta t =
     B.write t.bd 0L [t.superblock] >>= fun () ->
     let freeMapSize = Int64.to_int (Cstruct.BE.get_uint64 t.superblock 8) in
     writeFreeMap t freeMapSize
 
-  (* Extract info from block device *)
-  (* Create relevant data structures of right size *)
-  (* Write those out to disk *)
   let initialise bd =
     lwt info = B.get_info bd in
     let superblock = Cstruct.create info.B.sector_size in
-    (* Instead, calculate the size necessary and store it in the superblock, it's not going to change *)
     let freeMapSize = Int64.(to_int @@ add (div (sub info.B.size_sectors 1L) (of_int (info.B.sector_size * 8))) 1L) in
-    (* if info.B.sector_size * 8 < Int64.to_int info.B.size_sectors
-      then return (`Error (`Unknown (Printf.sprintf "Block size %d to small to store FreeMap of size %Ld" info.B.sector_size info.B.size_sectors)))
-      else return (`Ok ()) >>= fun () -> *)
     let freeMap = FreeMap.create freeMapSize info.B.sector_size in
     I.create freeMap bd info.B.sector_size >>= fun inodeIndex ->
     Cstruct.BE.set_uint64 superblock 0 inodeIndex.I.rootAddress;
@@ -101,8 +64,6 @@ module Make (B : BLOCK) = struct
     flush_meta t >>= fun () ->
     return (`Ok t)
 
-  (* Read freeMap from memory *)
-  (* Read root of index from memory and construct InodeIndex *)
   let connect bd =
     lwt info = B.get_info bd in
     let freeMap = Cstruct.create info.B.sector_size in
@@ -114,18 +75,14 @@ module Make (B : BLOCK) = struct
     return (`Ok { superblock ; freeMap ; inodeIndex ; bd ; info })
 
   let createFile t name =
-    (*Printf.printf "*** CREATING FILE ***\n";*)
     let inode = Inode.create (t.info.B.sector_size / 8) in
     let inodeNum = hash name in
     begin match FreeMap.alloc t.freeMap 1 with
       | [diskAddr] -> return (`Ok diskAddr)
       | _ -> return (`Error (`Unknown "Wrong number of blocks allocated"))
     end >>= fun diskAddr ->
-    (* Printf.printf "About to insert key\n"; *)
     I.insert t.inodeIndex inodeNum diskAddr >>= fun () ->
-    (* Printf.printf "Inserted key\n"; *)
     B.write t.bd diskAddr [inode] >>= fun () ->
-    (* Printf.printf "Wrote inode to disk!\n"; *)
     flush_meta t
 
   (* Should probably remove inode and free memory if there is an error *)
@@ -138,11 +95,9 @@ module Make (B : BLOCK) = struct
       | Some diskAddr ->
         let inode = Inode.create (t.info.B.sector_size / 8) in
         B.read t.bd diskAddr [inode] >>= fun () ->
-        (*Printf.printf "Read inode: %s\n" (Cstruct.to_string inode);*)
         return (`Ok inode)
 
   let flushInodeForFile t name inode =
-    (*Printf.printf "Writing inode: %s\n" (Cstruct.to_string inode);*)
     let inodeNum = hash name in
     I.find t.inodeIndex t.inodeIndex.I.root inodeNum >>= fun a ->
     match a with
@@ -151,7 +106,6 @@ module Make (B : BLOCK) = struct
         B.write t.bd diskAddr [inode]
 
   let writeFile t name contents =
-    (*Printf.printf "*** WRITING FILE ***\n";*)
     inodeForFile t name >>= fun inode ->
     let inodeLength = Inode.noPtrs inode in
     let contentLength = (Cstruct.len contents - 1) / t.info.B.sector_size + 1 in
@@ -165,7 +119,6 @@ module Make (B : BLOCK) = struct
       Inode.addPtrs inode allocated
     );
     flushInodeForFile t name inode >>= fun () ->
-    (* Loop around writing contents to pointers *)
     let rec loop = function
       | 0 -> return (`Ok ())
       | n ->
@@ -177,7 +130,6 @@ module Make (B : BLOCK) = struct
 
   (* Need length or EOF markers so that we don't need sector_size aligned files*)
   let readFile t name =
-    (*Printf.printf "*** READING FILE ***\n";*)
     inodeForFile t name >>= fun inode ->
     let inodeLength = Inode.noPtrs inode in
     let result = Cstruct.create (inodeLength * t.info.B.sector_size) in

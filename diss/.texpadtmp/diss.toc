@@ -27,21 +27,21 @@
 \contentsline {subsection}{\numberline {3.1.7}Statelessness}{25}{subsection.3.1.7}
 \contentsline {subsection}{\numberline {3.1.8}Optimisation}{25}{subsection.3.1.8}
 \contentsline {subsection}{\numberline {3.1.9}Integrity Verification}{25}{subsection.3.1.9}
-\contentsline {section}{\numberline {3.2}Object Store}{25}{section.3.2}
+\contentsline {section}{\numberline {3.2}File System}{25}{section.3.2}
 \contentsline {subsection}{\numberline {3.2.1}General Design}{25}{subsection.3.2.1}
-\contentsline {subsection}{\numberline {3.2.2}FreeMap}{25}{subsection.3.2.2}
-\contentsline {subsection}{\numberline {3.2.3}B-Trees}{25}{subsection.3.2.3}
-\contentsline {section}{\numberline {3.3}Search Module}{26}{section.3.3}
-\contentsline {subsection}{\numberline {3.3.1}Inverted Index}{26}{subsection.3.3.1}
-\contentsline {subsection}{\numberline {3.3.2}Keyword Search API}{26}{subsection.3.3.2}
-\contentsline {section}{\numberline {3.4}Encryption}{26}{section.3.4}
-\contentsline {subsection}{\numberline {3.4.1}Library}{26}{subsection.3.4.1}
-\contentsline {chapter}{\numberline {4}Evaluation}{29}{chapter.4}
-\contentsline {section}{\numberline {4.1}Overall Results}{29}{section.4.1}
-\contentsline {section}{\numberline {4.2}Unit Tests}{29}{section.4.2}
-\contentsline {section}{\numberline {4.3}Performance Tests}{29}{section.4.3}
-\contentsline {subsection}{\numberline {4.3.1}Microbenchmarks}{29}{subsection.4.3.1}
-\contentsline {section}{\numberline {4.4}Security Analysis}{29}{section.4.4}
-\contentsline {chapter}{\numberline {5}Conclusion}{31}{chapter.5}
-\contentsline {chapter}{Bibliography}{31}{chapter.5}
-\contentsline {chapter}{\numberline {A}Project Proposal}{35}{appendix.A}
+\contentsline {subsection}{\numberline {3.2.2}The Inode Index}{26}{subsection.3.2.2}
+\contentsline {subsection}{\numberline {3.2.3}The Free Map}{26}{subsection.3.2.3}
+\contentsline {section}{\numberline {3.3}Search Module}{27}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Inverted Index}{27}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.3.2}Keyword Search API}{27}{subsection.3.3.2}
+\contentsline {section}{\numberline {3.4}Encryption}{28}{section.3.4}
+\contentsline {subsection}{\numberline {3.4.1}Library}{28}{subsection.3.4.1}
+\contentsline {chapter}{\numberline {4}Evaluation}{31}{chapter.4}
+\contentsline {section}{\numberline {4.1}Overall Results}{31}{section.4.1}
+\contentsline {section}{\numberline {4.2}Unit Tests}{31}{section.4.2}
+\contentsline {section}{\numberline {4.3}Performance Tests}{31}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}Microbenchmarks}{31}{subsection.4.3.1}
+\contentsline {section}{\numberline {4.4}Security Analysis}{31}{section.4.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{33}{chapter.5}
+\contentsline {chapter}{Bibliography}{33}{chapter.5}
+\contentsline {chapter}{\numberline {A}Project Proposal}{37}{appendix.A}
