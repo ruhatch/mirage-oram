@@ -4,7 +4,7 @@ open V1_LWT
 open Core_kernel.Std
 open PosMapIntf
 
-module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
+module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
 
   module PositionMap = MakePositionMap(BlockDevice)
 
@@ -287,7 +287,7 @@ module Make (MakePositionMap : PosMapF)(BlockDevice : BLOCK) = struct
   let writeBuffer t startAddress buffer =
     let bufferLengthInSectors = buffer.Cstruct.len / t.info.sector_size in
     let rec writeSectors = function
-      | 0 -> return (`Ok ())
+      | -1 -> return (`Ok ())
       | sectorAddressInBuffer ->
         let offsetInBuffer = sectorAddressInBuffer * t.info.sector_size in
         let dataToWrite = Cstruct.sub buffer offsetInBuffer t.info.sector_size in

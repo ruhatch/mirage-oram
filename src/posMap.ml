@@ -1,15 +1,14 @@
 open Bigarray
-open V1_LWT
 open Core_kernel.Std
 open Lwt
 
-module InMemory (B : BLOCK) = struct
+module InMemory (BlockDevice : V1_LWT.BLOCK) = struct
 
   type t = (int64, int64_elt, c_layout) Array3.t
 
-  type block = B.t
+  type block = BlockDevice.t
 
-  type error = B.error
+  type error = BlockDevice.error
 
   let indices a =
     let x = Option.value Int64.(to_int @@ shift_right a 60) ~default:0 in

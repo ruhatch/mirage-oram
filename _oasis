@@ -45,6 +45,18 @@ Library mirage_block_fs
                     lwt.syntax,
                     mirage-btrees
 
+Library mirage_ir
+  Path:             src/search
+  Findlibname:      mirage-ir
+  Modules:          InvertedIndex
+  BuildDepends:     mirage,
+                    cstruct,
+                    lwt,
+                    lwt.syntax,
+                    mirage-block-fs,
+                    core_kernel,
+                    bin_prot
+
 Library tests
   Path: tests
   Build$:           flag(tests)
@@ -174,6 +186,19 @@ Executable oram_fs_tests
                     tests,
                     core_kernel
 
+Executable inverted_index_tests
+  Path:             tests/searchTests
+  MainIs:           invertedIndexTests.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-block-fs,
+                    mirage-ir,
+                    alcotest,
+                    mirage-block-unix,
+                    lwt,
+                    tests
+
 Test oram_tests
   Run$:             flag(tests)
   TestTools:        oram_tests
@@ -238,4 +263,10 @@ Test oram_fs_tests
   Run$:             flag(tests)
   TestTools:        oram_fs_tests
   Command:          $oram_fs_tests
+  WorkingDirectory: tests
+
+Test inverted_index_tests
+  Run$:             flag(tests)
+  TestTools:        inverted_index_tests
+  Command:          $inverted_index_tests
   WorkingDirectory: tests

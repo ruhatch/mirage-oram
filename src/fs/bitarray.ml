@@ -2,9 +2,7 @@
 
   Need to access using int64
 
-  For now we will just use ints, but we will have to create an array of cstructs
-
-  Could even do this as a BTree if we need
+  For now we will just use ints, but we will have to create an array of cstructs for full coverage
 
 *)
 

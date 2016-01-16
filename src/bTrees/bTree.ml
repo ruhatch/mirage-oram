@@ -60,109 +60,150 @@ module type STORE = sig
 
 end
 
-module Make (A : ALLOCATOR) (S : STORE with type pointer = A.pointer) (N : Node.NODE with type t = S.page_aligned_buffer and type pointer = A.pointer) = struct
+module type S = sig
 
-  let (>>=) = S.bind
-
-  let return = S.return
-
-  type pointer = A.pointer
+  type pointer
+  type allocator
+  type store
+  type error
+  type 'a io
+  type node
+  type key
+  type value
 
   type t = {
-    allocator : A.t;
-    store : S.t;
-    mutable root : N.t;
-    mutable rootAddress : A.pointer;
+    allocator : allocator;
+    store : store;
+    mutable root : node;
+    mutable rootAddress : pointer;
     minDegree : int;
   }
+
+  val create : allocator -> store -> int -> [`Error of error | `Ok of t] io
+
+  val connect : allocator -> store -> int -> pointer -> [`Error of error | `Ok of t] io
+
+  val insert : t -> key -> value -> [`Error of error | `Ok of unit] io
+
+  val find : t -> node -> key -> [`Error of error | `Ok of value option] io
+
+end
+
+module Make (Allocator : ALLOCATOR) (Store : STORE with type pointer = Allocator.pointer) (Node : Node.NODE with type t = Store.page_aligned_buffer and type pointer = Allocator.pointer) = struct
+
+  let (>>=) = Store.bind
+
+  let return = Store.return
+
+  type pointer = Allocator.pointer
+  type allocator = Allocator.t
+  type store = Store.t
+  type error = Store.error
+  type 'a io = 'a Store.io
+  type node = Node.t
+  type key = Node.key
+  type value = Node.value
+
+  type t = {
+    allocator : allocator;
+    store : store;
+    mutable root : node;
+    mutable rootAddress : pointer;
+    minDegree : int;
+  }
+
+  (* include S with type pointer = Allocator.pointer
+  and type allocator = Allocator.t
+  and type store = Store.t
+  and type node = Node.t *)
 
   let ( >>= ) x f = x >>= function
     | `Error e -> return (`Error e)
     | `Ok x -> f x
 
   let create allocator store pageSize =
-    let root = N.create pageSize in
-    N.setLeaf root true;
-    let minDegree = N.minDegree root in
-    let [rootAddress] = A.alloc allocator 1 in
-    S.write store rootAddress [root] >>= fun () ->
+    let root = Node.create pageSize in
+    Node.setLeaf root true;
+    let minDegree = Node.minDegree root in
+    let [rootAddress] = Allocator.alloc allocator 1 in
+    Store.write store rootAddress [root] >>= fun () ->
     return (`Ok ({ allocator ; store ; root ; rootAddress ; minDegree }))
 
   let connect allocator store pageSize rootAddress =
-    let root = N.create pageSize in
-    S.read store rootAddress [root] >>= fun () ->
-    let minDegree = N.minDegree root in
+    let root = Node.create pageSize in
+    Store.read store rootAddress [root] >>= fun () ->
+    let minDegree = Node.minDegree root in
     return (`Ok ({ allocator ; store ; root ; rootAddress ; minDegree }))
 
   let splitChild t parent parentAddress child childAddress childIndex =
-    let newChild = N.create (N.pageSize t.root) in
-    let [newChildAddress] = A.alloc t.allocator 1 in
-    N.setLeaf newChild (N.leaf child);
-    N.setNoKeys newChild (t.minDegree - 1);
+    let newChild = Node.create (Node.pageSize t.root) in
+    let [newChildAddress] = Allocator.alloc t.allocator 1 in
+    Node.setLeaf newChild (Node.leaf child);
+    Node.setNoKeys newChild (t.minDegree - 1);
     for j = 1 to t.minDegree - 1 do
-      N.setKey newChild j (N.getKey child (j + t.minDegree));
-      N.setValue newChild j (N.getValue child (j + t.minDegree))
+      Node.setKey newChild j (Node.getKey child (j + t.minDegree));
+      Node.setValue newChild j (Node.getValue child (j + t.minDegree))
     done;
-    if not (N.leaf child)
+    if not (Node.leaf child)
     then
       for j = childIndex to t.minDegree do
-        N.setChild newChild j (N.getChild child (j + t.minDegree))
+        Node.setChild newChild j (Node.getChild child (j + t.minDegree))
       done;
-    N.setNoKeys child (t.minDegree - 1);
-    for j = N.noKeys parent + 1 downto childIndex + 1 do
-      N.setChild parent (j + 1) (N.getChild parent j)
+    Node.setNoKeys child (t.minDegree - 1);
+    for j = Node.noKeys parent + 1 downto childIndex + 1 do
+      Node.setChild parent (j + 1) (Node.getChild parent j)
     done;
-    N.setChild parent (childIndex + 1) newChildAddress;
-    for j = N.noKeys parent downto childIndex do
-      N.setKey parent (j + 1) (N.getKey parent j);
-      N.setValue parent (j + 1) (N.getValue parent j)
+    Node.setChild parent (childIndex + 1) newChildAddress;
+    for j = Node.noKeys parent downto childIndex do
+      Node.setKey parent (j + 1) (Node.getKey parent j);
+      Node.setValue parent (j + 1) (Node.getValue parent j)
     done;
-    N.setKey parent childIndex (N.getKey child t.minDegree);
-    N.setValue parent childIndex (N.getValue child t.minDegree);
-    N.setNoKeys parent (N.noKeys parent + 1);
-    S.write t.store parentAddress [parent] >>= fun () ->
-    S.write t.store childAddress [child] >>= fun () ->
-    S.write t.store newChildAddress [newChild] >>= fun () ->
+    Node.setKey parent childIndex (Node.getKey child t.minDegree);
+    Node.setValue parent childIndex (Node.getValue child t.minDegree);
+    Node.setNoKeys parent (Node.noKeys parent + 1);
+    Store.write t.store parentAddress [parent] >>= fun () ->
+    Store.write t.store childAddress [child] >>= fun () ->
+    Store.write t.store newChildAddress [newChild] >>= fun () ->
     return (`Ok (newChild,newChildAddress))
 
   let rec insertNonfull t node nodeAddress key value =
-    (*Printf.printf "Inserting. Node is leaf? %b\n" (N.leaf node);*)
-    let i = ref (N.noKeys node) in
-    if N.leaf node
+    (*Printf.printf "Inserting. Node is leaf? %b\n" (Node.leaf node);*)
+    let i = ref (Node.noKeys node) in
+    if Node.leaf node
     then (
-      while !i >= 1 && key < N.getKey node !i do
-        N.setKey node (!i + 1) (N.getKey node !i);
-        N.setValue node (!i + 1) (N.getValue node !i);
+      while !i >= 1 && key < Node.getKey node !i do
+        Node.setKey node (!i + 1) (Node.getKey node !i);
+        Node.setValue node (!i + 1) (Node.getValue node !i);
         decr i
       done;
-      N.setKey node (!i + 1) key;
-      N.setValue node (!i + 1) value;
-      N.setNoKeys node (N.noKeys node + 1);
-      S.write t.store nodeAddress [node]
+      Node.setKey node (!i + 1) key;
+      Node.setValue node (!i + 1) value;
+      Node.setNoKeys node (Node.noKeys node + 1);
+      Store.write t.store nodeAddress [node]
     ) else (
-      while !i >= 1 && key < N.getKey node !i do
+      while !i >= 1 && key < Node.getKey node !i do
         decr i
       done;
       incr i;
-      let child = N.create (N.pageSize t.root) in
-      let childAddress = N.getChild node !i in
-      S.read t.store childAddress [child] >>= fun () ->
-      if N.noKeys child = (2 * t.minDegree - 1)
+      let child = Node.create (Node.pageSize t.root) in
+      let childAddress = Node.getChild node !i in
+      Store.read t.store childAddress [child] >>= fun () ->
+      if Node.noKeys child = (2 * t.minDegree - 1)
       then (
         splitChild t node nodeAddress child childAddress !i >>= fun (n,na) ->
-        if key > N.getKey node !i
+        if key > Node.getKey node !i
         then insertNonfull t n na key value
-        else insertNonfull t child (N.getChild node !i) key value
-      ) else insertNonfull t child (N.getChild node !i) key value
+        else insertNonfull t child (Node.getChild node !i) key value
+      ) else insertNonfull t child (Node.getChild node !i) key value
     )
 
   let insert t key value =
-    if N.noKeys t.root = (2 * t.minDegree - 1)
+    if Node.noKeys t.root = (2 * t.minDegree - 1)
     then (
-      let s = N.create (N.pageSize t.root) in
-      let [sa] = A.alloc t.allocator 1 in
-      N.setLeaf s false;
-      N.setChild s 1 t.rootAddress;
+      let s = Node.create (Node.pageSize t.root) in
+      let [sa] = Allocator.alloc t.allocator 1 in
+      Node.setLeaf s false;
+      Node.setChild s 1 t.rootAddress;
       splitChild t s sa t.root t.rootAddress 1 >>= fun (n, na) ->
       t.root <- s;
       t.rootAddress <- sa;
@@ -170,22 +211,22 @@ module Make (A : ALLOCATOR) (S : STORE with type pointer = A.pointer) (N : Node.
     ) else insertNonfull t t.root t.rootAddress key value
 
   let rec find t node key =
-    (* let keyStrings = N.printKeys node in
+    (* let keyStrings = Node.printKeys node in
     Printf.printf "Looking for key in list: ";
     List.iter (fun k -> Printf.printf "%s " k) keyStrings;
     Printf.printf "\n"; *)
     let i = ref 1 in
-    while !i <= N.noKeys node && key > N.getKey node !i do
+    while !i <= Node.noKeys node && key > Node.getKey node !i do
       incr i;
     done;
-    if !i <= N.noKeys node && key = N.getKey node !i
-    then return (`Ok (Some (N.getValue node !i)))
-    else if N.leaf node
+    if !i <= Node.noKeys node && key = Node.getKey node !i
+    then return (`Ok (Some (Node.getValue node !i)))
+    else if Node.leaf node
     then return (`Ok None)
     else (
-      let child = N.create (N.pageSize t.root) in
-      let childAddress = N.getChild node !i in
-      S.read t.store childAddress [child] >>= fun () ->
+      let child = Node.create (Node.pageSize t.root) in
+      let childAddress = Node.getChild node !i in
+      Store.read t.store childAddress [child] >>= fun () ->
       find t child key
     )
 

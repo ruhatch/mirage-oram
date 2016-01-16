@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2016.1.4)  12 JAN 2016 19:11
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2016.1.4)  15 JAN 2016 07:56
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -715,7 +715,7 @@ LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <12> not available
 (Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 442.
  [21]
 Package hyperref Info: bookmark level for unknown listing defaults to 0 on input line 452.
- (./.texpadtmp/_minted-diss/83DAEB1E6F7829E1D1D7B1A1FA34B7E10438B337C3448CDF87D621938C174BA3.pygtex)
+ (./.texpadtmp/_minted-diss/E33195778C7760765E0FDE32D530DEE70438B337C3448CDF87D621938C174BA3.pygtex)
 \openout4 = `diss.pyg'.
 
  (./.texpadtmp/_minted-diss/B0D16569E56B4397E2E05019A45AD189DC67E8E086D2EC8D138354ABC09D0BEC.pygtex)
@@ -813,13 +813,13 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 748.
 Here is how much of TeX's memory you used:
  20577 strings out of 493089
  393301 string characters out of 6134843
- 512423 words of memory out of 5000000
+ 512422 words of memory out of 5000000
  23527 multiletter control sequences out of 15000+600000
  15090 words of font info for 54 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  62i,11n,80p,1440b,628s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/latxfont/line10.pfb>
-Output written on /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.pdf (45 pages, 321321 bytes).
+Output written on /Users/ruhatch/Documents/Part_II/Project/mirage-oram/diss/.texpadtmp/diss.pdf (45 pages, 321504 bytes).
 PDF statistics:
  718 PDF objects out of 1000 (max. 8388607)
  643 compressed objects within 7 object streams

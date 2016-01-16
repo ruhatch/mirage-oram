@@ -9,10 +9,10 @@ let oram_fs_tests =
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd "")
+              newFile fs.F.blockDevice "")
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd "" >>= fun file ->
+              newFile fs.F.blockDevice "" >>= fun file ->
               F.createFile fs "test" >>= fun () ->
               F.writeFile fs "test" file  >>= fun () ->
               F.readFile fs "test"));
@@ -21,10 +21,10 @@ let oram_fs_tests =
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd "All work and no play makes Dave a dull boy")
+              newFile fs.F.blockDevice "All work and no play makes Dave a dull boy")
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd "All work and no play makes Dave a dull boy" >>= fun file ->
+              newFile fs.F.blockDevice "All work and no play makes Dave a dull boy" >>= fun file ->
               F.createFile fs "test" >>= fun () ->
               F.writeFile fs "test" file  >>= fun () ->
               F.readFile fs "test"));
@@ -34,10 +34,10 @@ let oram_fs_tests =
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd contents)
+              newFile fs.F.blockDevice contents)
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd contents >>= fun file ->
+              newFile fs.F.blockDevice contents >>= fun file ->
               F.createFile fs "pg61.txt" >>= fun () ->
               F.writeFile fs "pg61.txt" file >>= fun () ->
               F.readFile fs "pg61.txt"));
@@ -46,12 +46,12 @@ let oram_fs_tests =
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg61.txt"))
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt"))
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
               F.createFile fs "pg61.txt" >>= fun () ->
               F.writeFile fs "pg61.txt" file1  >>= fun () ->
               F.createFile fs "pg62.txt" >>= fun () ->
@@ -64,12 +64,12 @@ let oram_fs_tests =
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg62.txt"))
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt"))
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
               F.createFile fs "pg61.txt" >>= fun () ->
               F.writeFile fs "pg61.txt" file1  >>= fun () ->
               F.createFile fs "pg62.txt" >>= fun () ->
@@ -82,12 +82,12 @@ let oram_fs_tests =
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg63.txt"))
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt"))
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
               F.createFile fs "pg61.txt" >>= fun () ->
               F.writeFile fs "pg61.txt" file1  >>= fun () ->
               F.createFile fs "pg62.txt" >>= fun () ->
@@ -100,17 +100,17 @@ let oram_fs_tests =
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg61.txt"))
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt"))
             (fun () ->
               newFs () >>= fun fs ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-              newFile fs.F.bd (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
+              newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
               F.createFile fs "pg61.txt" >>= fun () ->
               F.writeFile fs "pg61.txt" file1  >>= fun () ->
-              bind (O.disconnect fs.F.bd) @@ fun () ->
-              Block.connect "disk.img" >>= fun bd ->
-              O.fakeReconnect fs.F.bd bd >>= fun oram ->
+              bind (O.disconnect fs.F.blockDevice) @@ fun () ->
+              Block.connect "disk.img" >>= fun blockDevice ->
+              O.fakeReconnect fs.F.blockDevice blockDevice >>= fun oram ->
               F.connect oram >>= fun fs ->
               F.createFile fs "pg62.txt" >>= fun () ->
               F.writeFile fs "pg62.txt" file2  >>= fun () ->
