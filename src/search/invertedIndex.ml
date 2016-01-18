@@ -1,32 +1,43 @@
 open Core_kernel.Std
 
-type t = int list String.Table.t
+type t = String.Hash_set.t String.Table.t
 
-let bin_writer_t = String.Table.bin_writer_t (List.bin_writer_t Int.bin_writer_t)
+let bin_writer_t = String.Table.bin_writer_t (String.Hash_set.bin_writer_t)
 
-let bin_reader_t = String.Table.bin_reader_t (List.bin_reader_t Int.bin_reader_t)
+let bin_reader_t = String.Table.bin_reader_t (String.Hash_set.bin_reader_t)
 
 let create () = String.Table.create ()
 
-let find t word =
-match String.Table.find t word with
-  | Some result -> result
-  | None -> []
+let intersectPostings postings1 postings2 =
+  Hash_set.filter postings1 ~f:(fun elem -> Hash_set.mem postings2 elem)
+
+let find t word = String.Table.find t word
 
 let findPhrase t phrase =
   let words = String.split_on_chars phrase ~on:[' '] in
-  let postings = List.map ~f:(fun word -> find t word) in
-  
+  let postings = List.filter_opt (List.map ~f:(fun word -> find t word) words) in
+  List.reduce postings ~f:intersectPostings
 
-let updatePosting t word docId =
-  let posting = find t word in
-  let _ = String.Table.set t ~key:word ~data:(docId :: posting) in
-  ()
+let fileNamesForQuery t query =
+  match findPhrase t query with
+    | Some result -> Hash_set.to_list result
+    | None -> []
 
-let indexFile t fileContents docId =
-  let fileString = Cstruct.to_string fileContents in
-  let words = String.split_on_chars fileString ~on:[' '] in
-  List.iter ~f:(fun word -> updatePosting t word docId) words
+let updatePosting t word fileName =
+  Printf.printf "Updating posting for %s with file name %s\n" word fileName;
+  match find t word with
+    | Some posting -> Hash_set.add posting fileName
+    | None ->
+      let data = String.Hash_set.create () in
+      Hash_set.add data fileName;
+      String.Table.set t ~key:word ~data
+
+let stripFile = String.filter ~f:(fun a -> not (String.contains ".,;:'\"\'?!" a))
+
+let indexFile t name contents =
+  let fileString = stripFile (Cstruct.to_string contents) in
+  let words = List.dedup (String.split_on_chars fileString ~on:[' ';'\n';'\r';'-']) in
+  List.iter ~f:(fun word -> updatePosting t word name) words
 
 let toCstruct t blockSize =
   let binarySize = bin_writer_t.Bin_prot.Type_class.size t in

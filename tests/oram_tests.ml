@@ -48,7 +48,7 @@ let oram_tests =
               let buff = Cstruct.create (Cstruct.len file) in
               O.read bd 0L [buff] >>= fun () ->
               return (`Ok buff)));
-      "ORAMWriteFile_ProjectGutenburg_ReadOutCorrectly", `Slow,
+      "ORAMWriteFile_ProjectGutenberg_ReadOutCorrectly", `Slow,
         (fun () ->
           let contents = readWholeFile "testFiles/pg61.txt" in
           (check (lwt_t @@ result error cstruct)) ""

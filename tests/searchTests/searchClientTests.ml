@@ -2,58 +2,56 @@ open Alcotest
 open Lwt
 open Testable
 
-let oram_fs_tests =
+let searchClientTests =
     [
-      "ORAMFSWriteFile_EmptyString_ReadOutEmptyString", `Slow,
+      "SearchClientWriteFile_EmptyString_ReadOutEmptyString", `Slow,
         (fun () ->
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice "")
+              newSearchClient () >>= fun searchClient ->
+              newFile searchClient.SearchClient.fileSystem.F.blockDevice "")
             (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice "" >>= fun file ->
-              F.writeFile fs "test" file  >>= fun () ->
-              F.readFile fs "test"));
-      "ORAMFSWriteFile_String_ReadOutString", `Slow,
+              newSearchClient () >>= fun searchClient ->
+              newFile searchClient.SearchClient.fileSystem.F.blockDevice "" >>= fun file ->
+              SearchClient.writeFile searchClient "test" file >>= fun () ->
+              SearchClient.readFile searchClient "test"));
+      "SearchClientWriteFile_String_ReadOutString", `Slow,
         (fun () ->
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice "All work and no play makes Dave a dull boy")
+              newSearchClient () >>= fun searchClient ->
+              newFile searchClient.SearchClient.fileSystem.F.blockDevice "All work and no play makes Dave a dull boy")
             (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice "All work and no play makes Dave a dull boy" >>= fun file ->
-              F.writeFile fs "test" file  >>= fun () ->
-              F.readFile fs "test"));
-      "ORAMFSWriteFile_ProjectGutenberg_ReadOutFileCorrectly", `Slow,
+              newSearchClient () >>= fun searchClient ->
+              newFile searchClient.SearchClient.fileSystem.F.blockDevice "All work and no play makes Dave a dull boy" >>= fun file ->
+              SearchClient.writeFile searchClient "test" file >>= fun () ->
+              SearchClient.readFile searchClient "test"));
+      "SearchClientWriteFile_ProjectGutenberg_ReadOutFileCorrectly", `Slow,
         (fun () ->
           let contents = readWholeFile "testFiles/pg61.txt" in
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice contents)
+              newSearchClient () >>= fun searchClient ->
+              newFile searchClient.SearchClient.fileSystem.F.blockDevice contents)
             (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice contents >>= fun file ->
-              F.writeFile fs "pg61.txt" file >>= fun () ->
-              F.readFile fs "pg61.txt"));
-      "ORAMFSWriteFile_3ProjectGutenbergs_ReadOutFile1Correctly", `Slow,
+              newSearchClient () >>= fun searchClient ->
+              newFile searchClient.SearchClient.fileSystem.F.blockDevice contents >>= fun file ->
+              SearchClient.writeFile searchClient "test" file >>= fun () ->
+              SearchClient.readFile searchClient "test"));
+      "SearchClientSearch_3ProjectGutenbergsForGutenberg_AllFiles", `Slow,
         (fun () ->
-          check (lwt_t @@ result error cstruct) ""
+          check (lwt_t @@ result error (list string)) ""
+            (fun () -> return (`Ok ["pg63.txt";"pg61.txt";"pg62.txt"]))
             (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt"))
-            (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
-              F.writeFile fs "pg61.txt" file1  >>= fun () ->
-              F.writeFile fs "pg62.txt" file2  >>= fun () ->
-              F.writeFile fs "pg63.txt" file3  >>= fun () ->
-              F.readFile fs "pg61.txt"));
-      "ORAMFSWriteFile_3ProjectGutenbergs_ReadOutFile2Correctly", `Slow,
+              newSearchClient () >>= fun searchClient ->
+              newFile searchClient.SearchClient.fileSystem.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
+              newFile searchClient.SearchClient.fileSystem.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
+              newFile searchClient.SearchClient.fileSystem.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+              SearchClient.writeFile searchClient "pg61.txt" file1 >>= fun () ->
+              SearchClient.writeFile searchClient "pg62.txt" file2 >>= fun () ->
+              SearchClient.writeFile searchClient "pg63.txt" file3 >>= fun () ->
+              SearchClient.search searchClient "Gutenberg"));
+      (*)"ORAMFSWriteFile_3ProjectGutenbergs_ReadOutFile2Correctly", `Slow,
         (fun () ->
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
@@ -101,10 +99,10 @@ let oram_fs_tests =
               F.connect oram >>= fun fs ->
               F.writeFile fs "pg62.txt" file2  >>= fun () ->
               F.writeFile fs "pg63.txt" file3  >>= fun () ->
-              F.readFile fs "pg61.txt"));
+              F.readFile fs "pg61.txt"));*)
     ]
 
 let () =
-  Alcotest.run "ORAM FS Tests" [
-    "ORAM FS Tests", oram_fs_tests
+  Alcotest.run "Search Client Tests" [
+    "Search Client Tests", searchClientTests
   ]

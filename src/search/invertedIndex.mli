@@ -2,11 +2,11 @@ type t
 
 val create : unit -> t
 
-val updatePosting : t -> string -> int -> unit
+val updatePosting : t -> string -> string -> unit
 
-val indexFile : t -> Cstruct.t -> int -> unit
+val indexFile : t -> string -> Cstruct.t -> unit
 
-val find : t -> string -> int list
+val fileNamesForQuery : t -> string -> string list
 
 val toCstruct : t -> int -> Cstruct.t
 

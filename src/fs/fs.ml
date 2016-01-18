@@ -37,7 +37,9 @@ module type S = sig
 
   val connect : blockDevice -> [`Error of error | `Ok of t] Lwt.t
 
-  val createFile : t -> string -> [`Error of error | `Ok of unit] Lwt.t
+  (* val createFile : t -> string -> [`Error of error | `Ok of unit] Lwt.t *)
+
+  val fileExists : t -> string -> [`Error of error | `Ok of bool] Lwt.t
 
   val writeFile : t -> string -> Cstruct.t -> [`Error of error | `Ok of unit] Lwt.t
 
@@ -114,7 +116,8 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
     end >>= fun diskAddr ->
     I.insert t.inodeIndex inodeNum diskAddr >>= fun () ->
     BlockDevice.write t.blockDevice diskAddr [inode] >>= fun () ->
-    flush_meta t
+    flush_meta t >>= fun () ->
+    return (`Ok inode)
 
   (* Should probably remove inode and free memory if there is an error *)
 
@@ -122,11 +125,17 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
     let inodeNum = hash name in
     I.find t.inodeIndex t.inodeIndex.I.root inodeNum >>= fun a ->
     match a with
-      | None -> return (`Error (`Unknown "File not found"))
+      | None -> return (`Ok None)
       | Some diskAddr ->
         let inode = Inode.create (t.info.BlockDevice.sector_size / 8) in
         BlockDevice.read t.blockDevice diskAddr [inode] >>= fun () ->
-        return (`Ok inode)
+        return (`Ok (Some inode))
+
+  let fileExists t name =
+    inodeForFile t name >>= fun inode ->
+    match inode with
+      | Some _ -> return (`Ok true)
+      | None -> return (`Ok false)
 
   let flushInodeForFile t name inode =
     let inodeNum = hash name in
@@ -138,6 +147,10 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
 
   let writeFile t name contents =
     inodeForFile t name >>= fun inode ->
+    begin match inode with
+      | Some inode -> return (`Ok inode)
+      | None -> createFile t name
+    end >>= fun inode ->
     let inodeLength = Inode.noPtrs inode in
     let contentLength = (Cstruct.len contents - 1) / t.info.BlockDevice.sector_size + 1 in
     if contentLength < inodeLength
@@ -162,6 +175,10 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
   (* Need length or EOF markers so that we don't need sector_size aligned files*)
   let readFile t name =
     inodeForFile t name >>= fun inode ->
+    begin match inode with
+      | Some inode -> return (`Ok inode)
+      | None -> return (`Error (`Unknown (Printf.sprintf "File %s does not exist" name)))
+    end >>= fun inode ->
     let inodeLength = Inode.noPtrs inode in
     let result = Cstruct.create (inodeLength * t.info.BlockDevice.sector_size) in
     let rec loop = function

@@ -48,7 +48,8 @@ Library mirage_block_fs
 Library mirage_ir
   Path:             src/search
   Findlibname:      mirage-ir
-  Modules:          InvertedIndex
+  Modules:          SearchClient,
+                    InvertedIndex
   BuildDepends:     mirage,
                     cstruct,
                     lwt,
@@ -61,7 +62,7 @@ Library tests
   Path: tests
   Build$:           flag(tests)
   Modules: Testable
-  BuildDepends: alcotest, lwt, lwt.unix, lwt.syntax, cstruct, mirage-block-unix, core_kernel, mirage-block-fs
+  BuildDepends: alcotest, lwt, lwt.unix, lwt.syntax, cstruct, mirage-block-unix, core_kernel, mirage-block-fs, mirage-ir
 
 Executable oram_tests
   Path:             tests
@@ -199,6 +200,19 @@ Executable inverted_index_tests
                     lwt,
                     tests
 
+Executable search_client_tests
+  Path:             tests/searchTests
+  MainIs:           searchClientTests.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-block-fs,
+                    mirage-ir,
+                    alcotest,
+                    mirage-block-unix,
+                    lwt,
+                    tests
+
 Test oram_tests
   Run$:             flag(tests)
   TestTools:        oram_tests
@@ -269,4 +283,10 @@ Test inverted_index_tests
   Run$:             flag(tests)
   TestTools:        inverted_index_tests
   Command:          $inverted_index_tests
+  WorkingDirectory: tests
+
+Test search_client_tests
+  Run$:             flag(tests)
+  TestTools:        search_client_tests
+  Command:          $search_client_tests
   WorkingDirectory: tests

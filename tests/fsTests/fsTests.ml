@@ -26,13 +26,6 @@ let newFile (fs : F.t) contents =
 
 let fs_tests =
     [
-      "FSCreateFile_NewFile_NoError", `Quick,
-        (fun () ->
-          check (lwt_t @@ result error int) ""
-            (fun () -> return (`Ok 0))
-            (fun () -> newFs () >>= fun fs ->
-              F.createFile fs "test" >>= fun () ->
-              return (`Ok 0)));
       "FSWriteFile_String_ReadOutString", `Quick,
         (fun () ->
           check (lwt_t @@ result error cstruct) ""
@@ -43,7 +36,6 @@ let fs_tests =
             (fun () ->
               newFs () >>= fun fs ->
               let file = newFile fs "All work and no play makes Dave a dull boy" in
-              F.createFile fs "test" >>= fun () ->
               F.writeFile fs "test" file  >>= fun () ->
               F.readFile fs "test"))
     ]
