@@ -86,8 +86,6 @@ module O = Oram.Make(PosMap.InMemory)(Block)
 
 module F = Fs.Make(O)
 
-module SearchClient = SearchClient.Make(O)
-
 let ( >>= ) x f = x >>= function
   | `Error e -> return (`Error e)
   | `Ok x -> f x
@@ -133,6 +131,8 @@ let newFs () =
   newORAM () >>= fun bd ->
   F.initialise bd
 
+module SearchClient = SearchClient.Make(O)
+
 let newSearchClient () =
-  newORAM () >>= fun oram ->
-  SearchClient.create oram
+  newORAM () >>= fun blockDevice ->
+  SearchClient.create blockDevice

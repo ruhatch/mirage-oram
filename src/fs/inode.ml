@@ -74,7 +74,8 @@ let addPtrs t ps =
   in loop (noPtrs t + 1) ps
 
 let prunePtrs t l =
-  let rec loop = function
-    | l -> []
-    | n -> decrPtrs t; getPtr t n :: loop (n - 1)
+  let rec loop n =
+    if n = l
+      then []
+      else ( decrPtrs t; getPtr t n :: loop (n - 1) )
   in loop (noPtrs t)

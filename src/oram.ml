@@ -98,8 +98,6 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
   let disconnect t =
     BlockDevice.disconnect t.blockDevice
 
-  (*let encrypt x = *)
-
   let calculateAddressOfBucket t leaf level =
     let rec loop acc = function
       | 0 -> acc
@@ -274,12 +272,17 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     in
     return (`Ok t)
 
-  let create ?(desiredSizeInSectors = 0L) ?(bucketSize = 4L) ?(desiredBlockSize = 0x40000) ?(offset = 0L) blockDevice =
+  let create ?(desiredSizeInSectors = 0L) ?(bucketSize = 4L) ?(desiredBlockSize = 0x2000) ?(offset = 0L) blockDevice =
     Random.self_init ();
     lwt info = BlockDevice.get_info blockDevice in
     if info.BlockDevice.sector_size > sizeOfAddressInBytes
       then (
-        createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSize offset blockDevice >>= fun t ->
+        let desiredBlockSizeToUse =
+          if info.BlockDevice.sector_size > desiredBlockSize
+            then info.BlockDevice.sector_size
+            else desiredBlockSize
+        in
+        createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSizeToUse offset blockDevice >>= fun t ->
         initialise t >>= fun () ->
         return (`Ok t)
       ) else return (`Error (`Unknown "Sector size too small to fit address"))

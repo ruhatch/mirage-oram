@@ -39,3 +39,12 @@ configure:
 .PHONY: build doc test all install uninstall reinstall clean distclean configure
 
 # OASIS_STOP
+
+report_dir:
+	mkdir report_dir
+
+report: report_dir
+	bisect-report -html report_dir tests/bisect*.out
+
+run:
+	$(SETUP) -test $(TESTFLAGS)

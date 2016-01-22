@@ -42,3 +42,8 @@ testFiles/
 *.input
 *.output
 *.test
+*.out
+
+# Emacs
+*~
+*#*#

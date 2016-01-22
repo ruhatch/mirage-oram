@@ -11,14 +11,20 @@ OASISFormat: 0.4
 BuildTools: ocamlbuild
 Plugins: META (0.4), DevFiles (0.4)
 
+Flag coverage
+  Description   : Use Bisect to generate coverage data.
+  Default       : false
+
 Library mirage_oram
   Path:             src
   Findlibname:      mirage-oram
   Modules:          Oram,
                     Stash,
                     OBlock,
-                    PosMap
-  BuildDepends:     core_kernel,
+                    PosMap,
+                    BlockSizeController
+  BuildDepends:	    bisect_ppx,
+                    core_kernel,
                     mirage,
                     cstruct,
                     lwt,
@@ -56,7 +62,8 @@ Library mirage_ir
                     lwt.syntax,
                     mirage-block-fs,
                     core_kernel,
-                    bin_prot
+                    bin_prot,
+                    stemmer
 
 Library tests
   Path: tests
@@ -213,6 +220,23 @@ Executable search_client_tests
                     lwt,
                     tests
 
+Executable encryption_tests
+  Path:             tests
+  MainIs:           encryptionTests.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-oram,
+                    mirage-block-fs,
+                    alcotest,
+                    mirage-block-unix,
+                    lwt,
+                    tests,
+                    core_kernel,
+                    io-page.unix,
+                    nocrypto.lwt,
+                    mirage-block-ccm
+
 Test oram_tests
   Run$:             flag(tests)
   TestTools:        oram_tests
@@ -289,4 +313,10 @@ Test search_client_tests
   Run$:             flag(tests)
   TestTools:        search_client_tests
   Command:          $search_client_tests
+  WorkingDirectory: tests
+
+Test encryption_tests
+  Run$:             flag(tests)
+  TestTools:        encryption_tests
+  Command:          $encryption_tests
   WorkingDirectory: tests

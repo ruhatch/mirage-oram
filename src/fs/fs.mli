@@ -11,6 +11,7 @@ module type S = sig
     inodeIndex : inodeIndex;
     blockDevice : blockDevice;
     info : blockDeviceInfo;
+    maxFileSize : int;
   }
 
   val initialise : blockDevice -> [`Error of error | `Ok of t] Lwt.t

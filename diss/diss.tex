@@ -171,6 +171,8 @@ Finally in order for the system to perform query-based search over encrypted doc
 \section{Defining the Threat Model}
 \label{sec:threatmodel}
 
+% Use a diagram
+
 The threat model is defined in terms of a client, a server and an attacker.
 
 We assume that the network is under the attacker's control. In the basic model we define the server and the attacker to be honest, but curious. This means that they will both gather as much information as possible, without deviating from the protocol. Thus the attacker will eavesdrop, but will not prevent messages from arriving at the server, tamper with them in any way or produce their own fake messages. The server will also not tamper with the messages, or with the underlying storage that the protocol is accessing. In this model the attacker is not as interesting as the server, because all communications are encrypted. Thus it is the server, that can see the access patterns of the underlying storage, that we are trying to protect against. The goal of the project is to make sure that this access pattern reveals nothing about the contents of the search queries or the documents in the underlying storage.
@@ -231,6 +233,7 @@ The security of this operation comes from the fact that positions are assigned u
 \mytodo{Give a quick introduction to recursive oram and statelessness}
 
 \section{Introduction to Inverted Indexes}
+\label{sec:invertedindexintro}
 
 The inverted index is the single most important data structure in Information Retrieval. It allows us to perform a large amount of work in advance in order to give performance that is linear in the number of documents involved in a query, much better than a linear scan of all documents that is $O(NK)$, for $N$ documents with an average of $K$ terms. It consists of two parts: the dictionary and the postings. The dictionary is a list, usually stored as a hash table, of all of the terms that appear in a set of documents. Then for each term, we have a postings list, a list of all the documents that contain a term. Collectively these postings lists are referred to as the postings.
 
@@ -248,6 +251,8 @@ In this project we will restrict operations to simple, space-separated disjuncti
 \section{System Architecture}
 
 \mytodo{Give an overview of the system level design including the figure from the proposal}
+
+% Stuff to do with higher level architectures and clients and cloud server
 
 \section{Requirements Analysis}
 
@@ -673,24 +678,35 @@ The \texttt{Cstruct} library performs data access in bytes. This leads us to \cr
 \section{Search Module}
 \label{sec:searchmodule}
 
-\subsection{Inverted Index}
+So we have our documents and we can access them without revealing which ones we are accessing. Now the final piece of the puzzle is actually performing search. We discuss building an Inverted Index, the data structure that will allow us to search efficiently, in \cref{subsec:invertedindex}. We then discuss the front-end of the whole application, the search API, in \cref{subsec:searchapi}.
 
-\mytodo{Build Inverted Index}
-\mytodo{Talk about the implementation of the Inverted Index}
-\mytodo{Talk about the time constraints and the possible extensions that could otherwise be implemented}
+\subsection{Inverted Index}
+\label{subsec:invertedindex}
+
+The basics of Inverted Indexes are discussed in \cref{sec:invertedindexintro}. As stated there, the Index consists of two main structures, the dictionary and the postings. For the dictionary, we will do the usual thing, which is to implement it as a hash table. This provides us with $O(1)$ lookup and insertion, which are the main operations we will be performing. The postings are more flexible. In our implementation we want to store the file names, because they are not actually stored in the filesystem itself. We also want to perform intersection of postings lists, allowing us to perform phrase search. Thus, we will use a Hash Set, a data structure built on top of a hash table, that stores a set of keys, and has the added benefit of keeping them unique for us.
+
+Having decided on our data structure, we need to actually index files. As usual in this project, the files will be \texttt{Cstruct}s. So we have a number of steps to perform in order to process a file. We first convert the file to a string and immediately strip it of characters we don't need, pretty much all punctuation. At this point we have a sequence of alphanumeric character strings, separated by spaces and newlines, so we can perform a split on these characters to get a list of words.
+
+We could perform indexing now, adding the name of the current file to the postings list of every word in our list, but there are a couple of things that we want to do first. We really don't want to store separate words for `run', `ran', `runs', and so on, so we will perform some linguistic preprocessing, stemming the words using Porter's stemming algorithm. I used a small open-source library implementation of this algorithm. This technique not only reduces the size of the index, but also arguably improves search, because now queries for 'run' can automatically returns documents containing any morphological derivation.
+
+Finally, we remove duplicates from our list of words, reducing insertion overhead, and put the entires into the index.
+
+For our purposes we will only implement simple conjunctive phrase search, meaning we look for documents containing all of the words in a space separated query string. Now search is as simple as performing the same preprocessing on the query string, performing lookup on each of the queries in turn and taking the big intersection of the resulting list of hash sets. In order to make this intersection operation efficient, we sort the list by order of hash set size. Then we can filter the smaller hash set by checking for membership in the larger hash set. This means we perform one constant time lookup for each member of the small set, rather than the large, giving a large performance boost, as this smaller set is monotonically decreasing.
 
 \subsection{Keyword Search API}
+\label{subsec:searchapi}
 
-\mytodo{Design and implement a search API}
-\mytodo{Discuss the design/complexity trade-offs made}
-\mytodo{Discuss extensions to the search API that would be implemented in a more advanced IR system}
+The final step in an end-to-end system is the API. We need to wrap file system access, indexing and search all into one module that provides a single point of entry for an encrypted search system.
+
+We have three main operations that are the most important to support. Writing files, reading files, and searching over files. We will not be concerned with deleting files at the moment, but it is left as an extension if time permits.
+
+Writing files is the most important step, because this is where the search module does the indexing. On write, we first write through to the first system, then index the file and finally flush the index to disk to make sure it persists. Reading files is simply a pass through to the file system and search makes calls to inverted index.
 
 \section{Encryption}
 \label{sec:encryption}
 
-\subsection{Library}
+Encryption is something that it can fatal to get wrong. In the case of ORAM, if you don't have encryption, it's completely superfluous. Thus, we want to use tested and trusted cryptographic libraries, rather than rolling our own. Luckily for us, there is an existing implementation of an encrypted block device satisfying Mirage's \texttt{BLOCK} interface, that provides a functor very similar to the ones that we created for ORAM.
 
-\mytodo{Give an overview of the encryption library and talk about why it is better than rolling my own}
 \mytodo{Discuss the integration of the encryption library into the system}
 
 \chapter{Evaluation}

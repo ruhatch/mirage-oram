@@ -1,0 +1,22 @@
+S src
+S src/bTrees
+S src/fs
+S src/search
+S tests
+
+B _build/src
+B _build/src/bTrees
+B _build/src/fs
+B _build/src/search
+B _build/tests
+
+PKG lwt
+PKG lwt.syntax
+PKG mirage
+PKG core_kernel
+PKG cstruct
+PKG alcotest
+PKG mirage-block-ccm
+PKG mirage-block-unix
+
+EXT lwt.syntax

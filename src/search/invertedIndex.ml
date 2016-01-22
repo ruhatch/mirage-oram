@@ -8,14 +8,24 @@ let bin_reader_t = String.Table.bin_reader_t (String.Hash_set.bin_reader_t)
 
 let create () = String.Table.create ()
 
+let sortByLength setList =
+  List.sort setList ~cmp:(fun set1 set2 ->
+    let length1 = Hash_set.length set1 in
+    let length2 = Hash_set.length set2 in
+    if length1 > length2
+      then 1
+      else if length2 > length1
+        then -1
+        else 0)
+
 let intersectPostings postings1 postings2 =
   Hash_set.filter postings1 ~f:(fun elem -> Hash_set.mem postings2 elem)
 
 let find t word = String.Table.find t word
 
 let findPhrase t phrase =
-  let words = String.split_on_chars phrase ~on:[' '] in
-  let postings = List.filter_opt (List.map ~f:(fun word -> find t word) words) in
+  let words = List.map ~f:Stemmer.stem (String.split_on_chars phrase ~on:[' ']) in
+  let postings = sortByLength (List.filter_opt (List.map ~f:(fun word -> find t word) words)) in
   List.reduce postings ~f:intersectPostings
 
 let fileNamesForQuery t query =
@@ -36,7 +46,7 @@ let stripFile = String.filter ~f:(fun a -> not (String.contains ".,;:'\"\'?!" a)
 
 let indexFile t name contents =
   let fileString = stripFile (Cstruct.to_string contents) in
-  let words = List.dedup (String.split_on_chars fileString ~on:[' ';'\n';'\r';'-']) in
+  let words = List.dedup @@ List.map ~f:Stemmer.stem (String.split_on_chars fileString ~on:[' ';'\n';'\r';'-']) in
   List.iter ~f:(fun word -> updatePosting t word name) words
 
 let toCstruct t blockSize =

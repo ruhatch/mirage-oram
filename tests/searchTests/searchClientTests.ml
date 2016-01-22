@@ -2,6 +2,18 @@ open Alcotest
 open Lwt
 open Testable
 
+(* module F = Fs.Make(Block)
+
+let newFile blockDevice contents =
+  lwt info = Block.get_info blockDevice in
+  let sectorLength = (String.length contents - 1) / info.Block.sector_size + 1 in
+  let file = Cstruct.create (sectorLength * info.Block.sector_size) in
+  for i = 0 to Cstruct.len file - 1 do
+    Cstruct.set_uint8 file i 0
+  done;
+  Cstruct.blit_from_string contents 0 file 0 (String.length contents);
+  return (`Ok file) *)
+
 let searchClientTests =
     [
       "SearchClientWriteFile_EmptyString_ReadOutEmptyString", `Slow,
@@ -50,7 +62,7 @@ let searchClientTests =
               SearchClient.writeFile searchClient "pg61.txt" file1 >>= fun () ->
               SearchClient.writeFile searchClient "pg62.txt" file2 >>= fun () ->
               SearchClient.writeFile searchClient "pg63.txt" file3 >>= fun () ->
-              SearchClient.search searchClient "Gutenberg"));
+              SearchClient.search searchClient "gutenberg"));
       (*)"ORAMFSWriteFile_3ProjectGutenbergs_ReadOutFile2Correctly", `Slow,
         (fun () ->
           check (lwt_t @@ result error cstruct) ""

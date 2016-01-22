@@ -31,6 +31,7 @@ module type S = sig
     inodeIndex : inodeIndex;
     blockDevice : blockDevice;
     info : blockDeviceInfo;
+    maxFileSize : int;
   }
 
   val initialise : blockDevice -> [`Error of error | `Ok of t] Lwt.t
@@ -62,6 +63,7 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
     inodeIndex : inodeIndex;
     blockDevice : blockDevice;
     info : blockDeviceInfo;
+    maxFileSize : int;
   }
 
   let ( >>= ) x f = x >>= function
@@ -93,7 +95,8 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
     I.create freeMap blockDevice info.BlockDevice.sector_size >>= fun inodeIndex ->
     Cstruct.BE.set_uint64 superblock 0 inodeIndex.I.rootAddress;
     Cstruct.BE.set_uint64 superblock 8 (Int64.of_int freeMapSize);
-    let t = { superblock ; freeMap ; inodeIndex ; blockDevice ; info } in
+    let maxFileSize = ((info.BlockDevice.sector_size / 8) - 1) * info.BlockDevice.sector_size in
+    let t = { superblock ; freeMap ; inodeIndex ; blockDevice ; info ; maxFileSize } in
     flush_meta t >>= fun () ->
     return (`Ok t)
 
@@ -105,7 +108,8 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
     BlockDevice.read blockDevice 0L [superblock] >>= fun () ->
     let rootAddress = Cstruct.BE.get_uint64 superblock 0 in
     I.connect freeMap blockDevice info.BlockDevice.sector_size rootAddress >>= fun inodeIndex ->
-    return (`Ok { superblock ; freeMap ; inodeIndex ; blockDevice ; info })
+    let maxFileSize = ((info.BlockDevice.sector_size / 8) - 1) * info.BlockDevice.sector_size in
+    return (`Ok { superblock ; freeMap ; inodeIndex ; blockDevice ; info ; maxFileSize })
 
   let createFile t name =
     let inode = Inode.create (t.info.BlockDevice.sector_size / 8) in
@@ -146,6 +150,9 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
         BlockDevice.write t.blockDevice diskAddr [inode]
 
   let writeFile t name contents =
+    if Cstruct.len contents > t.maxFileSize
+      then return (`Error (`Unknown (Printf.sprintf "File %s exceeds maximum file size" name)))
+      else return (`Ok ()) >>= fun () ->
     inodeForFile t name >>= fun inode ->
     begin match inode with
       | Some inode -> return (`Ok inode)
