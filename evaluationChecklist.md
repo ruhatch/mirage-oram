@@ -1,4 +1,4 @@
-[ ] Look at using a code coverage tool
+[X] Look at using a code coverage tool
 
 [ ] Gather more test data (more Gutenbergs and random data)
 

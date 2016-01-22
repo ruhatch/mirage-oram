@@ -91,7 +91,7 @@ let ( >>= ) x f = x >>= function
   | `Ok x -> f x
 
 let readWholeFile name =
-  let file = Unix.openfile name [Unix.O_RDWR; Unix.O_CREAT] 0o664 in
+  let file = Unix.openfile name [Unix.O_RDWR] 0o664 in
   let length = (Unix.fstat file).Unix.st_size in
   let buff = Bytes.create length in
   let rec loop off = function

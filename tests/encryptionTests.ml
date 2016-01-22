@@ -56,7 +56,7 @@ let encryptionTests1 =
             F.readFile fs "test"));
     "ORAMFSWriteFile_ProjectGutenberg_ReadOutFileCorrectly", `Slow,
       (fun () ->
-        let contents = readWholeFile "testFiles/pg61.txt" in
+        let contents = readWholeFile "testFiles/gutenberg/pg61.txt" in
         check (lwt_t @@ result error cstruct) ""
           (fun () ->
             newFs () >>= fun fs ->
@@ -71,12 +71,12 @@ let encryptionTests1 =
         check (lwt_t @@ result error cstruct) ""
           (fun () ->
             newFs () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt"))
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg61.txt"))
           (fun () ->
             newFs () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg61.txt") >>= fun file1 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg62.txt") >>= fun file2 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg63.txt") >>= fun file3 ->
             F.writeFile fs "pg61.txt" file1  >>= fun () ->
             F.writeFile fs "pg62.txt" file2  >>= fun () ->
             F.writeFile fs "pg63.txt" file3  >>= fun () ->
@@ -86,12 +86,12 @@ let encryptionTests1 =
         check (lwt_t @@ result error cstruct) ""
           (fun () ->
             newFs () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt"))
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg62.txt"))
           (fun () ->
             newFs () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg61.txt") >>= fun file1 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg62.txt") >>= fun file2 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg63.txt") >>= fun file3 ->
             F.writeFile fs "pg61.txt" file1  >>= fun () ->
             F.writeFile fs "pg62.txt" file2  >>= fun () ->
             F.writeFile fs "pg63.txt" file3  >>= fun () ->
@@ -101,12 +101,12 @@ let encryptionTests1 =
         check (lwt_t @@ result error cstruct) ""
           (fun () ->
             newFs () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt"))
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg63.txt"))
           (fun () ->
             newFs () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg61.txt") >>= fun file1 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg62.txt") >>= fun file2 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg63.txt") >>= fun file3 ->
             F.writeFile fs "pg61.txt" file1  >>= fun () ->
             F.writeFile fs "pg62.txt" file2  >>= fun () ->
             F.writeFile fs "pg63.txt" file3  >>= fun () ->
@@ -116,12 +116,12 @@ let encryptionTests1 =
         check (lwt_t @@ result error cstruct) ""
           (fun () ->
             newFs () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt"))
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg61.txt"))
           (fun () ->
             newFs () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg61.txt") >>= fun file1 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg62.txt") >>= fun file2 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg63.txt") >>= fun file3 ->
             F.writeFile fs "pg61.txt" file1  >>= fun () ->
             bind (O.disconnect fs.F.blockDevice) @@ fun () ->
             Block.connect "disk.img" >>= fun blockDevice ->
@@ -160,7 +160,7 @@ let encryptionTests ?(oramBlockSize = 0x40000) desiredBlockSize =
             F.readFile fs "test"));
     "ORAMFSWriteFile_ProjectGutenberg_ReadOutFileCorrectly", `Slow,
       (fun () ->
-        let contents = readWholeFile "testFiles/pg61.txt" in
+        let contents = readWholeFile "testFiles/gutenberg/pg61.txt" in
         check (lwt_t @@ result error cstruct) ""
           (fun () ->
             newFs ~oramBlockSize ~desiredBlockSize () >>= fun fs ->
@@ -175,12 +175,12 @@ let encryptionTests ?(oramBlockSize = 0x40000) desiredBlockSize =
         check (lwt_t @@ result error cstruct) ""
           (fun () ->
             newFs ~oramBlockSize ~desiredBlockSize () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt"))
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg61.txt"))
           (fun () ->
             newFs ~oramBlockSize ~desiredBlockSize () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg61.txt") >>= fun file1 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg62.txt") >>= fun file2 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg63.txt") >>= fun file3 ->
             F.writeFile fs "pg61.txt" file1  >>= fun () ->
             F.writeFile fs "pg62.txt" file2  >>= fun () ->
             F.writeFile fs "pg63.txt" file3  >>= fun () ->
@@ -190,12 +190,12 @@ let encryptionTests ?(oramBlockSize = 0x40000) desiredBlockSize =
         check (lwt_t @@ result error cstruct) ""
           (fun () ->
             newFs ~oramBlockSize ~desiredBlockSize () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt"))
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg62.txt"))
           (fun () ->
             newFs ~oramBlockSize ~desiredBlockSize () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg61.txt") >>= fun file1 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg62.txt") >>= fun file2 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg63.txt") >>= fun file3 ->
             F.writeFile fs "pg61.txt" file1  >>= fun () ->
             F.writeFile fs "pg62.txt" file2  >>= fun () ->
             F.writeFile fs "pg63.txt" file3  >>= fun () ->
@@ -205,12 +205,12 @@ let encryptionTests ?(oramBlockSize = 0x40000) desiredBlockSize =
         check (lwt_t @@ result error cstruct) ""
           (fun () ->
             newFs ~oramBlockSize ~desiredBlockSize () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt"))
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg63.txt"))
           (fun () ->
             newFs ~oramBlockSize ~desiredBlockSize () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg61.txt") >>= fun file1 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg62.txt") >>= fun file2 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg63.txt") >>= fun file3 ->
             F.writeFile fs "pg61.txt" file1  >>= fun () ->
             F.writeFile fs "pg62.txt" file2  >>= fun () ->
             F.writeFile fs "pg63.txt" file3  >>= fun () ->
@@ -220,12 +220,12 @@ let encryptionTests ?(oramBlockSize = 0x40000) desiredBlockSize =
         check (lwt_t @@ result error cstruct) ""
           (fun () ->
             newFs ~oramBlockSize ~desiredBlockSize () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt"))
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg61.txt"))
           (fun () ->
             newFs ~oramBlockSize ~desiredBlockSize () >>= fun fs ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-            newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg61.txt") >>= fun file1 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg62.txt") >>= fun file2 ->
+            newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg63.txt") >>= fun file3 ->
             F.writeFile fs "pg61.txt" file1  >>= fun () ->
             bind (O.disconnect fs.F.blockDevice) @@ fun () ->
             Block.connect "disk.img" >>= fun blockDevice ->

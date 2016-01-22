@@ -40,7 +40,7 @@ let searchClientTests =
               SearchClient.readFile searchClient "test"));
       "SearchClientWriteFile_ProjectGutenberg_ReadOutFileCorrectly", `Slow,
         (fun () ->
-          let contents = readWholeFile "testFiles/pg61.txt" in
+          let contents = readWholeFile "testFiles/gutenberg/pg61.txt" in
           check (lwt_t @@ result error cstruct) ""
             (fun () ->
               newSearchClient () >>= fun searchClient ->
@@ -56,9 +56,9 @@ let searchClientTests =
             (fun () -> return (`Ok ["pg63.txt";"pg61.txt";"pg62.txt"]))
             (fun () ->
               newSearchClient () >>= fun searchClient ->
-              newFile searchClient.SearchClient.fileSystem.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-              newFile searchClient.SearchClient.fileSystem.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-              newFile searchClient.SearchClient.fileSystem.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
+              newFile searchClient.SearchClient.fileSystem.F.blockDevice (readWholeFile "testFiles/gutenberg/pg61.txt") >>= fun file1 ->
+              newFile searchClient.SearchClient.fileSystem.F.blockDevice (readWholeFile "testFiles/gutenberg/pg62.txt") >>= fun file2 ->
+              newFile searchClient.SearchClient.fileSystem.F.blockDevice (readWholeFile "testFiles/gutenberg/pg63.txt") >>= fun file3 ->
               SearchClient.writeFile searchClient "pg61.txt" file1 >>= fun () ->
               SearchClient.writeFile searchClient "pg62.txt" file2 >>= fun () ->
               SearchClient.writeFile searchClient "pg63.txt" file3 >>= fun () ->

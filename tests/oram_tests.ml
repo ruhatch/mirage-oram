@@ -50,7 +50,7 @@ let oram_tests =
               return (`Ok buff)));
       "ORAMWriteFile_ProjectGutenberg_ReadOutCorrectly", `Slow,
         (fun () ->
-          let contents = readWholeFile "testFiles/pg61.txt" in
+          let contents = readWholeFile "testFiles/gutenberg/pg61.txt" in
           (check (lwt_t @@ result error cstruct)) ""
             (fun () ->
               newORAM () >>= fun bd ->
