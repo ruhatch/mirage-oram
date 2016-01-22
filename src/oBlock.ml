@@ -12,21 +12,6 @@ let hash = Hashtbl.hash
 
 let dummy x = (-1L, Cstruct.create x)
 
-(*let to_string (a,b) =
-  match a with
-    | Some x -> sprintf "%d : %s" x (BytesLabels.to_string (BytesLabels.escaped b))
-    | None -> "DUMMY"*)
-
-(*let to_string (a,b) =
-  let buf = String.create 8 in
-  Binary_packing.pack_signed_64_little_endian ~buf ~pos:0 a;
-  String.concat [buf; b]
-
-let of_string buf =
-  let a = Binary_packing.unpack_signed_64_little_endian ~buf ~pos:0 in
-  let b = String.sub buf 8 (String.length buf - 8) in
-  (a,b)*)
-
 let to_cstruct (a,b) =
   let result = Cstruct.create (8 + Cstruct.len b) in
   Cstruct.BE.set_uint64 result 0 a;

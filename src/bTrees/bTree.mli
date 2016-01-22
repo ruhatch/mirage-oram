@@ -16,7 +16,12 @@ module type STORE = sig
 
   type page_aligned_buffer
 
-  type error
+  type error = [
+    | `Unknown of string
+    | `Unimplemented
+    | `Is_read_only
+    | `Disconnected
+  ]
 
   type pointer
 

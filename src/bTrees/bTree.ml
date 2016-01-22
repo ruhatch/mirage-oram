@@ -46,7 +46,12 @@ module type STORE = sig
 
   type page_aligned_buffer
 
-  type error
+  type error = [
+    | `Unknown of string
+    | `Unimplemented
+    | `Is_read_only
+    | `Disconnected
+  ]
 
   type pointer
 
@@ -125,7 +130,10 @@ module Make (Allocator : ALLOCATOR) (Store : STORE with type pointer = Allocator
     let root = Node.create pageSize in
     Node.setLeaf root true;
     let minDegree = Node.minDegree root in
-    let [rootAddress] = Allocator.alloc allocator 1 in
+    begin match Allocator.alloc allocator 1 with
+    | [rootAddress] -> return (`Ok rootAddress)
+    | _ -> return (`Error (`Unknown ("Wrong number of addresses allocated")))
+    end >>= fun rootAddress ->
     Store.write store rootAddress [root] >>= fun () ->
     return (`Ok ({ allocator ; store ; root ; rootAddress ; minDegree }))
 
@@ -137,7 +145,10 @@ module Make (Allocator : ALLOCATOR) (Store : STORE with type pointer = Allocator
 
   let splitChild t parent parentAddress child childAddress childIndex =
     let newChild = Node.create (Node.pageSize t.root) in
-    let [newChildAddress] = Allocator.alloc t.allocator 1 in
+    begin match Allocator.alloc t.allocator 1 with
+    | [newChildAddress] -> return (`Ok newChildAddress)
+    | _ -> return (`Error (`Unknown ("Wrong number of addresses allocated")))
+    end >>= fun newChildAddress ->
     Node.setLeaf newChild (Node.leaf child);
     Node.setNoKeys newChild (t.minDegree - 1);
     for j = 1 to t.minDegree - 1 do
@@ -201,7 +212,10 @@ module Make (Allocator : ALLOCATOR) (Store : STORE with type pointer = Allocator
     if Node.noKeys t.root = (2 * t.minDegree - 1)
     then (
       let s = Node.create (Node.pageSize t.root) in
-      let [sa] = Allocator.alloc t.allocator 1 in
+      begin match Allocator.alloc t.allocator 1 with
+      | [sa] -> return (`Ok sa)
+      | _ -> return (`Error (`Unknown ("Wrong number of addresses allocated")))
+      end >>= fun sa ->
       Node.setLeaf s false;
       Node.setChild s 1 t.rootAddress;
       splitChild t s sa t.root t.rootAddress 1 >>= fun (n, na) ->

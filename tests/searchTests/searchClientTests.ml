@@ -63,55 +63,6 @@ let searchClientTests =
               SearchClient.writeFile searchClient "pg62.txt" file2 >>= fun () ->
               SearchClient.writeFile searchClient "pg63.txt" file3 >>= fun () ->
               SearchClient.search searchClient "gutenberg"));
-      (*)"ORAMFSWriteFile_3ProjectGutenbergs_ReadOutFile2Correctly", `Slow,
-        (fun () ->
-          check (lwt_t @@ result error cstruct) ""
-            (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt"))
-            (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
-              F.writeFile fs "pg61.txt" file1  >>= fun () ->
-              F.writeFile fs "pg62.txt" file2  >>= fun () ->
-              F.writeFile fs "pg63.txt" file3  >>= fun () ->
-              F.readFile fs "pg62.txt"));
-      "ORAMFSWriteFile_3ProjectGutenbergs_ReadOutFile3Correctly", `Slow,
-        (fun () ->
-          check (lwt_t @@ result error cstruct) ""
-            (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt"))
-            (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
-              F.writeFile fs "pg61.txt" file1  >>= fun () ->
-              F.writeFile fs "pg62.txt" file2  >>= fun () ->
-              F.writeFile fs "pg63.txt" file3  >>= fun () ->
-              F.readFile fs "pg63.txt"));
-      "ORAMFSWriteFile_DisconnectWhileWriting_ReadOutFile1Correctly", `Slow,
-        (fun () ->
-          check (lwt_t @@ result error cstruct) ""
-            (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt"))
-            (fun () ->
-              newFs () >>= fun fs ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg61.txt") >>= fun file1 ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg62.txt") >>= fun file2 ->
-              newFile fs.F.blockDevice (readWholeFile "testFiles/pg63.txt") >>= fun file3 ->
-              F.writeFile fs "pg61.txt" file1  >>= fun () ->
-              bind (O.disconnect fs.F.blockDevice) @@ fun () ->
-              Block.connect "disk.img" >>= fun blockDevice ->
-              O.fakeReconnect fs.F.blockDevice blockDevice >>= fun oram ->
-              F.connect oram >>= fun fs ->
-              F.writeFile fs "pg62.txt" file2  >>= fun () ->
-              F.writeFile fs "pg63.txt" file3  >>= fun () ->
-              F.readFile fs "pg61.txt"));*)
     ]
 
 let () =

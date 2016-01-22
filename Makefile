@@ -44,7 +44,16 @@ report_dir:
 	mkdir report_dir
 
 report: report_dir
-	bisect-report -html report_dir tests/bisect*.out
+	find tests -name 'bisect*' | xargs rm -f
+	make test
+	bisect-report tests/bisect*.out -I _build -html report_dir
 
-run:
-	$(SETUP) -test $(TESTFLAGS)
+clean_report:
+	rm -rf report_dir
+	find tests -name 'bisect*' | xargs rm -f
+
+clean_tests:
+	rm -rf _tests
+	rm -rf tests/_tests
+
+clean_all: clean clean_report clean_tests
