@@ -1,0 +1,50 @@
+* Checklists for the remainder of the project
+
+** TODO Project Evaluation [2/13]
+
+  - [X] Look at using a code coverage tool
+
+  - [X] Gather more test data (more Gutenbergs and random data)
+
+  - [ ] Extend unit tests to work on more data and have more coverage
+
+  - [ ] Use QuickCheck to push the functional tests even further
+
+  - [ ] Identify any parameters that could use optimisation and perform
+        experiments to test these
+
+  - [ ] Begin performance testing by examining options (Core_bench vs. own
+        profiling)
+
+  - [ ] Try and identify hot spots that could be optimised
+
+  - [ ] Perform experiments that compare overhead due to ORAM vs. normal
+        block device
+
+  - [ ] Compare bandwidth overhead of recursive vs. non-recursive
+
+  - [ ] Expand performance testing as necessary
+
+  - [ ] Perform security analysis first by checking randomness of access pattern
+
+  - [ ] Do regression tests between the same and different access patterns
+
+  - [ ] Figure out how to break non-ORAM scheme to show worth of ORAM
+
+** TODO Write Progress Report [0/4]
+
+  - [ ] Start LaTeX document for progress report
+
+  - [ ] Read Project Briefing Document to find our content needs
+
+  - [ ] Write necessary content
+
+  - [ ] Submit progress report (29/01/16)
+
+** TODO Project Presentation [0/3]
+
+  - [ ] Read Project Briefing Document section about presentation
+
+  - [ ] Prepare slides for presentation
+
+  - [ ] Practice the presentation in head before this Wednesday (for Improbable)

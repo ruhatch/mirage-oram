@@ -151,7 +151,7 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
 
   let writeFile t name contents =
     if Cstruct.len contents > t.maxFileSize
-      then return (`Error (`Unknown (Printf.sprintf "File %s exceeds maximum file size" name)))
+      then return (`Error (`Unknown (Printf.sprintf "File %s exceeds maximum file size of %d" name t.maxFileSize)))
       else return (`Ok ()) >>= fun () ->
     inodeForFile t name >>= fun inode ->
     begin match inode with
