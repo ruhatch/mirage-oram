@@ -1,0 +1,39 @@
+\begin{figure}
+\begin{center}
+\begin{picture}(170,70)
+\put(50,60){\framebox(50,10){Object Store}}
+
+\put(100,65){\vector(1,0){20}}
+\put(120,65){\vector(-1,0){20}}
+
+\put(120,60){\framebox(50,10){Indexed Search}}
+
+\multiput(44,55)(4,0){32}{\line(1,0){2}}
+\put(0,54){BLOCK Interface}
+\put(75,60){\vector(0,-1){10}}
+\put(75,50){\vector(0,1){10}}
+
+\put(145,45){\vector(0,1){15}}
+\put(145,45){\vector(-1,0){45}}
+
+\put(50,40){\framebox(50,10){ORAM}}
+
+\multiput(44,35)(4,0){32}{\line(1,0){2}}
+\put(0,34){BLOCK Interface}
+\put(75,40){\vector(0,-1){10}}
+\put(75,30){\vector(0,1){10}}
+
+\put(50,20){\framebox(50,10){Encryption}}
+
+\multiput(44,15)(4,0){32}{\line(1,0){2}}
+\put(0,14){BLOCK Interface}
+\put(75,20){\vector(0,-1){10}}
+\put(75,10){\vector(0,1){10}}
+
+\put(50,0){\framebox(50,10){BLOCK}}
+
+\end{picture}
+\end{center}
+\caption{The Application Stack: We can use any underlying BLOCK implementation and we can add/remove ORAM, Encryption or Search modules as we please}
+\label{miragestack}
+\end{figure}

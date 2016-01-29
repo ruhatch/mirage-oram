@@ -68,11 +68,13 @@ let lwt_t (type a) elt =
     let equal x y =
       let x' = Lwt_main.run (x ()) in
       let y' = Lwt_main.run (y ()) in
-      x' = y'
+      Elt.equal x' y'
   end in
   (module M: Alcotest.TESTABLE with type t = M.t)
 
-let oblock = Alcotest.(pair int64 cstruct)
+let oblock = pair int64 cstruct
+
+let bucket = list oblock
 
 (* Helper modules and functions for testing *)
 

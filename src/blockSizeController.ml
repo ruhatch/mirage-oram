@@ -33,7 +33,6 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
     let read_write = info.BlockDevice.read_write in
     let sector_size = sectorsPerBlock * info.BlockDevice.sector_size in
     let size_sectors = Int64.(div info.BlockDevice.size_sectors (of_int sectorsPerBlock)) in
-    Printf.printf "Created a block device with sector_size %d and size_sectors %Ld\n" sector_size size_sectors;
     Lwt.return (`Ok { blockDevice ; info = { read_write ; sector_size ; size_sectors } ; sectorsPerBlock })
 
   let write { blockDevice ; sectorsPerBlock } startAddress buffers =

@@ -5,13 +5,13 @@ module Make (P : PosMapF) (B : V1_LWT.BLOCK) : sig
   type t
 
   include V1_LWT.BLOCK
-  with type t := t
-  with type id = string
+          with type t := t
+          with type id = string
 
   include PosMap
-  with type t := t
-  and type block := B.t
-  and type error := B.error
+          with type t := t
+                     and type block := B.t
+                                   and type error := B.error
 
   (* Don't expose the initialise method *)
   (*val initialise : B.t -> [`Ok of unit | `Error of error] Lwt.t*)
@@ -22,6 +22,14 @@ module Make (P : PosMapF) (B : V1_LWT.BLOCK) : sig
   (* Lower level functions - exposed for testing purposes *)
 
   val floor_log : int64 -> int
+
+  type structuralInfo = {
+      height : int;
+      numLeaves : int64;
+      sectorsPerBlock : int;
+    }
+
+  val getStructuralInfo : t -> structuralInfo Lwt.t
 
   type bucket = OBlock.t list
 
@@ -34,5 +42,9 @@ module Make (P : PosMapF) (B : V1_LWT.BLOCK) : sig
   val readBucket : t -> int64 -> [`Ok of bucket | `Error of error] Lwt.t
 
   val readPathToLeaf : t -> int64 -> [`Ok of bucket list | `Error of error] Lwt.t
+
+  type op = Read | Write
+
+  val access : t -> op -> int64 -> Cstruct.t option -> [`Ok of Cstruct.t | `Error of error] Lwt.t
 
 end

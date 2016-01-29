@@ -67,7 +67,8 @@ Library mirage_ir
 Library tests
   Path: tests
   Build$:           flag(tests)
-  Modules:          Testable
+  Modules:          Testable,
+                    Generators
   BuildDepends:     bisect_ppx,
                     alcotest,
                     lwt,
@@ -260,7 +261,7 @@ Executable encryption_tests
 Test oram_tests
   Run$:             flag(tests)
   TestTools:        oram_tests
-  Command:          $oram_tests
+  Command:          $oram_tests -q
   WorkingDirectory: tests
 
 Test stash_tests

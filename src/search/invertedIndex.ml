@@ -34,7 +34,6 @@ let fileNamesForQuery t query =
     | None -> []
 
 let updatePosting t word fileName =
-  Printf.printf "Updating posting for %s with file name %s\n" word fileName;
   match find t word with
     | Some posting -> Hash_set.add posting fileName
     | None ->

@@ -1,6 +1,8 @@
 open Alcotest
+open Core_kernel.Std
 open Lwt
 open Testable
+open Generators
 
 let oram_tests =
   [
@@ -13,14 +15,14 @@ let oram_tests =
     "OramFloorLog_OneTwentyEight_Seven", `Quick,
     (fun () ->
       check int "" 7 (O.floor_log 128L));
-    "OramBlockInitialise_Initialised_BlockZeroZero", `Slow,
+    "OramBlockInitialise_Initialised_BlockZeroZero", `Quick,
     (fun () ->
       check (lwt_t @@ result error bool) ""
             (fun () -> return (`Ok true))
             (fun () -> newORAM () >>= fun bd ->
                        O.readBucket bd 0L >>= fun bucket ->
-                       return (`Ok (List.for_all (fun (a,d) -> a = -1L) bucket))));
-    "ORAMWriteFile_EmptyString_ReadOutEmptyString", `Slow,
+                       return (`Ok (List.for_all ~f:(fun (a,d) -> a = -1L) bucket))));
+    "ORAMWriteFile_EmptyString_ReadOutEmptyString", `Quick,
     (fun () ->
       check (lwt_t @@ result error cstruct) ""
             (fun () ->
@@ -34,7 +36,7 @@ let oram_tests =
               let buff = Cstruct.create (Cstruct.len file) in
               O.read bd 0L [buff] >>= fun () ->
               return (`Ok buff)));
-    "ORAMWriteFile_String_ReadOutString", `Slow,
+    "ORAMWriteFile_String_ReadOutString", `Quick,
     (fun () ->
       check (lwt_t @@ result error cstruct) ""
             (fun () ->
@@ -48,7 +50,7 @@ let oram_tests =
               let buff = Cstruct.create (Cstruct.len file) in
               O.read bd 0L [buff] >>= fun () ->
               return (`Ok buff)));
-    "ORAMWriteFile_ProjectGutenberg_ReadOutCorrectly", `Slow,
+    "ORAMWriteFile_ProjectGutenberg_ReadOutCorrectly", `Quick,
     (fun () ->
       let contents = readWholeFile "testFiles/gutenberg/pg61.txt" in
       check (lwt_t @@ result error cstruct) ""
@@ -63,6 +65,72 @@ let oram_tests =
               let buff = Cstruct.create (Cstruct.len file) in
               O.read bd 0L [buff] >>= fun () ->
               return (`Ok buff)));
+    "ORAMWriteBucket_QuickCheck_ReadSameValueFromBucket", `Slow,
+    (fun () ->
+      let oram = match Lwt_main.run (newORAM ()) with
+        | `Ok oram -> oram
+        | `Error _ -> failwith "Failed to connect to ORAM"
+      in
+      let info = Lwt_main.run (O.get_info oram) in
+      Quickcheck.test
+        (Quickcheck.Generator.tuple2
+           (addressGenerator info.O.size_sectors)
+           (bucketGenerator info.O.size_sectors info.O.sector_size 4))
+        (fun (address, bucketToWrite) ->
+          check (lwt_t @@ result error bucket) ""
+                (fun () -> return (`Ok bucketToWrite))
+                (fun () ->
+                  O.writeBucket oram address bucketToWrite >>= fun () ->
+                  O.readBucket oram address)));
+    "ORAMWritePathToLeaf_QuickCheck_ReadSamePath", `Slow,
+    (fun () ->
+      Printf.printf "Testing\n";
+      let oram = match Lwt_main.run (newORAM ()) with
+        | `Ok oram -> oram
+        | `Error _ -> failwith "Failed to connect to ORAM"
+      in
+      let info = Lwt_main.run (O.get_info oram) in
+      let structuralInfo = Lwt_main.run (O.getStructuralInfo oram) in
+      Quickcheck.test ~trials:1
+                      (Quickcheck.Generator.tuple2 (Quickcheck.Generator.return 0L) (* (leafGenerator structuralInfo.O.numLeaves)*)
+                                                   (bucketGenerator info.O.size_sectors info.O.sector_size 4))
+                      ~f:(fun (leaf, pathToWrite) ->
+                        check (lwt_t @@ result error (list bucket)) ""
+                              (fun () -> return (`Ok [pathToWrite]))
+                              (fun () ->
+                                O.writePathToLeaf oram leaf [pathToWrite] >>= fun () ->
+                                O.readPathToLeaf oram leaf)));
+    "ORAMAccess_QuickCheck_ReadSameBlock", `Slow,
+    (fun () ->
+      let oram = match Lwt_main.run (newORAM ()) with
+        | `Ok oram -> oram
+        | `Error _ -> failwith "Failed to connect to ORAM"
+      in
+      let info = Lwt_main.run (O.get_info oram) in
+      Quickcheck.test (Quickcheck.Generator.tuple2 (addressGenerator info.O.size_sectors) (cstructGenerator info.O.sector_size))
+                      (fun (address, data) ->
+                        check (lwt_t @@ result error cstruct) ""
+                              (fun () -> return (`Ok data))
+                              (fun () ->
+                                O.access oram O.Write address (Some data) >>= fun _ ->
+                                O.access oram O.Read address None)));
+    "ORAMGetSet_QuickCheck_GetSamePosition", `Slow,
+    (fun () ->
+      let oram = match Lwt_main.run (newORAM ()) with
+        | `Ok oram -> oram
+        | `Error _ -> failwith "Failed to connect to ORAM"
+      in
+      let info = Lwt_main.run (O.get_info oram) in
+      let structuralInfo = Lwt_main.run (O.getStructuralInfo oram) in
+      Quickcheck.test (Quickcheck.Generator.tuple2
+                         (addressGenerator info.O.size_sectors)
+                         (leafGenerator structuralInfo.O.numLeaves))
+                      (fun (address, position) ->
+                        check (lwt_t @@ result error int64) ""
+                              (fun () -> return (`Ok position))
+                              (fun () ->
+                                O.set oram address position >>= fun () ->
+                                O.get oram address)));
   ]
 
 let () =

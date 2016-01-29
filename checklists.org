@@ -1,6 +1,6 @@
 * Checklists for the remainder of the project
 
-** TODO Project Evaluation [2/13]
+** TODO Project Evaluation [2/15]
 
   - [X] Look at using a code coverage tool
 
@@ -8,7 +8,31 @@
 
   - [ ] Extend unit tests to work on more data and have more coverage
 
-  - [ ] Use QuickCheck to push the functional tests even further
+  - [-] Define QuickCheck properties for each module [6/12]
+
+    - [X] ORAM
+
+    - [X] Stash
+
+    - [X] PosMap
+
+    - [X] Node
+
+    - [ ] BTrees
+
+    - [ ] FS
+
+    - [ ] InodeIndex
+
+    - [X] Bitarray
+
+    - [ ] FreeMap
+
+    - [X] Inode
+
+    - [ ] InvertedIndex
+
+    - [ ] SearchClient
 
   - [ ] Identify any parameters that could use optimisation and perform
         experiments to test these
@@ -16,7 +40,7 @@
   - [ ] Begin performance testing by examining options (Core_bench vs. own
         profiling)
 
-  - [ ] Try and identify hot spots that could be optimised
+  - [ ] Try and identify hot spots that could be optimised (Valgrind/Gprof)
 
   - [ ] Perform experiments that compare overhead due to ORAM vs. normal
         block device
@@ -27,24 +51,29 @@
 
   - [ ] Perform security analysis first by checking randomness of access pattern
 
+  - [ ] Test uniformly writing/reading to a single address having randomness
+
   - [ ] Do regression tests between the same and different access patterns
 
   - [ ] Figure out how to break non-ORAM scheme to show worth of ORAM
 
-** TODO Write Progress Report [0/4]
+  - [ ] Figure what we actually mean by randomness in the context of ORAM
 
-  - [ ] Start LaTeX document for progress report
+** DONE Write Progress Report [4/4]
+   CLOSED: [2016-01-29 Fri 17:32]
 
-  - [ ] Read Project Briefing Document to find our content needs
+  - [X] Start LaTeX document for progress report
 
-  - [ ] Write necessary content
+  - [X] Read Project Briefing Document to find our content needs
 
-  - [ ] Submit progress report (29/01/16)
+  - [X] Write necessary content
 
-** TODO Project Presentation [0/3]
+  - [X] Submit progress report (29/01/16)
 
-  - [ ] Read Project Briefing Document section about presentation
+** TODO Project Presentation [2/3]
 
-  - [ ] Prepare slides for presentation
+  - [X] Read Project Briefing Document section about presentation
+
+  - [X] Prepare slides for presentation
 
   - [ ] Practice the presentation in head before this Wednesday (for Improbable)
