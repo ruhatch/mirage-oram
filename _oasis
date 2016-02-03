@@ -341,3 +341,29 @@ Test encryption_tests
   TestTools:        encryption_tests
   Command:          $encryption_tests
   WorkingDirectory: tests
+
+Executable oram_bench
+  Path:             tests/bench
+  MainIs:           oramBench.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-oram,
+                    mirage-block-fs,
+                    alcotest,
+                    mirage-block-unix,
+                    lwt,
+                    tests,
+                    core,
+                    core_bench
+
+Executable oram_macro_bench
+  Path:             tests/bench
+  MainIs:           oramMacroBench.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-oram,
+                    lwt,
+                    tests,
+                    core_kernel

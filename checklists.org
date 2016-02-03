@@ -1,6 +1,6 @@
 * Checklists for the remainder of the project
 
-** TODO Project Evaluation [2/15]
+** TODO Project Evaluation [3/15]
 
   - [X] Look at using a code coverage tool
 
@@ -37,27 +37,32 @@
   - [ ] Identify any parameters that could use optimisation and perform
         experiments to test these
 
-  - [ ] Begin performance testing by examining options (Core_bench vs. own
+    - [ ] Bucket Size
+
+    - [ ] Levels of recursion
+
+  - [X] Begin performance testing by examining options (Core_bench vs. own
         profiling)
 
-  - [ ] Try and identify hot spots that could be optimised (Valgrind/Gprof)
+  - [ ] Perform experiments that compare overhead due to ORAM
 
-  - [ ] Perform experiments that compare overhead due to ORAM vs. normal
-        block device
+    - [ ] Do time overhead experiment
+
+    - [ ] Do max stash size experiment in parallel
+
+    - [ ] Figure out how to do bandwidth overhead
 
   - [ ] Compare bandwidth overhead of recursive vs. non-recursive
 
-  - [ ] Expand performance testing as necessary
+  - [ ] Find file system benchmarks and run those for standardisation
 
-  - [ ] Perform security analysis first by checking randomness of access pattern
+  - [ ] Try and identify slowest section in order to focus optimisation
+
+  - [ ] Figure out what we actually mean by randomness in the context of ORAM
 
   - [ ] Test uniformly writing/reading to a single address having randomness
 
   - [ ] Do regression tests between the same and different access patterns
-
-  - [ ] Figure out how to break non-ORAM scheme to show worth of ORAM
-
-  - [ ] Figure what we actually mean by randomness in the context of ORAM
 
 ** DONE Write Progress Report [4/4]
    CLOSED: [2016-01-29 Fri 17:32]
@@ -70,10 +75,12 @@
 
   - [X] Submit progress report (29/01/16)
 
-** TODO Project Presentation [2/3]
+** TODO Project Presentation [2/4]
 
   - [X] Read Project Briefing Document section about presentation
 
   - [X] Prepare slides for presentation
 
   - [ ] Practice the presentation in head before this Wednesday (for Improbable)
+
+  - [ ] Do presentation on right day at right time

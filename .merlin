@@ -13,7 +13,9 @@ B _build/tests
 PKG lwt
 PKG lwt.syntax
 PKG mirage
+PKG core
 PKG core_kernel
+PKG core_bench
 PKG cstruct
 PKG alcotest
 PKG mirage-block-ccm

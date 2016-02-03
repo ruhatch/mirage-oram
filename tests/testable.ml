@@ -125,9 +125,9 @@ let newFile (oram : O.t) contents =
   Cstruct.blit_from_string contents 0 file 0 (String.length contents);
   return (`Ok file)
 
-let newORAM () =
-  Block.connect "disk.img" >>= fun bd ->
-  O.create bd
+let newORAM ?(fileName = "disk.img") ?(desiredSizeInSectors = 0L) () =
+  Block.connect fileName >>= fun bd ->
+  O.create ~desiredSizeInSectors bd
 
 let newFs () =
   newORAM () >>= fun bd ->
