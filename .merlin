@@ -11,7 +11,7 @@ B _build/src/search
 B _build/tests
 
 PKG lwt
-PKG lwt.syntax
+PKG lwt.ppx
 PKG mirage
 PKG core
 PKG core_kernel
@@ -21,4 +21,4 @@ PKG alcotest
 PKG mirage-block-ccm
 PKG mirage-block-unix
 
-EXT lwt.syntax
+EXT lwt.ppx

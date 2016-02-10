@@ -10,6 +10,8 @@ Homepage: https://github.com/ruhatch/mirage-oram
 OASISFormat: 0.4
 BuildTools: ocamlbuild
 Plugins: META (0.4), DevFiles (0.4)
+AlphaFeatures:         ocamlbuild_more_args
+XOCamlbuildExtraArgs: 
 
 Library mirage_oram
   Path:             src
@@ -20,12 +22,14 @@ Library mirage_oram
                     PosMap,
                     BlockSizeController
   BuildDepends:     bisect_ppx,
+                    ppx_bin_prot,
                     core_kernel,
                     mirage,
                     cstruct,
                     lwt,
-                    lwt.syntax
-
+                    lwt.ppx,
+                    bin_prot
+                    
 Library mirage_btrees
   Path:             src/bTrees
   Findlibname:      mirage-btrees
@@ -47,7 +51,8 @@ Library mirage_block_fs
                     cstruct,
                     lwt,
                     lwt.syntax,
-                    mirage-btrees
+                    mirage-btrees,
+                    core_kernel
 
 Library mirage_ir
   Path:             src/search

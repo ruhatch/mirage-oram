@@ -28,7 +28,7 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
     BlockDevice.disconnect blockDevice
 
   let connect ?(desiredBlockSize = 0x4000) blockDevice =
-    lwt info = BlockDevice.get_info blockDevice in
+    let%lwt info = BlockDevice.get_info blockDevice in
     let sectorsPerBlock = (desiredBlockSize - 1) / info.BlockDevice.sector_size + 1 in
     let read_write = info.BlockDevice.read_write in
     let sector_size = sectorsPerBlock * info.BlockDevice.sector_size in

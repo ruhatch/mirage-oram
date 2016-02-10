@@ -1,3 +1,5 @@
+open Core_kernel.Std
+
 module type S = sig
 
   type fileSystem
@@ -52,11 +54,13 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
     FileSystem.writeFile t.fileSystem "files.index" indexFile
 
   let writeFile t name contents =
+    Printf.printf "(0, %d)\n" (Time_ns.to_int_ns_since_epoch (Time_ns.now ()));
     FileSystem.writeFile t.fileSystem name contents >>= fun () ->
     InvertedIndex.indexFile t.index name contents;
     flushIndex t
 
   let readFile t name =
+    Printf.printf "(0, %d)\n" (Time_ns.to_int_ns_since_epoch (Time_ns.now ()));
     FileSystem.readFile t.fileSystem name
 
   let search t query =

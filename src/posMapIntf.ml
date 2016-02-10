@@ -4,6 +4,7 @@ open Lwt
 module type PosMap = sig
 
   type t
+  type core [@@ deriving bin_io]
   type block
   type error
 

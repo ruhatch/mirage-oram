@@ -17,6 +17,7 @@
 *)
 
 open Lwt
+open Core_kernel.Std
 
 module type S = sig
 
@@ -84,13 +85,13 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
 
   let flush_meta t =
     BlockDevice.write t.blockDevice 0L [t.superblock] >>= fun () ->
-    let freeMapSize = Int64.to_int (Cstruct.BE.get_uint64 t.superblock 8) in
+    let freeMapSize = Int64.to_int_exn (Cstruct.BE.get_uint64 t.superblock 8) in
     writeFreeMap t freeMapSize
 
   let initialise blockDevice =
     lwt info = BlockDevice.get_info blockDevice in
     let superblock = Cstruct.create info.BlockDevice.sector_size in
-    let freeMapSize = Int64.(to_int @@ add (div (sub info.BlockDevice.size_sectors 1L) (of_int (info.BlockDevice.sector_size * 8))) 1L) in
+    let freeMapSize = Int64.(to_int_exn ((info.BlockDevice.size_sectors - 1L) / (of_int info.BlockDevice.sector_size * 8L) + 1L)) in
     let freeMap = FreeMap.create freeMapSize info.BlockDevice.sector_size in
     I.create freeMap blockDevice info.BlockDevice.sector_size >>= fun inodeIndex ->
     Cstruct.BE.set_uint64 superblock 0 inodeIndex.I.rootAddress;
@@ -150,6 +151,7 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
         BlockDevice.write t.blockDevice diskAddr [inode]
 
   let writeFile t name contents =
+    Printf.printf "(1, %d)\n" (Time_ns.to_int_ns_since_epoch (Time_ns.now ()));
     if Cstruct.len contents > t.maxFileSize
       then return (`Error (`Unknown (Printf.sprintf "File %s exceeds maximum file size of %d" name t.maxFileSize)))
       else return (`Ok ()) >>= fun () ->
@@ -175,12 +177,14 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
       | n ->
         let buffer = Cstruct.sub contents ((n - 1) * t.info.BlockDevice.sector_size) t.info.BlockDevice.sector_size in
         BlockDevice.write t.blockDevice (Inode.getPtr inode n) [buffer] >>= fun () ->
+        Printf.printf "(1, %d)\n" (Time_ns.to_int_ns_since_epoch (Time_ns.now ()));
         loop (n - 1)
     in loop (Inode.noPtrs inode) >>= fun () ->
     flush_meta t
 
   (* Need length or EOF markers so that we don't need sector_size aligned files*)
   let readFile t name =
+    Printf.printf "(1, %f)\n" (Unix.time ());
     inodeForFile t name >>= fun inode ->
     begin match inode with
       | Some inode -> return (`Ok inode)

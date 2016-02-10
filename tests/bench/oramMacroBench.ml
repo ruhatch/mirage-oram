@@ -11,7 +11,7 @@ let dataForORAM oram =
   Some (Cstruct.create (info.O.sector_size))
 
 let desiredSizes =
-  let heights = List.range 0 18 in
+  let heights = List.range 0 10 in
   List.map ~f:(fun height -> Int64.of_int ((Int.pow 2 (height + 1) - 1) * 4)) heights
 
 (* Loop around writing then reading over and over again! *)
@@ -27,7 +27,7 @@ let performExperiment oram desiredSizeInSectors data =
        if address = Int64.(desiredSizeInSectors - 1L)
        then loop 0L (reverseOperation operation) (n - 1)
        else loop Int64.(address + 1L) operation (n - 1)
-  in loop 0L O.Write 1000000
+  in loop 0L O.Write 10
 
 let () =
   List.iter desiredSizes

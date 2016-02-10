@@ -4,7 +4,7 @@ open Lwt
 
 module InMemory (BlockDevice : V1_LWT.BLOCK) = struct
 
-  type t = (int64, int64_elt, c_layout) Array3.t
+  type posmap = (int64, int64_elt, c_layout) Array3.t [@@ deriving bin_io]
 
   type block = BlockDevice.t
 

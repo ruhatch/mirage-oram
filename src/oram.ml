@@ -3,6 +3,7 @@ open Printf
 open V1_LWT
 open Core_kernel.Std
 open PosMapIntf
+open Bin_prot.Std
 
 module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
 
@@ -19,17 +20,31 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     | `Disconnected
     ]
 
+  type superblock = {
+      offset : int64;
+      length : int;
+    } [@@ deriving bin_io]
+
   type info = {
       read_write: bool;
       sector_size: int;
       size_sectors: int64;
-    }
+    } [@@ deriving bin_io]
 
   type structuralInfo = {
       height : int;
       numLeaves : int64;
       sectorsPerBlock : int;
-    }
+    } [@@ deriving bin_io]
+
+  type core = {
+      info : info;
+      structuralInfo : structuralInfo;
+      bucketSize : int64;
+      offset : int64;
+      desiredBlockSize : int;
+      stash : Stash.t;
+    } [@@ deriving bin_io]
 
   type t = {
       info : info;
@@ -42,6 +57,30 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
       blockDevice : BlockDevice.t;
       (*output : Out_channel.t;*)
     }
+
+  let core { info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash ; positionMap } =
+    { info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash ; positionMap }
+
+  let bin_size_t t = core t |> bin_size_core
+
+  let bin_write_t buf ~pos t = core t |> bin_write_core buf ~pos
+
+  let bin_writer_t = { Bin_prot.Type_class.size = bin_size_t; write = bin_write_t  }
+
+  let bin_read_t buf ~pos_ref =
+    let ({ info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash ; positionMap } : core)
+      = bin_read_core buf ~pos_ref in
+    { info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash ; positionMap ; blockDevice = None }
+
+  let variant_wrong_type name _buf ~pos_ref _x =
+    Bin_prot.Common.raise_variant_wrong_type name !pos_ref
+
+  let bin_reader_t = { Bin_prot.Type_class.read = bin_read_t ; vtag_read = variant_wrong_type "oram"}
+
+  let __bin_read_t__ _buf ~pos_ref _vint =
+    Bin_prot.Common.raise_variant_wrong_type "oram" !pos_ref
+
+  let bin_t = { Bin_prot.Type_class.writer = bin_writer_t ; reader = bin_reader_t }
 
   type id = string
 
@@ -74,18 +113,34 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     let output = Out_channel.create filename in
     output*)
 
-  (*let connect bd =
-    lwt info = B.get_info bd in
-    let read_write = info.B.read_write in
-    if info.B.sector_size > 8
-    then let sector_size = info.B.sector_size - 8 in
-      let height = floor_log Int64.(info.B.size_sectors / 4L + 1L) - 1 in
-      let size_sectors = Int64.(4L * (pow 2L (of_int height + 1L) - 1L)) in
-      let stash = Stash.create () in
-      P.create ~size:size_sectors bd >>= fun posMap ->
-      (*let output = newLog () in*)
-      return (`Ok { info = { read_write; sector_size; size_sectors } ; height ; stash ; posMap ; bd ; offset = 0L (*); output*) })
-    else return (`Error `Disconnected)*)
+
+  (* Create superblock containing offset and length and store at 0 *)
+  (* Then create buffer for the actual data and store at offset *)
+  let flush t =
+    let binarySize = bin_size_t t in
+    let offset = Int64.(t.offset + t.info.size_sectors) in
+    let requiredBlocks = (binarySize + 8 - 1) / t.info.sector_size + 1 in
+    let length = requiredBlocks * t.info.sector_size in
+    let superblock = { offset ; length } in
+    let superblockBuffer = Bin_prot.Common.create_buf (t.info.sector_size / t.structuralInfo.sectorsPerBlock) in
+    let _ = bin_write_superblock superblockBuffer ~pos:0 superblock in
+    let superblockCstruct = Cstruct.of_bigarray superblockBuffer in
+    BlockDevice.write t.blockDevice 0L [superblockCstruct] >>= fun () ->
+    let buffer = Bin_prot.Common.create_buf length in
+    let _ = bin_write_t buffer ~pos:0 t in
+    let cstruct = Cstruct.of_bigarray buffer in
+    BlockDevice.write t.blockDevice offset [cstruct]
+
+  let connect blockDevice =
+    let%lwt info = BlockDevice.get_info blockDevice in
+    let superblockCstruct = Cstruct.create info.BlockDevice.sector_size in
+    BlockDevice.read blockDevice 0L [superblockCstruct] >>= fun () ->
+    let superblockBuffer = Cstruct.to_bigarray superblockCstruct in
+    let { offset ; length } = bin_read_superblock superblockBuffer ~pos_ref:(ref 0) in
+    let buffer = Bin_prot.Common.create_buf length in
+    let ({ info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash ; positionMap } : core) =
+      bin_read_core buffer ~pos_ref:(ref 0) in
+    return (`Ok { info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash ; positionMap ; blockDevice })
 
   let fakeReconnect oram blockDevice =
     return (`Ok { oram with blockDevice })
@@ -247,40 +302,58 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     else calculateHeightOfDataORAM desiredSizeInSectors bucketSize
 
   let createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSize offset blockDevice =
-    lwt info = BlockDevice.get_info blockDevice in
-      let read_write = info.BlockDevice.read_write in
-      let sectorsPerBlock = (desiredBlockSize - 1) / info.BlockDevice.sector_size + 1 in
-      let blockOffset = Int64.(offset * (of_int sectorsPerBlock)) in
-      let sector_size = sectorsPerBlock * info.BlockDevice.sector_size - sizeOfAddressInBytes in
-      (* should in fact save log size_sectors space for the stash *)
-      let height = calculateHeight desiredSizeInSectors info sectorsPerBlock sector_size bucketSize blockOffset in
-      let numLeaves = Int64.(pow 2L (of_int height)) in
-      let size_sectors = Int64.(bucketSize * (2L * numLeaves - 1L)) in
-      let stash = Stash.create () in
-      PositionMap.create ~desiredSizeInSectors:size_sectors ~bucketSize ~desiredBlockSize ~offset:Int64.(blockOffset + size_sectors) blockDevice >>= fun positionMap ->
-      let t = {
-          info = { read_write; sector_size; size_sectors } ;
-          structuralInfo = { height ; numLeaves ; sectorsPerBlock } ;
-          bucketSize ; desiredBlockSize ; offset = blockOffset ;
-          stash ; positionMap ; blockDevice
-        }
-      in
-      return (`Ok t)
+    let%lwt info = BlockDevice.get_info blockDevice in
+    let read_write = info.BlockDevice.read_write in
+    let sectorsPerBlock = (desiredBlockSize - 1) / info.BlockDevice.sector_size + 1 in
+    let blockOffset = Int64.(offset * (of_int sectorsPerBlock)) in
+    let sector_size = sectorsPerBlock * info.BlockDevice.sector_size - sizeOfAddressInBytes in
+    (* should in fact save log size_sectors space for the stash *)
+    let height = calculateHeight desiredSizeInSectors info sectorsPerBlock sector_size bucketSize blockOffset in
+    let numLeaves = Int64.(pow 2L (of_int height)) in
+    let size_sectors = Int64.(bucketSize * (2L * numLeaves - 1L)) in
+    let stash = Stash.create () in
+    PositionMap.create ~desiredSizeInSectors:size_sectors ~bucketSize ~desiredBlockSize ~offset:Int64.(blockOffset + size_sectors) blockDevice >>= fun positionMap ->
+    let t = {
+        info = { read_write; sector_size; size_sectors } ;
+        structuralInfo = { height ; numLeaves ; sectorsPerBlock } ;
+        bucketSize ; desiredBlockSize ; offset = blockOffset ;
+        stash ; positionMap ; blockDevice
+      }
+    in
+    return (`Ok t)
 
   let create ?(desiredSizeInSectors = 0L) ?(bucketSize = 4L) ?(desiredBlockSize = 0x2000) ?(offset = 0L) blockDevice =
     Random.self_init ();
-    lwt info = BlockDevice.get_info blockDevice in
-      if info.BlockDevice.sector_size > sizeOfAddressInBytes
-      then (
-        let desiredBlockSizeToUse =
-          if info.BlockDevice.sector_size > desiredBlockSize
-          then info.BlockDevice.sector_size
-          else desiredBlockSize
-        in
-        createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSizeToUse offset blockDevice >>= fun t ->
-        initialise t >>= fun () ->
-        return (`Ok t)
-      ) else return (`Error (`Unknown "Sector size too small to fit address"))
+    let%lwt info = BlockDevice.get_info blockDevice in
+    if info.BlockDevice.sector_size > sizeOfAddressInBytes
+    then (
+      let desiredBlockSizeToUse =
+        if info.BlockDevice.sector_size > desiredBlockSize
+        then info.BlockDevice.sector_size
+        else desiredBlockSize
+      in
+      createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSizeToUse offset blockDevice >>= fun t ->
+      initialise t >>= fun () ->
+      return (`Ok t)
+    ) else return (`Error (`Unknown "Sector size too small to fit address"))
+
+  (*let flushORAM {
+          info ;
+          structuralInfo ;
+          bucketSize ;
+          offset ;
+          desiredBlockSize ;
+          stash ;
+          positionMap ;
+          blockDevice ;
+        } =
+    let bucketSizeSize = Bin_prot.Std.bin_size_int64 bucketSize in
+    let offsetSize = Bin_prot.Std.bin_size_int64 offset in
+    let desiredBlockSize = Bin_prot.Std.bin_size_int desiredBlockSize in
+    let stashSize = Stash.bin_size_t stash in
+    let positionMap = Bin_prot.Std.
+                      BlockDevice.write blockDevice*)
+
 
   let writeBuffer t startAddress buffer =
     let bufferLengthInSectors = buffer.Cstruct.len / t.info.sector_size in
@@ -293,15 +366,19 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
          writeSectors (sectorAddressInBuffer - 1)
     in writeSectors (bufferLengthInSectors - 1)
 
-  let rec write t startAddress = function
-    | [] -> return (`Ok ())
-    | buffer :: buffers ->
-       if startAddress >= t.info.size_sectors
-       then return (`Error (`Unknown "End of file"))
-       else
-         writeBuffer t startAddress buffer >>= fun () ->
-         let startAddressOfNextBuffer = Int64.(startAddress + (of_int buffer.Cstruct.len / (of_int t.info.sector_size))) in
-         write t startAddressOfNextBuffer buffers
+  let rec write t startAddress buffers =
+    Printf.printf "(2, %d)\n" (Time_ns.to_int_ns_since_epoch (Time_ns.now ()));
+    let rec loop startAddress = function
+      | [] -> return (`Ok ())
+      | buffer :: buffers ->
+         if startAddress >= t.info.size_sectors
+         then return (`Error (`Unknown "End of file"))
+         else
+           writeBuffer t startAddress buffer >>= fun () ->
+           let startAddressOfNextBuffer = Int64.(startAddress + (of_int buffer.Cstruct.len / (of_int t.info.sector_size))) in
+           loop startAddressOfNextBuffer buffers
+    in
+    loop startAddress buffers
 
   let readBuffer t startAddress buffer =
     let bufferLengthInSectors = buffer.Cstruct.len / t.info.sector_size in
@@ -314,14 +391,18 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
          readSectors (sectorAddressInBuffer - 1)
     in readSectors (bufferLengthInSectors - 1)
 
-  let rec read t startAddress = function
-    | [] -> return (`Ok ())
-    | buffer :: buffers ->
-       if startAddress >= t.info.size_sectors
-       then return (`Error (`Unknown "End of file"))
-       else
-         readBuffer t startAddress buffer >>= fun () ->
-         read t Int64.(startAddress + (of_int buffer.Cstruct.len / (of_int t.info.sector_size))) buffers
+  let rec read t startAddress buffers =
+    Printf.printf "(2, %d)\n" (Time_ns.to_int_ns_since_epoch (Time_ns.now ()));
+    let rec loop startAddress = function
+      | [] -> return (`Ok ())
+      | buffer :: buffers ->
+         if startAddress >= t.info.size_sectors
+         then return (`Error (`Unknown "End of file"))
+         else
+           readBuffer t startAddress buffer >>= fun () ->
+           loop Int64.(startAddress + (of_int buffer.Cstruct.len / (of_int t.info.sector_size))) buffers
+    in
+    loop startAddress buffers
 
   let get t sectorAddress =
     let sizeOfPositionInBytes = 8 in

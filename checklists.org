@@ -75,12 +75,12 @@
 
   - [X] Submit progress report (29/01/16)
 
-** TODO Project Presentation [2/4]
+** TODO Project Presentation [3/4]
 
   - [X] Read Project Briefing Document section about presentation
 
   - [X] Prepare slides for presentation
 
-  - [ ] Practice the presentation in head before this Wednesday (for Improbable)
+  - [X] Practice the presentation in head before this Wednesday (for Improbable)
 
   - [ ] Do presentation on right day at right time
