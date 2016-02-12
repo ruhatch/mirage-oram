@@ -65,6 +65,24 @@ let oram_tests =
               let buff = Cstruct.create (Cstruct.len file) in
               O.read bd 0L [buff] >>= fun () ->
               return (`Ok buff)));
+    "ORAMWriteFile_ProjectGutenbergReconnect_ReadOutCorrectly", `Quick,
+    (fun () ->
+      let contents = readWholeFile "testFiles/gutenberg/pg61.txt" in
+      check (lwt_t @@ result error cstruct) ""
+            (fun () ->
+              newORAM () >>= fun bd ->
+              newFile bd contents >>= fun file ->
+              return (`Ok file))
+            (fun () ->
+              newORAM () >>= fun bd ->
+              newFile bd contents >>= fun file ->
+              O.write bd 0L [file] >>= fun () ->
+              let%lwt () = O.disconnect bd in
+              Block.connect "disk.img" >>= fun blockDevice ->
+              O.connect blockDevice >>= fun oram ->
+              let buff = Cstruct.create (Cstruct.len file) in
+              O.read oram 0L [buff] >>= fun () ->
+              return (`Ok buff)));
     "ORAMWriteBucket_QuickCheck_ReadSameValueFromBucket", `Slow,
     (fun () ->
       let oram = match Lwt_main.run (newORAM ()) with

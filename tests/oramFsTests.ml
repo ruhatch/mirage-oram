@@ -95,13 +95,13 @@ let oram_fs_tests =
               newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg62.txt") >>= fun file2 ->
               newFile fs.F.blockDevice (readWholeFile "testFiles/gutenberg/pg63.txt") >>= fun file3 ->
               F.writeFile fs "pg61.txt" file1 >>= fun () ->
-              bind (O.disconnect fs.F.blockDevice) @@ fun () ->
-                                                      Block.connect "disk.img" >>= fun blockDevice ->
-                                                      O.fakeReconnect fs.F.blockDevice blockDevice >>= fun oram ->
-                                                      F.connect oram >>= fun fs ->
-                                                      F.writeFile fs "pg62.txt" file2 >>= fun () ->
-                                                      F.writeFile fs "pg63.txt" file3 >>= fun () ->
-                                                      F.readFile fs "pg61.txt"));
+              let%lwt () = O.disconnect fs.F.blockDevice in
+              Block.connect "disk.img" >>= fun blockDevice ->
+              O.connect blockDevice >>= fun oram ->
+              F.connect oram >>= fun fs ->
+              F.writeFile fs "pg62.txt" file2 >>= fun () ->
+              F.writeFile fs "pg63.txt" file3 >>= fun () ->
+              F.readFile fs "pg61.txt"));
     "ORAMFSWriteFile_FullProjectGutenberg_ReadOutFileCorrectly", `Slow,
     (fun () ->
       check (lwt_t @@ result error cstruct) ""

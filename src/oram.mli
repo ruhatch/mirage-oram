@@ -18,6 +18,7 @@ module Make (P : PosMapF) (B : V1_LWT.BLOCK) : sig
   (*val connect : B.t -> [`Ok of t | `Error of error] Lwt.t*)
   val fakeReconnect : t -> B.t -> [`Ok of t | `Error of error] Lwt.t
   val disconnect : t -> unit Lwt.t
+  val connect : B.t -> [`Ok of t | `Error  of error] Lwt.t
 
   (* Lower level functions - exposed for testing purposes *)
 

@@ -89,7 +89,7 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
     writeFreeMap t freeMapSize
 
   let initialise blockDevice =
-    lwt info = BlockDevice.get_info blockDevice in
+    let%lwt info = BlockDevice.get_info blockDevice in
     let superblock = Cstruct.create info.BlockDevice.sector_size in
     let freeMapSize = Int64.(to_int_exn ((info.BlockDevice.size_sectors - 1L) / (of_int info.BlockDevice.sector_size * 8L) + 1L)) in
     let freeMap = FreeMap.create freeMapSize info.BlockDevice.sector_size in
@@ -102,7 +102,7 @@ module Make (BlockDevice : V1_LWT.BLOCK) = struct
     return (`Ok t)
 
   let connect blockDevice =
-    lwt info = BlockDevice.get_info blockDevice in
+    let%lwt info = BlockDevice.get_info blockDevice in
     let freeMap = Cstruct.create info.BlockDevice.sector_size in
     BlockDevice.read blockDevice 1L [freeMap] >>= fun () ->
     let superblock = Cstruct.create info.BlockDevice.sector_size in

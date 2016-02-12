@@ -10,8 +10,6 @@ Homepage: https://github.com/ruhatch/mirage-oram
 OASISFormat: 0.4
 BuildTools: ocamlbuild
 Plugins: META (0.4), DevFiles (0.4)
-AlphaFeatures:         ocamlbuild_more_args
-XOCamlbuildExtraArgs: 
 
 Library mirage_oram
   Path:             src
@@ -50,7 +48,7 @@ Library mirage_block_fs
                     mirage,
                     cstruct,
                     lwt,
-                    lwt.syntax,
+                    lwt.ppx,
                     mirage-btrees,
                     core_kernel
 
@@ -63,7 +61,7 @@ Library mirage_ir
                     mirage,
                     cstruct,
                     lwt,
-                    lwt.syntax,
+                    lwt.ppx,
                     mirage-block-fs,
                     core_kernel,
                     bin_prot,
@@ -78,7 +76,7 @@ Library tests
                     alcotest,
                     lwt,
                     lwt.unix,
-                    lwt.syntax,
+                    lwt.ppx,
                     cstruct,
                     mirage-block-unix,
                     core_kernel,
@@ -96,6 +94,7 @@ Executable oram_tests
                     alcotest,
                     mirage-block-unix,
                     lwt,
+                    lwt.ppx,
                     tests
 
 Executable stash_tests
@@ -371,4 +370,4 @@ Executable oram_macro_bench
   BuildDepends:     mirage-oram,
                     lwt,
                     tests,
-                    core_kernel
+                    core

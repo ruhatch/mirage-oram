@@ -1,14 +1,55 @@
 open Bigarray
 open Core_kernel.Std
 open Lwt
+open Bin_prot.Std
+open Bin_prot.Common
 
 module InMemory (BlockDevice : V1_LWT.BLOCK) = struct
 
-  type posmap = (int64, int64_elt, c_layout) Array3.t [@@ deriving bin_io]
+  type t = (int64, int64_elt, c_layout) Array3.t
 
   type block = BlockDevice.t
 
   type error = BlockDevice.error
+
+  external buf_of_array3 : t -> buf = "%identity"
+
+  let bin_size_t t =
+    let len1 = Array3.dim1 t in
+    let len2 = Array3.dim2 t in
+    let len3 = Array3.dim3 t in
+    let size = len1 * len2 * len3 * 8 in
+    bin_size_int len1 + bin_size_int len2 + bin_size_int len3 + size
+
+  let bin_write_t buf ~pos t =
+    let len1 = Array3.dim1 t in
+    let len2 = Array3.dim2 t in
+    let len3 = Array3.dim3 t in
+    let pos = bin_write_int buf ~pos len1 in
+    let pos = bin_write_int buf ~pos len2 in
+    let pos = bin_write_int buf ~pos len3 in
+    let size = len1 * len2 * len3 * 8 in
+    let next = pos + size in
+    check_next buf next;
+    unsafe_blit_buf ~src:(buf_of_array3 t) ~src_pos:0 ~dst:buf ~dst_pos:pos ~len:size;
+    next
+
+  let bin_writer_t = { Bin_prot.Type_class.write = bin_write_t ; size = bin_size_t }
+
+  let bin_read_t buf ~pos_ref blockDevice =
+    let len1 = (bin_read_int buf ~pos_ref) in
+    let len2 = (bin_read_int buf ~pos_ref) in
+    let len3 = (bin_read_int buf ~pos_ref) in
+    let size = len1 * len2 * len3 * 8 in
+    let pos = !pos_ref in
+    let next = pos + size in
+    check_next buf next;
+    let t = Array3.create Int64 c_layout len1 len2 len3 in
+    unsafe_blit_buf ~src:buf ~src_pos:pos ~dst:(buf_of_array3 t) ~dst_pos:0 ~len:size;
+    pos_ref := next;
+    t
+
+  let diskSize _ = 0L
 
   let indices a =
     let x = Option.value Int64.(to_int @@ shift_right a 60) ~default:0 in

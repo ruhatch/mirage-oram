@@ -55,32 +55,30 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
       stash : Stash.t;
       positionMap : PositionMap.t;
       blockDevice : BlockDevice.t;
-      (*output : Out_channel.t;*)
+      (* output : Out_channel.t; *)
     }
 
-  let core { info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash ; positionMap } =
-    { info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash ; positionMap }
+  let core { info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash } =
+    { info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash }
 
-  let bin_size_t t = core t |> bin_size_core
+  let extendCore ({ info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash } : core) positionMap blockDevice =
+    { info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash ; positionMap ; blockDevice}
 
-  let bin_write_t buf ~pos t = core t |> bin_write_core buf ~pos
+  let bin_size_t t =
+    let coreSize = core t |> bin_size_core in
+    let posMapSize = PositionMap.bin_size_t t.positionMap in
+    coreSize + posMapSize
+
+  let bin_write_t buf ~pos t =
+    let pos = core t |> bin_write_core buf ~pos in
+    PositionMap.bin_write_t buf ~pos t.positionMap
 
   let bin_writer_t = { Bin_prot.Type_class.size = bin_size_t; write = bin_write_t  }
 
-  let bin_read_t buf ~pos_ref =
-    let ({ info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash ; positionMap } : core)
-      = bin_read_core buf ~pos_ref in
-    { info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash ; positionMap ; blockDevice = None }
-
-  let variant_wrong_type name _buf ~pos_ref _x =
-    Bin_prot.Common.raise_variant_wrong_type name !pos_ref
-
-  let bin_reader_t = { Bin_prot.Type_class.read = bin_read_t ; vtag_read = variant_wrong_type "oram"}
-
-  let __bin_read_t__ _buf ~pos_ref _vint =
-    Bin_prot.Common.raise_variant_wrong_type "oram" !pos_ref
-
-  let bin_t = { Bin_prot.Type_class.writer = bin_writer_t ; reader = bin_reader_t }
+  let bin_read_t buf ~pos_ref blockDevice =
+    let core = bin_read_core buf ~pos_ref in
+    let positionMap = PositionMap.bin_read_t buf ~pos_ref blockDevice in
+    extendCore core positionMap blockDevice
 
   type id = string
 
@@ -113,23 +111,26 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     let output = Out_channel.create filename in
     output*)
 
+  let diskSize t =
+    Int64.((t.info.size_sectors * of_int t.structuralInfo.sectorsPerBlock) + (PositionMap.diskSize t.positionMap))
 
-  (* Create superblock containing offset and length and store at 0 *)
   (* Then create buffer for the actual data and store at offset *)
   let flush t =
+    let%lwt info = BlockDevice.get_info t.blockDevice in
     let binarySize = bin_size_t t in
-    let offset = Int64.(t.offset + t.info.size_sectors) in
-    let requiredBlocks = (binarySize + 8 - 1) / t.info.sector_size + 1 in
-    let length = requiredBlocks * t.info.sector_size in
+    let offset = Int64.(t.offset + diskSize t) in
+    let requiredBlocks = (binarySize - 1) / info.BlockDevice.sector_size + 1 in
+    let length = requiredBlocks * info.BlockDevice.sector_size in
     let superblock = { offset ; length } in
-    let superblockBuffer = Bin_prot.Common.create_buf (t.info.sector_size / t.structuralInfo.sectorsPerBlock) in
+    let superblockBuffer = Bin_prot.Common.create_buf info.BlockDevice.sector_size in
     let _ = bin_write_superblock superblockBuffer ~pos:0 superblock in
     let superblockCstruct = Cstruct.of_bigarray superblockBuffer in
     BlockDevice.write t.blockDevice 0L [superblockCstruct] >>= fun () ->
     let buffer = Bin_prot.Common.create_buf length in
     let _ = bin_write_t buffer ~pos:0 t in
     let cstruct = Cstruct.of_bigarray buffer in
-    BlockDevice.write t.blockDevice offset [cstruct]
+    BlockDevice.write t.blockDevice offset [cstruct] >>= fun () ->
+    return (`Ok ())
 
   let connect blockDevice =
     let%lwt info = BlockDevice.get_info blockDevice in
@@ -137,16 +138,19 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     BlockDevice.read blockDevice 0L [superblockCstruct] >>= fun () ->
     let superblockBuffer = Cstruct.to_bigarray superblockCstruct in
     let { offset ; length } = bin_read_superblock superblockBuffer ~pos_ref:(ref 0) in
-    let buffer = Bin_prot.Common.create_buf length in
-    let ({ info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash ; positionMap } : core) =
-      bin_read_core buffer ~pos_ref:(ref 0) in
-    return (`Ok { info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash ; positionMap ; blockDevice })
+    let core = Cstruct.create length in
+    BlockDevice.read blockDevice offset [core] >>= fun () ->
+    let buffer = Cstruct.to_bigarray core in
+    let t = bin_read_t buffer ~pos_ref:(ref 0) blockDevice in
+    return (`Ok t)
 
   let fakeReconnect oram blockDevice =
     return (`Ok { oram with blockDevice })
 
   let disconnect t =
-    BlockDevice.disconnect t.blockDevice
+    match%lwt flush t with
+    | `Ok _ -> BlockDevice.disconnect t.blockDevice
+    | `Error _ -> failwith "Failed to flush ORAM! You're probably screwed!"
 
   let calculateAddressOfBucket t leaf level =
     let rec loop acc = function
@@ -158,6 +162,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     in loop 0L level
 
   let writeBucket t address bucket =
+    Printf.printf "%Ld\n" Int64.(address + t.offset);
     let buffers = List.map ~f:OBlock.to_cstruct bucket in
     BlockDevice.write t.blockDevice Int64.(address + t.offset) buffers
 
@@ -183,6 +188,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     List.map ~f:(fun _ -> Cstruct.create sector_size) zeroToBucketSize
 
   let readBucket t address =
+    Printf.printf "%Ld\n" Int64.(address + t.offset);
     let buffersForBucket = createBuffersForBucket t in
     BlockDevice.read t.blockDevice Int64.(address + t.offset) buffersForBucket >>= fun () ->
     let bucket = List.map ~f:OBlock.of_cstruct buffersForBucket in
@@ -236,7 +242,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     readPathToLeaf t leaf >>= fun pathRead ->
     List.iter pathRead ~f:(
                 List.iter ~f:(
-                            fun (address, data) -> Stash.add t.stash ~address ~data));
+                            fun (address, data) ->  Stash.add t.stash ~address ~data));
     let dataRead = match Stash.find t.stash address with
       | Some data -> data
       | None -> Cstruct.create t.info.sector_size
@@ -266,7 +272,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
       | x -> BlockDevice.write t.blockDevice Int64.(t.offset + (x - 1L) * (of_int t.structuralInfo.sectorsPerBlock)) [dummy_struct] >>= fun () -> loop Int64.(x - 1L)
     in
     loop t.info.size_sectors >>= fun () ->
-    if t.offset > 0L
+    if t.offset > Int64.of_int t.structuralInfo.sectorsPerBlock
     then (
       let b = Float.(to_int (log (of_int t.info.sector_size * 8.) / log 2.)) in
       let height' = t.structuralInfo.height - 6 + b in
@@ -284,8 +290,14 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
       loop t.info.size_sectors
     ) else return (`Ok ())
 
+  let stashSizesForBucketSize = [(4L,89L);(5L,63L);(6L,53L)]
+
   let calculateHeightToFillBlockDevice info sectorsPerBlock bucketSize =
-    floor_log Int64.(info.BlockDevice.size_sectors / ((of_int sectorsPerBlock) * bucketSize) + 1L) - 1
+    (* Need to accommodate stash space into this calculation *)
+    let maxStashSizeInBlocks = List.Assoc.find_exn stashSizesForBucketSize bucketSize in
+    let normalisedSizeInSectors = Int64.(info.BlockDevice.size_sectors / of_int sectorsPerBlock) in
+    let sectorsForORAM = Int64.(normalisedSizeInSectors - maxStashSizeInBlocks) in
+    floor_log Int64.(sectorsForORAM / bucketSize + 1L) - 1
 
   let calculateHeightOfPositionMap desiredSizeInSectors sector_size bucketSize =
     let reductionFactor = Float.(to_int (log (of_int sector_size * 8.) / log 2.)) in
@@ -297,7 +309,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
   let calculateHeight desiredSizeInSectors info sectorsPerBlock sector_size bucketSize offset =
     if desiredSizeInSectors = 0L
     then calculateHeightToFillBlockDevice info sectorsPerBlock bucketSize
-    else if offset > 0L
+    else if offset > Int64.of_int (sector_size + sizeOfAddressInBytes)
     then calculateHeightOfPositionMap desiredSizeInSectors sector_size bucketSize
     else calculateHeightOfDataORAM desiredSizeInSectors bucketSize
 
@@ -311,8 +323,10 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     let height = calculateHeight desiredSizeInSectors info sectorsPerBlock sector_size bucketSize blockOffset in
     let numLeaves = Int64.(pow 2L (of_int height)) in
     let size_sectors = Int64.(bucketSize * (2L * numLeaves - 1L)) in
+    (* let totalSizeSectors = Int64.(info.BlockDevice.size_sectors / of_int sectorsPerBlock) in *)
+    (* Printf.printf "Creating ORAM of size %Ld in block of size %Ld with block offset %Ld\n" size_sectors totalSizeSectors blockOffset; *)
     let stash = Stash.create () in
-    PositionMap.create ~desiredSizeInSectors:size_sectors ~bucketSize ~desiredBlockSize ~offset:Int64.(blockOffset + size_sectors) blockDevice >>= fun positionMap ->
+    PositionMap.create ~desiredSizeInSectors:size_sectors ~bucketSize ~desiredBlockSize ~offset:Int64.(offset + size_sectors) blockDevice >>= fun positionMap ->
     let t = {
         info = { read_write; sector_size; size_sectors } ;
         structuralInfo = { height ; numLeaves ; sectorsPerBlock } ;
@@ -322,38 +336,18 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     in
     return (`Ok t)
 
-  let create ?(desiredSizeInSectors = 0L) ?(bucketSize = 4L) ?(desiredBlockSize = 0x2000) ?(offset = 0L) blockDevice =
+  let create ?(desiredSizeInSectors = 0L) ?(bucketSize = 4L) ?(desiredBlockSize = 0x2000) ?(offset = 1L) blockDevice =
     Random.self_init ();
     let%lwt info = BlockDevice.get_info blockDevice in
-    if info.BlockDevice.sector_size > sizeOfAddressInBytes
-    then (
-      let desiredBlockSizeToUse =
-        if info.BlockDevice.sector_size > desiredBlockSize
-        then info.BlockDevice.sector_size
-        else desiredBlockSize
-      in
-      createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSizeToUse offset blockDevice >>= fun t ->
-      initialise t >>= fun () ->
-      return (`Ok t)
-    ) else return (`Error (`Unknown "Sector size too small to fit address"))
-
-  (*let flushORAM {
-          info ;
-          structuralInfo ;
-          bucketSize ;
-          offset ;
-          desiredBlockSize ;
-          stash ;
-          positionMap ;
-          blockDevice ;
-        } =
-    let bucketSizeSize = Bin_prot.Std.bin_size_int64 bucketSize in
-    let offsetSize = Bin_prot.Std.bin_size_int64 offset in
-    let desiredBlockSize = Bin_prot.Std.bin_size_int desiredBlockSize in
-    let stashSize = Stash.bin_size_t stash in
-    let positionMap = Bin_prot.Std.
-                      BlockDevice.write blockDevice*)
-
+    let desiredBlockSizeToUse =
+      if info.BlockDevice.sector_size > desiredBlockSize
+      then info.BlockDevice.sector_size
+      else desiredBlockSize
+    in
+    createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSizeToUse offset blockDevice >>= fun t ->
+    initialise t >>= fun () ->
+    flush t >>= fun () ->
+    return (`Ok t)
 
   let writeBuffer t startAddress buffer =
     let bufferLengthInSectors = buffer.Cstruct.len / t.info.sector_size in
@@ -366,19 +360,20 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
          writeSectors (sectorAddressInBuffer - 1)
     in writeSectors (bufferLengthInSectors - 1)
 
-  let rec write t startAddress buffers =
-    Printf.printf "(2, %d)\n" (Time_ns.to_int_ns_since_epoch (Time_ns.now ()));
+  let write t startAddress buffers =
+    (* Printf.printf "(2, %d)\n" (Time_ns.to_int_ns_since_epoch (Time_ns.now ())); *)
     let rec loop startAddress = function
       | [] -> return (`Ok ())
       | buffer :: buffers ->
-         if startAddress >= t.info.size_sectors
+         let startAddressOfNextBuffer = Int64.(startAddress + (of_int buffer.Cstruct.len / (of_int t.info.sector_size))) in
+         if startAddressOfNextBuffer > t.info.size_sectors
          then return (`Error (`Unknown "End of file"))
          else
            writeBuffer t startAddress buffer >>= fun () ->
-           let startAddressOfNextBuffer = Int64.(startAddress + (of_int buffer.Cstruct.len / (of_int t.info.sector_size))) in
            loop startAddressOfNextBuffer buffers
     in
-    loop startAddress buffers
+    loop startAddress buffers >>= fun () ->
+    flush t
 
   let readBuffer t startAddress buffer =
     let bufferLengthInSectors = buffer.Cstruct.len / t.info.sector_size in
@@ -391,18 +386,20 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
          readSectors (sectorAddressInBuffer - 1)
     in readSectors (bufferLengthInSectors - 1)
 
-  let rec read t startAddress buffers =
-    Printf.printf "(2, %d)\n" (Time_ns.to_int_ns_since_epoch (Time_ns.now ()));
+  let read t startAddress buffers =
+    (* Printf.printf "(2, %d)\n" (Time_ns.to_int_ns_since_epoch (Time_ns.now ())); *)
     let rec loop startAddress = function
       | [] -> return (`Ok ())
       | buffer :: buffers ->
-         if startAddress >= t.info.size_sectors
+         let startAddressOfNextBuffer = Int64.(startAddress + (of_int buffer.Cstruct.len / (of_int t.info.sector_size))) in
+         if startAddressOfNextBuffer > t.info.size_sectors
          then return (`Error (`Unknown "End of file"))
          else
            readBuffer t startAddress buffer >>= fun () ->
-           loop Int64.(startAddress + (of_int buffer.Cstruct.len / (of_int t.info.sector_size))) buffers
+           loop startAddressOfNextBuffer buffers
     in
-    loop startAddress buffers
+    loop startAddress buffers >>= fun () ->
+    flush t
 
   let get t sectorAddress =
     let sizeOfPositionInBytes = 8 in

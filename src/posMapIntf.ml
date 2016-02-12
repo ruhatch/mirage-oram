@@ -3,8 +3,7 @@ open Lwt
 
 module type PosMap = sig
 
-  type t
-  type core [@@ deriving bin_io]
+  type t [@@ deriving bin_write]
   type block
   type error
 
@@ -12,6 +11,9 @@ module type PosMap = sig
   val get : t -> int64 -> [`Ok of int64 | `Error of error] Lwt.t
   val set : t -> int64 -> int64 -> [`Ok of unit | `Error of error] Lwt.t
   val length : t -> int64
+  val diskSize : t -> int64
+
+  val bin_read_t : Bin_prot.Common.buf -> pos_ref:Bin_prot.Common.pos_ref -> block -> t
 
 end
 

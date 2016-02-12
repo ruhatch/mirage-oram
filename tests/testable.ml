@@ -116,7 +116,7 @@ let writeWholeFile name contents =
   in loop 0 length
 
 let newFile (oram : O.t) contents =
-  lwt info = O.get_info oram in
+  let%lwt info = O.get_info oram in
   let sectorLength = (String.length contents - 1) / info.O.sector_size + 1 in
   let file = Cstruct.create (sectorLength * info.O.sector_size) in
   for i = 0 to Cstruct.len file - 1 do

@@ -22,3 +22,4 @@ PKG mirage-block-ccm
 PKG mirage-block-unix
 
 EXT lwt.ppx
+EXT ppx_bin_prot

@@ -43,6 +43,7 @@ testFiles/
 *.output
 *.test
 *.out
+*.dat
 
 # Emacs
 *~
