@@ -8,8 +8,8 @@ bug-reports: "https://github.com/ruhatch/mirage-oram/issues"
 license: "MIT"
 dev-repo: "https://github.com/ruhatch/mirage-oram.git"
 build: [
-  ["./configure" "--prefix=%{prefix}%"]
-  [make]
+  ["ocaml" "setup.ml" "-configure" "--prefix" prefix]
+  ["ocaml" "setup.ml" "-build"]
 ]
 install: [make "install"]
 remove: ["ocamlfind" "remove" "mirage-oram"]
