@@ -148,7 +148,7 @@ By virtue of being stored in the cloud, we should be able to access our data at 
 
 In order to make statelessness more efficient, it is necessary to augment ORAM with recursion (\cref{sec:oramintro}), which reduces the amount of transient client-side storage. This enables us to efficiently store the client's state between accesses. Recursion introduces the challenge of choosing how many levels to use. Each extra level of recursion reduces the size of the client's state, but also incurs a time and space overhead. This is explored briefly in \cite{stefanov2013path}, but we will attempt to have the system automatically choose parameters for the recursion based on the size and block size of the underlying storage used by the system.
 
-Finally in order for the system to perform query-based search over encrypted documents we need to implement an object store, an information retrieval module and an encryption module. These modules will be rudimentary, as the main focus of the project is the implementation and optimisation of the ORAM module, but all of them have inherent design and implementation challenges that will be need to be addressed.
+Finally in order for the system to perform query-based search over encrypted documents we need to implement a file system, an information retrieval module and an encryption module. These modules will be rudimentary, as the main focus of the project is the implementation and optimisation of the ORAM module, but all of them have inherent design and implementation challenges that will be need to be addressed.
 
 \section{Related Work}
 
@@ -171,13 +171,15 @@ Finally in order for the system to perform query-based search over encrypted doc
 \section{Defining the Threat Model}
 \label{sec:threatmodel}
 
-% Use a diagram
-
 The threat model is defined in terms of a client, a server and an attacker.
 
-We assume that the network is under the attacker's control. In the basic model we define the server and the attacker to be honest, but curious. This means that they will both gather as much information as possible, without deviating from the protocol. Thus the attacker will eavesdrop, but will not prevent messages from arriving at the server, tamper with them in any way or produce their own fake messages. The server will also not tamper with the messages, or with the underlying storage that the protocol is accessing. In this model the attacker is not as interesting as the server, because all communications are encrypted. Thus it is the server, that can see the access patterns of the underlying storage, that we are trying to protect against. The goal of the project is to make sure that this access pattern reveals nothing about the contents of the search queries or the documents in the underlying storage.
+\setlength{\unitlength}{0.67mm}
+\input{threatModel}
+\setlength{\unitlength}{0.5mm}
 
-We can also extend the model to one where both the attacker and the server freely tamper with messages and introduce new messages, and the server tampers with the underlying storage. In this case we will need to extend our solution with integrity verification.
+We assume that the network is under the attacker's control. In the basic model we define the server and the attacker to be passive, and honest, but curious. This means that they will both gather as much information as possible, without deviating from the protocol. Thus the attacker will eavesdrop, but will not prevent messages from arriving at the server, tamper with them in any way or produce their own fake messages. The server will also not tamper with the messages, or with the underlying storage that the protocol is accessing. In this model the attacker is not as interesting as the server, because all communications are encrypted. Thus it is the server, that can see the access patterns of the underlying storage, that we are trying to protect against. The goal of the project is to make sure that this access pattern reveals nothing about the contents of the search queries or the documents in the underlying storage.
+
+We can also extend the model to one where both the attacker and the server become active, freely tampering with messages and introducing new messages, and the server tampers with the underlying storage. In this case we will need to extend our solution with integrity verification.
 
 \section{Introduction to Path ORAM}
 \label{sec:oramintro}
@@ -195,7 +197,7 @@ This is achieved using \cref{alg:access}, which is split into four main steps:
 
 Clearly after this, either it was possible to write a block into the stash along the path to its leaf, or not, in which case it is in the stash, and the invariant holds.
 
-\begin{algorithm}[H]
+\begin{algorithm}[h]
 \caption{Read/write data block at address $\mathsf{a}$}
 \label{alg:access}
 \begin{algorithmic}[1]
@@ -230,7 +232,9 @@ Clearly after this, either it was possible to write a block into the stash along
 
 The security of this operation comes from the fact that positions are assigned uniformly at random. If we consider the sequence of accesses, $$\mathbf{p} = (\mathsf{position}_M[\mathsf{a}_M], \mathsf{position}_{M-1}[\mathsf{a}_{M-1}], \dots, \mathsf{position}_1[\mathsf{a}_1]),$$ any two accesses to the same address will be statistically independent and trivially so will two accesses to different addresses. Thus, by an application of Bayes' rule, $$\Pr(\mathbf{p}) = \prod\limits^{M}_{j=1}\Pr(\mathsf{position}_j[\mathsf{a}_j]) = \left(\frac{1}{2^L}\right)^M$$ and the access pattern is indistinguishable from a random sequence of bit strings.
 
-\mytodo{Give a quick introduction to recursive oram and statelessness}
+We might, and for our application will, want to make ORAM stateless, storing all information on the disk, and nothing (except private keys) on the client. We can do this na\"ively by simply dumping all of the state to disk after every operation, but in our current construction, the position map takes $O(n)$ storage space on the client, and the stash $O(\log N)$. Adding recursion to ORAM allows us to reduce the size of the overall client storage to $O(\log N)$, by reducing the space required for the position map to $O(1)$, while maintaining $O(\log N)$ for the stash (actually now multiple stashes). We can now write the client-side storage to the server after each call, and read it back again before the next one, without increasing the asymptotic bandwidth overheads.
+
+Recursion works by storing the position map of our original ORAM, now referred to as ORAM$_0$, in a new ORAM, ORAM$_1$. Now the client stores the position map of this ORAM, plus the stashes of both. If we can store $\chi$ positions in each block of ORAM$_1$, then the new position map is only $O(N/\chi)$. We can then repeat this process until we have the position map of ORAM$_n$ being of constant size. The number of levels required to achieve this are examined in \cite{stefanov2013path} and explored further in \cref{subsec:comparisonWithLiterature}.
 
 \section{Introduction to Inverted Indexes}
 \label{sec:invertedindexintro}
@@ -241,12 +245,13 @@ So now looking up a single keyword is as simple as hashing the keyword and retur
 
 In this project we will restrict operations to simple, space-separated disjunctions, because we are focusing on showing the correctness and efficiency of search using the ORAM implementation, rather than creating an advanced IR system.
 
-\mytodo{Talk about constructing an inverted index}
+Constructing an Inverted Index can be done in three simple steps. We first tokenise the text that we want to add to the index. We then perform some linguistic preprocessing on these tokens, for example stemming, to get them into some sort of normalised form. Finally, we add the document ID of the document to the postings list of each token.
 
 \section{Introduction to MirageOS}
 
-\mytodo{Give a brief introduction to MirageOS}
-\mytodo{Discuss the choice to use MirageOS}
+MirageOS is a unikernel operating system designed to run on the Xen hypervisor. The idea is to provide the minimum amount of functionality required of an application by pulling together a number of libraries, and compiling down to an executable that runs directly on the hypervisor. Compared to the traditional approach of running a full operating system such as Ubuntu, with databases, web servers, and the like built on top, the unikernel provides significant speed and memory improvements.
+
+Building the implementation of ORAM on Mirage allows us to have a consistent interface between client machines and cloud providers. We can run the ORAM software on a trusted cloud instance and connect through it from any client machine, to any cloud provider that we like. We also don't need to have the instance running at all times. Mirage is so lightweight, that we could spin up an instance every time we need to perform some actions. This saves us money because, using cloud services like AWS, we only pay for the compute time we actually use. This is the main motivation behind implementing statelessness in the project.
 
 \section{System Architecture}
 
@@ -264,7 +269,7 @@ In this project we will restrict operations to simple, space-separated disjuncti
 
 \begin{description}
 	\item [High Priority] Basic ORAM implementation
-	\item [Medium Priority] Object Store
+	\item [Medium Priority] File System
 	\item [Medium Priority] Search Module
 	\item [Low Priority] Encryption
 	\item [Low Priority] Further Optimisations including Recursion and Statelessness
@@ -356,7 +361,7 @@ The next chapter will show how all of this information was used to achieve the a
 
 \chapter{Implementation}
 
-This chapter describes the process that took the designs and algorithms of the previous chapter and turned them into a functioning system. As it is the core of the project, the implementation of Path ORAM is discussed first (\cref{sec:pathORAM}), followed by the object store (\cref{sec:objectStore}), the search module (\cref{sec:searchmodule}) and finally encryption (\cref{sec:encryption}).
+This chapter describes the process that took the designs and algorithms of the previous chapter and turned them into a functioning system. As it is the core of the project, the implementation of Path ORAM is discussed first (\cref{sec:pathORAM}), followed by the file system (\cref{sec:fileSystem}), the search module (\cref{sec:searchmodule}) and finally encryption (\cref{sec:encryption}).
 
 % Describe what was actually implemented
 
@@ -595,12 +600,6 @@ So at this point we have a functioning ORAM functor, that can be used to augment
 \subsection{Recursion}
 \label{subsec:recursion}
 
-THIS SHOULD PROBABLY BE MOVED TO CHAPTER 2
-
-In our current construction, the position map takes $O(n)$ storage space on the client, and the stash $O(\log N)$. Adding recursion to ORAM allows us to reduce the size of the overall client storage to $O(\log N)$, by reducing the space required for the position map to $O(1)$, while maintaining $O(\log N)$ for the stash (actually now multiple stashes). This is useful to us, because it allows us to implement statelessness. We can now write the client-side storage to the server after each call, and read it back again before the next one, without increasing the asymptotic bandwidth.
-
-NOW WE'RE TALKING ABOUT THE IMPLEMENTATION, SO THIS SHOULD STAY
-
 The essence of recursive ORAM, is that the position map of one ORAM is another ORAM. Thus, we can extend our original ORAM functor, parameterising it in the implementation of the position map. To do this we use a single interface, that is satisfied by both the in memory position map and the ORAM module. We can apply this new ORAM functor with the in memory position map module to get our original construction. However, we can now take this further, applying the functor again with the result of the first application, and this can be done to an arbitrary depth. Recursion has been made easy using the power of OCaml's module system.
 
 There is of course hidden complexity here. How do we create a recursive ORAM? We definitely can't assume that the data ORAM can use the whole of the disk anymore, so we will have to do some calculations. How do we initialise recursive ORAM? How do we actually use ORAM as a position map? We will examine all of these now.
@@ -610,21 +609,14 @@ There is of course hidden complexity here. How do we create a recursive ORAM? We
 \subsection{Statelessness}
 \label{subsec:statelessness}
 
-\mytodo{Do implementation of Statelessness!}
 \mytodo{Explain the implementation of Statelessness}
-
-\subsection{Optimisation}
-\label{subsec:oramoptimisation}
-
-\mytodo{Talk about optimising the block size through design space exploration}
-\mytodo{Talk about other optimisations that we're made as they come up}
 
 \subsection{Integrity Verification}
 
 \mytodo{If had time to do integrity verification then include here otherwise discuss why I chose not to include it}
 
 \section{File System}
-\label{sec:objectStore}
+\label{sec:fileSystem}
 
 In order to perform search over documents, we need some way of actually storing those documents. This section describes the design and implementation of a basic file system that satisfies the requirements of the project.
 
@@ -709,9 +701,7 @@ Writing files is the most important step, because this is where the search modul
 \section{Encryption}
 \label{sec:encryption}
 
-Encryption is something that it can fatal to get wrong. In the case of ORAM, if you don't have encryption, it's completely superfluous. Thus, we want to use tested and trusted cryptographic libraries, rather than rolling our own. Luckily for us, there is an existing implementation of an encrypted block device satisfying Mirage's \texttt{BLOCK} interface, that provides a functor very similar to the ones that we created for ORAM.
-
-\mytodo{Discuss the integration of the encryption library into the system}
+Encryption is something that it can be fatal to get wrong. In the case of ORAM, if you don't have encryption, it's completely superfluous. Thus, we want to use tested and trusted cryptographic libraries, rather than rolling our own. Luckily for us, there is an existing implementation of an encrypted block device satisfying Mirage's \texttt{BLOCK} interface, that provides a functor very similar to the ones that we created for ORAM. We simply have to chain together the application of this functor with the ones that we are already using to get an encrypted block device.
 
 \chapter{Evaluation}
 
@@ -760,8 +750,14 @@ Encryption is something that it can fatal to get wrong. In the case of ORAM, if 
 \mytodo{Talk about microbenchmarks, identifying part of the system that are taking time/memory}
 
 \subsection{Comparison with Literature}
+\label{subsec:comparisonWithLiterature}
 
 \mytodo{Compare the results of microbenchmarking with theoretical bounds on speed, bandwidth and stash size given in the literature}
+
+\subsection{File System Benchmarking}
+\label{subsec:fsBenchmarking}
+
+\mytodo{Talk about testing the file system (and therefore ORAM) on standardised workloads, allowing us to compare with other file systems in a useful way}
 
 \section{Security Analysis}
 
