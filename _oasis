@@ -18,6 +18,7 @@ Library mirage_oram
                     Stash,
                     OBlock,
                     PosMap,
+                    PosMapIntf,
                     BlockSizeController
   BuildDepends:     bisect_ppx,
                     ppx_bin_prot,

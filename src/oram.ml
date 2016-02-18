@@ -55,7 +55,6 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
       stash : Stash.t;
       positionMap : PositionMap.t;
       blockDevice : BlockDevice.t;
-      (* output : Out_channel.t; *)
     }
 
   let core { info ; structuralInfo ; bucketSize ; offset ; desiredBlockSize ; stash } =
@@ -104,17 +103,9 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
       | x -> loop (acc + 1) Int64.(x / 2L)
     in loop 0 x
 
-  (*let newLog () =
-    let time = Unix.gmtime (Unix.time ()) in
-    let twoDigit i = if i > 9 then Printf.sprintf "%d" i else Printf.sprintf "0%d" i in
-    let filename = Printf.sprintf "oramOutput%d%d%d_%s%s%s" time.Unix.tm_mday time.Unix.tm_mon time.Unix.tm_year (twoDigit time.Unix.tm_hour) (twoDigit time.Unix.tm_min) (twoDigit time.Unix.tm_sec) in
-    let output = Out_channel.create filename in
-    output*)
-
   let diskSize t =
     Int64.((t.info.size_sectors * of_int t.structuralInfo.sectorsPerBlock) + (PositionMap.diskSize t.positionMap))
 
-  (* Then create buffer for the actual data and store at offset *)
   let flush t =
     let%lwt info = BlockDevice.get_info t.blockDevice in
     let binarySize = bin_size_t t in
@@ -162,7 +153,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     in loop 0L level
 
   let writeBucket t address bucket =
-    Printf.printf "%Ld\n" Int64.(address + t.offset);
+    (* Printf.printf "%Ld\n" Int64.(address + t.offset); *)
     let buffers = List.map ~f:OBlock.to_cstruct bucket in
     BlockDevice.write t.blockDevice Int64.(address + t.offset) buffers
 
@@ -188,7 +179,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     List.map ~f:(fun _ -> Cstruct.create sector_size) zeroToBucketSize
 
   let readBucket t address =
-    Printf.printf "%Ld\n" Int64.(address + t.offset);
+    (* Printf.printf "%Ld\n" Int64.(address + t.offset);*)
     let buffersForBucket = createBuffersForBucket t in
     BlockDevice.read t.blockDevice Int64.(address + t.offset) buffersForBucket >>= fun () ->
     let bucket = List.map ~f:OBlock.of_cstruct buffersForBucket in

@@ -57,3 +57,6 @@ clean_tests:
 	rm -rf tests/_tests
 
 clean_all: clean clean_report clean_tests
+
+mirage: build reinstall
+	(cd oram-client; make clean; make build; ./mir-oram-client)
