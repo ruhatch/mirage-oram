@@ -1,6 +1,6 @@
 opam-version: "1.2"
 name: "mirage-oram"
-version: "~unknown"
+version: "0.0.1"
 maintainer: "ruhatch <ruhatch@me.com>"
 authors: "ruhatch <ruhatch@me.com>"
 homepage: "https://github.com/ruhatch/mirage-oram"
