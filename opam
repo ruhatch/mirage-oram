@@ -4,9 +4,9 @@ version: "~unknown"
 maintainer: "ruhatch <ruhatch@me.com>"
 authors: "ruhatch <ruhatch@me.com>"
 homepage: "https://github.com/ruhatch/mirage-oram"
-bug-reports: "https://github.com/ruhatch/mirage-oram"
+bug-reports: "https://github.com/ruhatch/mirage-oram/issues"
 license: "MIT"
-dev-repo: "https://github.com/ruhatch/mirage-oram"
+dev-repo: "https://github.com/ruhatch/mirage-oram.git"
 build: [
   ["./configure" "--prefix=%{prefix}%"]
   [make]
