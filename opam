@@ -15,4 +15,13 @@ install: [make "install"]
 remove: ["ocamlfind" "remove" "mirage-oram"]
 depends: [
   "ocamlfind" {build}
+  "bin_prot"
+  "bisect_ppx"
+  "core_kernel"
+  "cstruct"
+  "lwt"
+  "lwt.ppx"
+  "mirage"
+  "ppx_bin_prot"
+  "stemmer"
 ]
