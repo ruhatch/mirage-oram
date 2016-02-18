@@ -20,7 +20,6 @@ depends: [
   "core_kernel"
   "cstruct"
   "lwt"
-  "lwt.ppx"
   "mirage"
   "ppx_bin_prot"
   "stemmer"
