@@ -70,6 +70,7 @@ Library mirage_ir
 
 Library tests
   Path: tests
+  Install:          false
   Build$:           flag(tests)
   Modules:          Testable,
                     Generators
