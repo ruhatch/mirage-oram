@@ -291,7 +291,7 @@ OCaml's static typing system is also indispensable for ensuring correctness of p
 \subsection{Libraries}
 \label{subsec:libraries}
 
-\mytodo{Add a small amount of discussion to this section}
+The libraries used for building ORAM are listed in \cref{tab:libraries}.
 
 \begin{table}[h]
 \centering
@@ -301,13 +301,17 @@ OCaml's static typing system is also indispensable for ensuring correctness of p
 \hline \hline
 Mirage & 2.6.1 & System Component Interface Definitions, Application Configuration Framework & ISC \\
 \hline
-Jane Street's Core & 112.35.00 & Data Structures, Algorithms & Apache-2.0 \\
+Jane Street's Core & 113.00.00 & Data Structures, Algorithms & Apache-2.0 \\
 \hline
 LWT & 2.5.1 & Threading & LGPL-2.1 \\
 \hline
-Cstruct & 1.7.1 & Data Structure & ISC \\
+Cstruct & 1.8.0 & Data Structure & ISC \\
 \hline
 Alcotest & 0.4.6 & Unit Testing & ISC \\
+\hline
+Mirage Block CCM & 1.0.0 & Encryption & ISC \\
+\hline
+Stemmer & 0.2 & Linguistic Processing & GNUv2 \\
 \hline
 \end{tabularx}
 \caption{Libraries used by Mirage ORAM}
