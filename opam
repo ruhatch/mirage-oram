@@ -12,7 +12,12 @@ build: [
  [make "build"]
 ]
 install: [make "install"]
-remove: [make "uninstall"]
+remove: [
+  ["ocamlfind" "remove" "mirage-oram"]
+  ["ocamlfind" "remove" "mirage-block-fs"]
+  ["ocamlfind" "remove" "mirage-btrees"]
+  ["ocamlfind" "remove" "mirage-ir"]
+]
 depends: [
   "ocamlfind" {build}
   "bin_prot"
