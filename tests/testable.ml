@@ -7,7 +7,7 @@ let int64 =
     let pp fmt t = Format.fprintf fmt "%Ld" t
     let equal = (=)
   end in
-  (module M: Alcotest.TESTABLE with type t = M.t)
+  (module M: TESTABLE with type t = M.t)
 
 let tuple3 (type a) (type b) (type c) (a:a testable) (b:b testable) (c:c testable): (a * b * c) testable =
   let module A = (val a) in
@@ -25,7 +25,7 @@ let cstruct =
     let pp fmt t = Format.pp_print_string fmt (Cstruct.to_string t)
     let equal = Cstruct.equal
   end in
-  (module M: Alcotest.TESTABLE with type t = M.t)
+  (module M: TESTABLE with type t = M.t)
 
 let error =
   let module M = struct
@@ -42,7 +42,7 @@ let error =
       | `Disconnected -> Format.pp_print_string fmt "Disconnected"
     let equal = (=)
   end in
-  (module M: Alcotest.TESTABLE with type t = M.t)
+  (module M: TESTABLE with type t = M.t)
 
 let result (type a) error (type b) ok =
   let (module Error: Alcotest.TESTABLE with type t = a) = error in
@@ -57,10 +57,10 @@ let result (type a) error (type b) ok =
       | `Error x, `Error y   -> Error.equal x y
       | _ -> false
   end in
-  (module M: Alcotest.TESTABLE with type t = M.t)
+  (module M: TESTABLE with type t = M.t)
 
 let lwt_t (type a) elt =
-  let (module Elt: Alcotest.TESTABLE with type t = a) = elt in
+  let (module Elt: TESTABLE with type t = a) = elt in
   let module M = struct
     type t = unit -> a Lwt.t
     let pp fmt t = match Lwt_main.run (t ()) with
@@ -70,7 +70,7 @@ let lwt_t (type a) elt =
       let y' = Lwt_main.run (y ()) in
       Elt.equal x' y'
   end in
-  (module M: Alcotest.TESTABLE with type t = M.t)
+  (module M: TESTABLE with type t = M.t)
 
 let oblock = pair int64 cstruct
 
