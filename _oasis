@@ -12,7 +12,7 @@ BuildTools: ocamlbuild
 Plugins: META (0.4), DevFiles (0.4)
 
 Library mirage_oram
-  Path:             src
+  Path:             lib
   Findlibname:      mirage-oram
   Modules:          Oram,
                     Stash,
@@ -28,62 +28,6 @@ Library mirage_oram
                     lwt,
                     lwt.ppx,
                     bin_prot
-                    
-Library mirage_btrees
-  Path:             src/bTrees
-  Findlibname:      mirage-btrees
-  Modules:          BTree,
-                    Node
-  BuildDepends:     bisect_ppx,
-                    cstruct
-
-Library mirage_block_fs
-  Path:             src/fs
-  Findlibname:      mirage-block-fs
-  Modules:          Fs,
-                    InodeIndex,
-                    Inode,
-                    FreeMap,
-                    Bitarray
-  BuildDepends:     bisect_ppx,
-                    mirage,
-                    cstruct,
-                    lwt,
-                    lwt.ppx,
-                    mirage-btrees,
-                    core_kernel
-
-Library mirage_ir
-  Path:             src/search
-  Findlibname:      mirage-ir
-  Modules:          SearchClient,
-                    InvertedIndex
-  BuildDepends:     bisect_ppx,
-                    mirage,
-                    cstruct,
-                    lwt,
-                    lwt.ppx,
-                    mirage-block-fs,
-                    core_kernel,
-                    bin_prot,
-                    stemmer
-
-Library tests
-  Path: tests
-  Install:          false
-  Build$:           flag(tests)
-  Modules:          Testable,
-                    Generators
-  BuildDepends:     bisect_ppx,
-                    alcotest,
-                    lwt,
-                    lwt.unix,
-                    lwt.ppx,
-                    cstruct,
-                    mirage-block-unix,
-                    core_kernel,
-                    mirage-block-fs,
-                    mirage-ir
 
 Executable oram_tests
   Path:             tests
@@ -96,8 +40,7 @@ Executable oram_tests
                     alcotest,
                     mirage-block-unix,
                     lwt,
-                    lwt.ppx,
-                    tests
+                    lwt.ppx
 
 Executable stash_tests
   Path:             tests
@@ -107,8 +50,7 @@ Executable stash_tests
   Install:          false
   BuildDepends:     bisect_ppx,
                     mirage-oram,
-                    alcotest,
-                    tests
+                    alcotest
 
 Executable posmap_tests
   Path:             tests
@@ -120,8 +62,7 @@ Executable posmap_tests
                     mirage-oram,
                     alcotest,
                     mirage-block-unix,
-                    lwt,
-                    tests
+                    lwt
 
 Executable oblock_tests
   Path:             tests
@@ -129,79 +70,9 @@ Executable oblock_tests
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends: bisect_ppx,     mirage-oram,
-                    alcotest,
-                    tests
-
-Executable node_tests
-  Path:             tests/bTreeTests
-  MainIs:           node_tests.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends: bisect_ppx,     mirage-btrees,
-                    alcotest,
-                    tests
-
-Executable fs_tests
-  Path:             tests/fsTests
-  MainIs:           fsTests.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
   BuildDepends:     bisect_ppx,
-                    mirage-block-fs,
-                    mirage-block-unix,
-                    lwt,
-                    alcotest,
-                    tests
-
-Executable inode_index_tests
-  Path:             tests/fsTests
-  MainIs:           inodeIndexTests.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     bisect_ppx,
-                    mirage-block-fs,
-                    mirage-block-unix,
-                    lwt,
-                    alcotest,
-                    tests
-
-Executable inode_tests
-  Path:             tests/fsTests
-  MainIs:           inodeTests.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     bisect_ppx,
-                    mirage-block-fs,
-                    alcotest,
-                    tests
-
-Executable bitarray_tests
-  Path:             tests/fsTests
-  MainIs:           bitarrayTests.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     bisect_ppx,
-                    mirage-block-fs,
-                    core_kernel,
-                    alcotest,
-                    tests
-
-Executable free_map_tests
-  Path:             tests/fsTests
-  MainIs:           free_map_tests.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     bisect_ppx,
-                    mirage-block-fs,
-                    alcotest,
-                    tests
+                    mirage-oram,
+                    alcotest
 
 Executable oram_fs_tests
   Path:             tests
@@ -215,37 +86,8 @@ Executable oram_fs_tests
                     alcotest,
                     mirage-block-unix,
                     lwt,
-                    tests,
                     core_kernel
-
-Executable inverted_index_tests
-  Path:             tests/searchTests
-  MainIs:           invertedIndexTests.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     bisect_ppx,
-                    mirage-block-fs,
-                    mirage-ir,
-                    alcotest,
-                    mirage-block-unix,
-                    lwt,
-                    tests
-
-Executable search_client_tests
-  Path:             tests/searchTests
-  MainIs:           searchClientTests.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     bisect_ppx,
-                    mirage-block-fs,
-                    mirage-ir,
-                    alcotest,
-                    mirage-block-unix,
-                    lwt,
-                    tests
-
+                    
 Executable encryption_tests
   Path:             tests
   MainIs:           encryptionTests.ml
@@ -258,7 +100,6 @@ Executable encryption_tests
                     alcotest,
                     mirage-block-unix,
                     lwt,
-                    tests,
                     core_kernel,
                     io-page.unix,
                     nocrypto.lwt,
@@ -288,58 +129,10 @@ Test oblock_tests
   Command:          $oblock_tests
   WorkingDirectory: tests
 
-Test node_tests
-  Run$:             flag(tests)
-  TestTools:        node_tests
-  Command:          $node_tests
-  WorkingDirectory: tests
-
-Test fs_tests
-  Run$:             flag(tests)
-  TestTools:        fs_tests
-  Command:          $fs_tests
-  WorkingDirectory: tests
-
-Test inode_index_tests
-  Run$:             flag(tests)
-  TestTools:        inode_index_tests
-  Command:          $inode_index_tests
-  WorkingDirectory: tests
-
-Test inode_tests
-  Run$:             flag(tests)
-  TestTools:        inode_tests
-  Command:          $inode_tests
-  WorkingDirectory: tests
-
-Test bitarray_tests
-  Run$:             flag(tests)
-  TestTools:        bitarray_tests
-  Command:          $bitarray_tests
-  WorkingDirectory: tests
-
-Test free_map_tests
-  Run$:             flag(tests)
-  TestTools:        free_map_tests
-  Command:          $free_map_tests
-  WorkingDirectory: tests
-
 Test oram_fs_tests
   Run$:             flag(tests)
   TestTools:        oram_fs_tests
   Command:          $oram_fs_tests
-  WorkingDirectory: tests
-
-Test inverted_index_tests
-  Run$:             flag(tests)
-  TestTools:        inverted_index_tests
-  Command:          $inverted_index_tests
-  WorkingDirectory: tests
-
-Test search_client_tests
-  Run$:             flag(tests)
-  TestTools:        search_client_tests
-  Command:          $search_client_tests
   WorkingDirectory: tests
 
 Test encryption_tests
@@ -359,7 +152,6 @@ Executable oram_bench
                     alcotest,
                     mirage-block-unix,
                     lwt,
-                    tests,
                     core,
                     core_bench
 
@@ -371,5 +163,4 @@ Executable oram_macro_bench
   Install:          false
   BuildDepends:     mirage-oram,
                     lwt,
-                    tests,
                     core

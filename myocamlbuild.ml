@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: e032b51b1cb70674bf660a09fb26db36) *)
+(* DO NOT EDIT (digest: 5e8de02b60b709d5e338397e82e42299) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -607,26 +607,10 @@ end
 open Ocamlbuild_plugin;;
 let package_default =
   {
-     MyOCamlbuildBase.lib_ocaml =
-       [
-          ("mirage_oram", ["src"], []);
-          ("mirage_btrees", ["src/bTrees"], []);
-          ("mirage_block_fs", ["src/fs"], []);
-          ("mirage_ir", ["src/search"], []);
-          ("tests", ["tests"], [])
-       ];
+     MyOCamlbuildBase.lib_ocaml = [("mirage_oram", ["lib"], [])];
      lib_c = [];
      flags = [];
-     includes =
-       [
-          ("tests/searchTests", ["src/fs"; "src/search"; "tests"]);
-          ("tests/fsTests", ["src/fs"; "tests"]);
-          ("tests/bench", ["src"; "src/fs"; "tests"]);
-          ("tests/bTreeTests", ["src/bTrees"; "tests"]);
-          ("tests", ["src"; "src/fs"; "src/search"]);
-          ("src/search", ["src/fs"]);
-          ("src/fs", ["src/bTrees"])
-       ]
+     includes = [("tests/bench", ["lib"]); ("tests", ["lib"])]
   }
   ;;
 
@@ -634,6 +618,6 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 638 "myocamlbuild.ml"
+# 622 "myocamlbuild.ml"
 (* OASIS_STOP *)
 Ocamlbuild_plugin.dispatch dispatch_default;;
