@@ -29,4 +29,9 @@ depends: [
   "mirage" {>= "2.6.1"}
   "ppx_bin_prot"
   "alcotest" {test}
+  "mirage-block-unix" {test}
+  "mirage-block-fs" {test}
+  "mirage-block-ccm" {test}
+  "core_bench" {test}
+  "core" {test}
 ]
