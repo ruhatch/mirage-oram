@@ -39,7 +39,9 @@ Executable oram_tests
                     mirage-oram,
                     alcotest,
                     mirage-block-unix,
+                    mirage-block-fs,
                     lwt,
+                    lwt.unix,
                     lwt.ppx
 
 Executable stash_tests
@@ -50,6 +52,10 @@ Executable stash_tests
   Install:          false
   BuildDepends:     bisect_ppx,
                     mirage-oram,
+                    mirage-block-unix,
+                    mirage-block-fs,
+                    lwt,
+                    lwt.unix,
                     alcotest
 
 Executable posmap_tests
@@ -62,7 +68,9 @@ Executable posmap_tests
                     mirage-oram,
                     alcotest,
                     mirage-block-unix,
-                    lwt
+                    mirage-block-fs,
+                    lwt,
+                    lwt.unix
 
 Executable oblock_tests
   Path:             tests
@@ -72,6 +80,10 @@ Executable oblock_tests
   Install:          false
   BuildDepends:     bisect_ppx,
                     mirage-oram,
+                    mirage-block-unix,
+                    mirage-block-fs,
+                    lwt,
+                    lwt.unix,
                     alcotest
 
 Executable oram_fs_tests
@@ -82,10 +94,11 @@ Executable oram_fs_tests
   Install:          false
   BuildDepends:     bisect_ppx,
                     mirage-oram,
+                    mirage-block-unix,
                     mirage-block-fs,
                     alcotest,
-                    mirage-block-unix,
                     lwt,
+                    lwt.unix,
                     core_kernel
                     
 Executable encryption_tests
@@ -96,10 +109,11 @@ Executable encryption_tests
   Install:          false
   BuildDepends:     bisect_ppx,
                     mirage-oram,
+                    mirage-block-unix,
                     mirage-block-fs,
                     alcotest,
-                    mirage-block-unix,
                     lwt,
+                    lwt.unix,
                     core_kernel,
                     io-page.unix,
                     nocrypto.lwt,
@@ -142,7 +156,7 @@ Test encryption_tests
   WorkingDirectory: tests
 
 Executable oram_bench
-  Path:             tests/bench
+  Path:             tests
   MainIs:           oramBench.ml
   Build$:           flag(tests)
   CompiledObject:   best
@@ -156,11 +170,15 @@ Executable oram_bench
                     core_bench
 
 Executable oram_macro_bench
-  Path:             tests/bench
+  Path:             tests
   MainIs:           oramMacroBench.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
   BuildDepends:     mirage-oram,
+                    mirage-block-unix,
+                    mirage-block-fs,
                     lwt,
+                    lwt.unix,
+                    alcotest,
                     core

@@ -132,9 +132,3 @@ let newORAM ?(fileName = "disk.img") ?(desiredSizeInSectors = 0L) () =
 let newFs () =
   newORAM () >>= fun bd ->
   F.initialise bd
-
-module SearchClient = SearchClient.Make(O)
-
-let newSearchClient () =
-  newORAM () >>= fun blockDevice ->
-  SearchClient.create blockDevice

@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 5e8de02b60b709d5e338397e82e42299) *)
+(* DO NOT EDIT (digest: 584412166a18b77c4ede7105487b76ac) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -610,7 +610,7 @@ let package_default =
      MyOCamlbuildBase.lib_ocaml = [("mirage_oram", ["lib"], [])];
      lib_c = [];
      flags = [];
-     includes = [("tests/bench", ["lib"]); ("tests", ["lib"])]
+     includes = [("tests", ["lib"])]
   }
   ;;
 
