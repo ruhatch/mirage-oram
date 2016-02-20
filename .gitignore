@@ -35,7 +35,6 @@ log
 .texpadtmp/
 
 # Test files
-testFiles/
 *.input
 *.output
 *.test

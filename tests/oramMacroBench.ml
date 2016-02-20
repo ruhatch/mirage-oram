@@ -14,7 +14,6 @@ let desiredSizes minHeight maxHeight =
   let heights = List.range minHeight maxHeight in
   List.map ~f:(fun height -> Int64.of_int ((Int.pow 2 (height + 1) - 1) * 4)) heights
 
-(* Loop around writing then reading over and over again! *)
 let performExperiment oram desiredSizeInSectors data iterations =
   let reverseOperation = function
     | O.Read -> O.Write
