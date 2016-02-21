@@ -39,14 +39,14 @@ let () =
     (fun iterations minHeight maxHeight () ->
       List.iter (desiredSizes minHeight maxHeight)
                 ~f:(fun desiredSizeInSectors ->
-                  (* Printf.printf "%Ld, %!" desiredSizeInSectors; *)
+                  Printf.printf "%Ld, %!" desiredSizeInSectors;
                   let oram = connectAndInitialiseORAMOfSize desiredSizeInSectors in
                   let data = dataForORAM oram in
                   let start = Time_ns.now () in
                   begin match Lwt_main.run (performExperiment oram desiredSizeInSectors data iterations) with
                   | `Ok () -> ()
                   | `Error _ -> failwith "Failed to perform experiment"
-                  end
-    (* let time = Time_ns.abs_diff start (Time_ns.now ()) in *)
-    (* Printf.printf "%f\n%!" (Time_ns.Span.to_ms time) *)))
+                  end;
+                  let time = Time_ns.abs_diff start (Time_ns.now ()) in
+                  Printf.printf "%f\n%!" (Time_ns.Span.to_ms time)))
   |> Command.run
