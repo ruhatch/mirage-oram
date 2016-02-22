@@ -2,7 +2,14 @@ open Core.Std
 open Testable
 
 let connectAndInitialiseORAMOfSize desiredSizeInSectors =
-  match Lwt_main.run (newORAM ~desiredSizeInSectors ~fileName:"disk.img" ()) with
+  match Lwt_main.run (newORAM ~desiredSizeInSectors ~fileName:(Printf.sprintf "disk%Ld.img" desiredSizeInSectors) ()) with
+  | `Ok oram -> oram
+  | `Error _ -> failwith (Printf.sprintf "Failed to connect to oram with size %Ld" desiredSizeInSectors)
+
+let connectToORAM desiredSizeInSectors =
+  match Lwt_main.run (
+            Block.connect (Printf.sprintf "disk%Ld.img" desiredSizeInSectors) >>= fun bd ->
+            O.connect bd) with
   | `Ok oram -> oram
   | `Error _ -> failwith (Printf.sprintf "Failed to connect to oram with size %Ld" desiredSizeInSectors)
 
@@ -35,12 +42,16 @@ let () =
     empty
     +> anon ("iterations" %: int)
     +> anon ("minHeight" %: int)
-    +> anon ("maxHeight" %: int))
-    (fun iterations minHeight maxHeight () ->
+    +> anon ("maxHeight" %: int)
+    +> flag "i" no_arg ~doc:"Pass in this flag to initialise block devices before connecting")
+    (fun iterations minHeight maxHeight shouldInitialise () ->
       List.iter (desiredSizes minHeight maxHeight)
                 ~f:(fun desiredSizeInSectors ->
                   Printf.printf "%Ld, %!" desiredSizeInSectors;
-                  let oram = connectAndInitialiseORAMOfSize desiredSizeInSectors in
+                  let oram =
+                    if shouldInitialise
+                    then connectAndInitialiseORAMOfSize desiredSizeInSectors
+                    else connectToORAM desiredSizeInSectors in
                   let data = dataForORAM oram in
                   let start = Time_ns.now () in
                   begin match Lwt_main.run (performExperiment oram desiredSizeInSectors data iterations) with
