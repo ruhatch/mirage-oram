@@ -182,3 +182,17 @@ Executable oram_macro_bench
                     lwt.unix,
                     alcotest,
                     core
+
+Executable control_macro_bench
+  Path:             tests
+  MainIs:           controlMacroBench.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-oram,
+                    mirage-block-unix,
+                    mirage-block-fs,
+                    lwt,
+                    lwt.unix,
+                    alcotest,
+                    core
