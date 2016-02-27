@@ -2,9 +2,19 @@ open Core.Std
 
 module O = Oram.Make(PosMap.InMemory)(Block)
 
+module O1 = Oram.Make(Oram.Make(PosMap.InMemory))(Block)
+
+module O2 = Oram.Make(Oram.Make(Oram.Make(PosMap.InMemory)))(Block)
+
 let ( >>= ) x f = Lwt.bind x @@ function
   | `Error e -> Lwt.return (`Error e)
   | `Ok x -> f x
+
+let connect desiredSizeInSectors = O1.connect
+  (* Calculate correct levels of recursion to use based on the desiredSizeInSectors *)
+
+let create desiredSizeInSectors = O1.create
+  (* Calculate correct levels of recursion to use based on the desiredSizeInSectors *)
 
 let connectAndInitialiseORAMOfSize desiredSizeInSectors =
   match Lwt_main.run (

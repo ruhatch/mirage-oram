@@ -100,7 +100,7 @@ Executable oram_fs_tests
                     lwt,
                     lwt.unix,
                     core_kernel
-                    
+
 Executable encryption_tests
   Path:             tests
   MainIs:           encryptionTests.ml
@@ -183,9 +183,37 @@ Executable oram_macro_bench
                     alcotest,
                     core
 
+Executable rec_oram_macro_bench
+  Path:             tests
+  MainIs:           recOramMacroBench.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-oram,
+                    mirage-block-unix,
+                    mirage-block-fs,
+                    lwt,
+                    lwt.unix,
+                    alcotest,
+                    core
+
 Executable control_macro_bench
   Path:             tests
   MainIs:           controlMacroBench.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-oram,
+                    mirage-block-unix,
+                    mirage-block-fs,
+                    lwt,
+                    lwt.unix,
+                    alcotest,
+                    core
+
+Executable block_size_experiment
+  Path:             tests
+  MainIs:           blockSizeExperiment.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false

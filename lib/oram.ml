@@ -288,7 +288,10 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     let maxStashSizeInBlocks = List.Assoc.find_exn stashSizesForBucketSize bucketSize in
     let normalisedSizeInSectors = Int64.(info.BlockDevice.size_sectors / of_int sectorsPerBlock) in
     let sectorsForORAM = Int64.(normalisedSizeInSectors - maxStashSizeInBlocks) in
-    floor_log Int64.(sectorsForORAM / bucketSize + 1L) - 1
+    Printf.printf "Saving %Ld of %Ld blocks for stash, leaving %Ld for ORAM\n%!" maxStashSizeInBlocks normalisedSizeInSectors sectorsForORAM;
+    if sectorsForORAM > 4L
+    then floor_log Int64.(sectorsForORAM / bucketSize + 1L) - 1
+    else failwith "BlockDevice too small for current parameters"
 
   let calculateHeightOfPositionMap desiredSizeInSectors sector_size bucketSize =
     let reductionFactor = Float.(to_int (log (of_int sector_size * 8.) / log 2.)) in
@@ -325,6 +328,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
         stash ; positionMap ; blockDevice
       }
     in
+    Printf.printf "Created ORAM of size %Ld with block size %d and bucket size %Ld\n%!" size_sectors sector_size bucketSize;
     return (`Ok t)
 
   let create ?(desiredSizeInSectors = 0L) ?(bucketSize = 4L) ?(desiredBlockSize = 0x2000) ?(offset = 1L) blockDevice =
@@ -335,6 +339,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
       then info.BlockDevice.sector_size
       else desiredBlockSize
     in
+    Printf.printf "Attempting to create ORAM of size %Ld with block size %d and bucket size %Ld\n%!" desiredSizeInSectors desiredBlockSizeToUse bucketSize;
     createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSizeToUse offset blockDevice >>= fun t ->
     initialise t >>= fun () ->
     flush t >>= fun () ->
