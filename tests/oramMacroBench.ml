@@ -22,14 +22,26 @@ let connectToORAM desiredSizeInSectors =
 
 let dataForORAM oram =
   let info = Lwt_main.run (O.get_info oram) in
-  Some (Cstruct.create (info.O.sector_size))
+  Cstruct.create (info.O.sector_size)
 
 let desiredSizes minHeight maxHeight =
   let heights = List.range minHeight maxHeight in
   List.map ~f:(fun height -> Int64.of_int ((Int.pow 2 (height + 1) - 1) * 4)) heights
 
 let performExperiment oram desiredSizeInSectors data iterations =
-  let reverseOperation = function
+  let rec loopWrite = function
+    | 0 -> Lwt.return (`Ok ())
+    | n ->
+      O.write oram 0L [data] >>= fun () ->
+      loopRead (n - 1)
+  and loopRead = function
+  | 0 -> Lwt.return (`Ok ())
+  | n ->
+    O.read oram 0L [data] >>= fun () ->
+    loopWrite (n - 1)
+  in loopWrite iterations
+
+(*)  let reverseOperation = function
     | O.Read -> O.Write
     | O.Write -> O.Read
   in
@@ -40,7 +52,7 @@ let performExperiment oram desiredSizeInSectors data iterations =
        if address = Int64.(desiredSizeInSectors - 1L)
        then loop 0L (reverseOperation operation) (n - 1)
        else loop Int64.(address + 1L) operation (n - 1)
-  in loop 0L O.Write iterations
+  in loop 0L O.Write iterations*)
 
 let () =
   Command.basic
