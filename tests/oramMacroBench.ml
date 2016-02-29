@@ -63,7 +63,7 @@ let () =
     +> anon ("minHeight" %: int)
     +> anon ("maxHeight" %: int)
     +> flag "i" no_arg ~doc:"Pass in this flag to initialise block devices before connecting"
-    +> flag "b" (optional_with_default 8192 int) ~doc:"Optional block size parameter")
+    +> flag "b" (optional_with_default 1048576 int) ~doc:"Optional block size parameter")
     (fun iterations minHeight maxHeight shouldInitialise desiredBlockSize () ->
       List.iter (desiredSizes minHeight maxHeight)
                 ~f:(fun desiredSizeInSectors ->
