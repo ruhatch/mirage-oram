@@ -224,3 +224,20 @@ Executable block_size_experiment
                     lwt.unix,
                     alcotest,
                     core
+
+Executable encrypted_time_experiment
+  Path:             tests
+  MainIs:           encryptedTimeExperiment.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-oram,
+                    mirage-block-unix,
+                    mirage-block-fs,
+                    mirage-block-ccm,
+                    io-page.unix,
+                    nocrypto.lwt,
+                    lwt,
+                    lwt.unix,
+                    alcotest,
+                    core
