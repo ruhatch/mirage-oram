@@ -3,10 +3,10 @@ open Testable
 
 module B = BlockSizeController.Make(Block)
 
-let connectToBlockDevice desiredSizeInSectors =
+let connectToBlockDevice desiredSizeInSectors desiredBlockSize =
   match Lwt_main.run (
             Block.connect "diskControl.img" >>= fun bd ->
-            B.connect bd) with
+            B.connect ~desiredBlockSize bd) with
   | `Ok blockDevice -> blockDevice
   | `Error _ -> failwith (Printf.sprintf "Failed to connect to oram with size %Ld" desiredSizeInSectors)
 
@@ -40,12 +40,13 @@ let () =
     empty
     +> anon ("iterations" %: int)
     +> anon ("minHeight" %: int)
-    +> anon ("maxHeight" %: int))
-    (fun iterations minHeight maxHeight () ->
+    +> anon ("maxHeight" %: int)
+    +> flag "b" (optional_with_default 1048576 int) ~doc:"Optional block size parameter")
+    (fun iterations minHeight maxHeight desiredBlockSize () ->
       List.iter (desiredSizes minHeight maxHeight)
                 ~f:(fun desiredSizeInSectors ->
                   Printf.printf "%Ld, %!" desiredSizeInSectors;
-                  let blockDevice = connectToBlockDevice desiredSizeInSectors in
+                  let blockDevice = connectToBlockDevice desiredSizeInSectors desiredBlockSize in
                   let data = dataForBlockDevice blockDevice in
                   let start = Time_ns.now () in
                   begin match Lwt_main.run (performExperiment blockDevice data desiredSizeInSectors iterations) with
