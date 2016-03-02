@@ -1,6 +1,6 @@
 <**/*>: thread
 # OASIS_START
-# DO NOT EDIT (digest: 7708383ca3485d982ec03d13b260cb18)
+# DO NOT EDIT (digest: 3b73850d4bddb72f4d1b4cc159b8e659)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -23,7 +23,7 @@ true: annot, bin_annot
 <lib/*.ml{,i,y}>: pkg_cstruct
 <lib/*.ml{,i,y}>: pkg_lwt
 <lib/*.ml{,i,y}>: pkg_lwt.ppx
-<lib/*.ml{,i,y}>: pkg_mirage
+<lib/*.ml{,i,y}>: pkg_mirage-types
 <lib/*.ml{,i,y}>: pkg_ppx_bin_prot
 # Executable oram_tests
 <tests/oram_tests.{native,byte}>: pkg_alcotest
@@ -34,9 +34,9 @@ true: annot, bin_annot
 <tests/oram_tests.{native,byte}>: pkg_lwt
 <tests/oram_tests.{native,byte}>: pkg_lwt.ppx
 <tests/oram_tests.{native,byte}>: pkg_lwt.unix
-<tests/oram_tests.{native,byte}>: pkg_mirage
 <tests/oram_tests.{native,byte}>: pkg_mirage-block-fs
 <tests/oram_tests.{native,byte}>: pkg_mirage-block-unix
+<tests/oram_tests.{native,byte}>: pkg_mirage-types
 <tests/oram_tests.{native,byte}>: pkg_ppx_bin_prot
 <tests/oram_tests.{native,byte}>: use_mirage_oram
 # Executable stash_tests
@@ -48,9 +48,9 @@ true: annot, bin_annot
 <tests/stash_tests.{native,byte}>: pkg_lwt
 <tests/stash_tests.{native,byte}>: pkg_lwt.ppx
 <tests/stash_tests.{native,byte}>: pkg_lwt.unix
-<tests/stash_tests.{native,byte}>: pkg_mirage
 <tests/stash_tests.{native,byte}>: pkg_mirage-block-fs
 <tests/stash_tests.{native,byte}>: pkg_mirage-block-unix
+<tests/stash_tests.{native,byte}>: pkg_mirage-types
 <tests/stash_tests.{native,byte}>: pkg_ppx_bin_prot
 <tests/stash_tests.{native,byte}>: use_mirage_oram
 # Executable posmap_tests
@@ -62,9 +62,9 @@ true: annot, bin_annot
 <tests/posmap_tests.{native,byte}>: pkg_lwt
 <tests/posmap_tests.{native,byte}>: pkg_lwt.ppx
 <tests/posmap_tests.{native,byte}>: pkg_lwt.unix
-<tests/posmap_tests.{native,byte}>: pkg_mirage
 <tests/posmap_tests.{native,byte}>: pkg_mirage-block-fs
 <tests/posmap_tests.{native,byte}>: pkg_mirage-block-unix
+<tests/posmap_tests.{native,byte}>: pkg_mirage-types
 <tests/posmap_tests.{native,byte}>: pkg_ppx_bin_prot
 <tests/posmap_tests.{native,byte}>: use_mirage_oram
 # Executable oblock_tests
@@ -76,9 +76,9 @@ true: annot, bin_annot
 <tests/oblock_tests.{native,byte}>: pkg_lwt
 <tests/oblock_tests.{native,byte}>: pkg_lwt.ppx
 <tests/oblock_tests.{native,byte}>: pkg_lwt.unix
-<tests/oblock_tests.{native,byte}>: pkg_mirage
 <tests/oblock_tests.{native,byte}>: pkg_mirage-block-fs
 <tests/oblock_tests.{native,byte}>: pkg_mirage-block-unix
+<tests/oblock_tests.{native,byte}>: pkg_mirage-types
 <tests/oblock_tests.{native,byte}>: pkg_ppx_bin_prot
 <tests/oblock_tests.{native,byte}>: use_mirage_oram
 # Executable oram_fs_tests
@@ -90,9 +90,9 @@ true: annot, bin_annot
 <tests/oramFsTests.{native,byte}>: pkg_lwt
 <tests/oramFsTests.{native,byte}>: pkg_lwt.ppx
 <tests/oramFsTests.{native,byte}>: pkg_lwt.unix
-<tests/oramFsTests.{native,byte}>: pkg_mirage
 <tests/oramFsTests.{native,byte}>: pkg_mirage-block-fs
 <tests/oramFsTests.{native,byte}>: pkg_mirage-block-unix
+<tests/oramFsTests.{native,byte}>: pkg_mirage-types
 <tests/oramFsTests.{native,byte}>: pkg_ppx_bin_prot
 <tests/oramFsTests.{native,byte}>: use_mirage_oram
 # Executable encryption_tests
@@ -105,10 +105,10 @@ true: annot, bin_annot
 <tests/encryptionTests.{native,byte}>: pkg_lwt
 <tests/encryptionTests.{native,byte}>: pkg_lwt.ppx
 <tests/encryptionTests.{native,byte}>: pkg_lwt.unix
-<tests/encryptionTests.{native,byte}>: pkg_mirage
 <tests/encryptionTests.{native,byte}>: pkg_mirage-block-ccm
 <tests/encryptionTests.{native,byte}>: pkg_mirage-block-fs
 <tests/encryptionTests.{native,byte}>: pkg_mirage-block-unix
+<tests/encryptionTests.{native,byte}>: pkg_mirage-types
 <tests/encryptionTests.{native,byte}>: pkg_nocrypto.lwt
 <tests/encryptionTests.{native,byte}>: pkg_ppx_bin_prot
 <tests/encryptionTests.{native,byte}>: use_mirage_oram
@@ -122,9 +122,9 @@ true: annot, bin_annot
 <tests/oramBench.{native,byte}>: pkg_cstruct
 <tests/oramBench.{native,byte}>: pkg_lwt
 <tests/oramBench.{native,byte}>: pkg_lwt.ppx
-<tests/oramBench.{native,byte}>: pkg_mirage
 <tests/oramBench.{native,byte}>: pkg_mirage-block-fs
 <tests/oramBench.{native,byte}>: pkg_mirage-block-unix
+<tests/oramBench.{native,byte}>: pkg_mirage-types
 <tests/oramBench.{native,byte}>: pkg_ppx_bin_prot
 <tests/oramBench.{native,byte}>: use_mirage_oram
 <tests/*.ml{,i,y}>: pkg_core_bench
@@ -138,9 +138,9 @@ true: annot, bin_annot
 <tests/oramMacroBench.{native,byte}>: pkg_lwt
 <tests/oramMacroBench.{native,byte}>: pkg_lwt.ppx
 <tests/oramMacroBench.{native,byte}>: pkg_lwt.unix
-<tests/oramMacroBench.{native,byte}>: pkg_mirage
 <tests/oramMacroBench.{native,byte}>: pkg_mirage-block-fs
 <tests/oramMacroBench.{native,byte}>: pkg_mirage-block-unix
+<tests/oramMacroBench.{native,byte}>: pkg_mirage-types
 <tests/oramMacroBench.{native,byte}>: pkg_ppx_bin_prot
 <tests/oramMacroBench.{native,byte}>: use_mirage_oram
 # Executable rec_oram_macro_bench
@@ -153,9 +153,9 @@ true: annot, bin_annot
 <tests/recOramMacroBench.{native,byte}>: pkg_lwt
 <tests/recOramMacroBench.{native,byte}>: pkg_lwt.ppx
 <tests/recOramMacroBench.{native,byte}>: pkg_lwt.unix
-<tests/recOramMacroBench.{native,byte}>: pkg_mirage
 <tests/recOramMacroBench.{native,byte}>: pkg_mirage-block-fs
 <tests/recOramMacroBench.{native,byte}>: pkg_mirage-block-unix
+<tests/recOramMacroBench.{native,byte}>: pkg_mirage-types
 <tests/recOramMacroBench.{native,byte}>: pkg_ppx_bin_prot
 <tests/recOramMacroBench.{native,byte}>: use_mirage_oram
 # Executable control_macro_bench
@@ -168,9 +168,9 @@ true: annot, bin_annot
 <tests/controlMacroBench.{native,byte}>: pkg_lwt
 <tests/controlMacroBench.{native,byte}>: pkg_lwt.ppx
 <tests/controlMacroBench.{native,byte}>: pkg_lwt.unix
-<tests/controlMacroBench.{native,byte}>: pkg_mirage
 <tests/controlMacroBench.{native,byte}>: pkg_mirage-block-fs
 <tests/controlMacroBench.{native,byte}>: pkg_mirage-block-unix
+<tests/controlMacroBench.{native,byte}>: pkg_mirage-types
 <tests/controlMacroBench.{native,byte}>: pkg_ppx_bin_prot
 <tests/controlMacroBench.{native,byte}>: use_mirage_oram
 # Executable block_size_experiment
@@ -183,9 +183,9 @@ true: annot, bin_annot
 <tests/blockSizeExperiment.{native,byte}>: pkg_lwt
 <tests/blockSizeExperiment.{native,byte}>: pkg_lwt.ppx
 <tests/blockSizeExperiment.{native,byte}>: pkg_lwt.unix
-<tests/blockSizeExperiment.{native,byte}>: pkg_mirage
 <tests/blockSizeExperiment.{native,byte}>: pkg_mirage-block-fs
 <tests/blockSizeExperiment.{native,byte}>: pkg_mirage-block-unix
+<tests/blockSizeExperiment.{native,byte}>: pkg_mirage-types
 <tests/blockSizeExperiment.{native,byte}>: pkg_ppx_bin_prot
 <tests/blockSizeExperiment.{native,byte}>: use_mirage_oram
 # Executable encrypted_time_experiment
@@ -199,10 +199,10 @@ true: annot, bin_annot
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_lwt
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_lwt.ppx
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_lwt.unix
-<tests/encryptedTimeExperiment.{native,byte}>: pkg_mirage
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_mirage-block-ccm
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_mirage-block-fs
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_mirage-block-unix
+<tests/encryptedTimeExperiment.{native,byte}>: pkg_mirage-types
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_nocrypto.lwt
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_ppx_bin_prot
 <tests/encryptedTimeExperiment.{native,byte}>: use_mirage_oram
@@ -216,10 +216,10 @@ true: annot, bin_annot
 <tests/*.ml{,i,y}>: pkg_lwt
 <tests/*.ml{,i,y}>: pkg_lwt.ppx
 <tests/*.ml{,i,y}>: pkg_lwt.unix
-<tests/*.ml{,i,y}>: pkg_mirage
 <tests/*.ml{,i,y}>: pkg_mirage-block-ccm
 <tests/*.ml{,i,y}>: pkg_mirage-block-fs
 <tests/*.ml{,i,y}>: pkg_mirage-block-unix
+<tests/*.ml{,i,y}>: pkg_mirage-types
 <tests/*.ml{,i,y}>: pkg_nocrypto.lwt
 <tests/*.ml{,i,y}>: pkg_ppx_bin_prot
 <tests/*.ml{,i,y}>: use_mirage_oram

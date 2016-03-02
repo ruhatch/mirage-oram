@@ -23,7 +23,7 @@ Library mirage_oram
   BuildDepends:     bisect_ppx,
                     ppx_bin_prot,
                     core_kernel,
-                    mirage,
+                    mirage-types,
                     cstruct,
                     lwt,
                     lwt.ppx,

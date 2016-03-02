@@ -339,7 +339,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
       then info.BlockDevice.sector_size
       else desiredBlockSize
     in
-    (*Printf.printf "Attempting to create ORAM of size %Ld with block size %d and bucket size %Ld\n%!" desiredSizeInSectors desiredBlockSizeToUse*) bucketSize;
+    (*Printf.printf "Attempting to create ORAM of size %Ld with block size %d and bucket size %Ld\n%!" desiredSizeInSectors desiredBlockSizeToUse bucketSize;*)
     createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSizeToUse offset blockDevice >>= fun t ->
     initialise t >>= fun () ->
     flush t >>= fun () ->
