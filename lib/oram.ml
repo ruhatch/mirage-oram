@@ -328,7 +328,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
         stash ; positionMap ; blockDevice
       }
     in
-    Printf.printf "Created ORAM of size %Ld with block size %d\n%!" size_sectors sector_size;
+    (*Printf.printf "Created ORAM of size %Ld with block size %d\n%!" size_sectors sector_size;*)
     return (`Ok t)
 
   let create ?(desiredSizeInSectors = 0L) ?(bucketSize = 4L) ?(desiredBlockSize = 0x2000) ?(offset = 1L) blockDevice =
