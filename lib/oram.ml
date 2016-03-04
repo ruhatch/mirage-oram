@@ -258,13 +258,11 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     for i = 8 to Cstruct.len dummy_struct - 1 do
       Cstruct.set_uint8 dummy_struct i 0
     done;
-    Printf.printf "Created dummy struct\n%!";
     let rec loop = function
       | 0L -> return (`Ok ())
       | x -> BlockDevice.write t.blockDevice Int64.(t.offset + (x - 1L) * (of_int t.structuralInfo.sectorsPerBlock)) [dummy_struct] >>= fun () -> loop Int64.(x - 1L)
     in
     loop t.info.size_sectors >>= fun () ->
-    Printf.printf "Finished main loop\n%!";
     if t.offset > Int64.of_int t.structuralInfo.sectorsPerBlock
     then (
       let b = Float.(to_int (log (of_int t.info.sector_size * 8.) / log 2.)) in
@@ -329,7 +327,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
         stash ; positionMap ; blockDevice
       }
     in
-    Printf.printf "Created ORAM of size %Ld with block size %d\n%!" size_sectors sector_size;
+    (*Printf.printf "Created ORAM of size %Ld with block size %d\n%!" size_sectors sector_size;*)
     return (`Ok t)
 
   let create ?(desiredSizeInSectors = 0L) ?(bucketSize = 4L) ?(desiredBlockSize = 0x2000) ?(offset = 1L) blockDevice =
@@ -340,13 +338,10 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
       then info.BlockDevice.sector_size
       else desiredBlockSize
     in
-    Printf.printf "Attempting to create ORAM of size %Ld with block size %d\n%!" desiredSizeInSectors desiredBlockSizeToUse;
+    (*Printf.printf "Attempting to create ORAM of size %Ld with block size %d\n%!" desiredSizeInSectors desiredBlockSizeToUse;*)
     createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSizeToUse offset blockDevice >>= fun t ->
-    Printf.printf "Initialising ORAM...\n%!";
     initialise t >>= fun () ->
-    Printf.printf "Initialised ORAM\n%!";
     flush t >>= fun () ->
-    Printf.printf "Flushed ORAM\n%!";
     return (`Ok t)
 
   let writeBuffer t startAddress buffer =

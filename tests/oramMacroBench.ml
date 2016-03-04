@@ -11,6 +11,9 @@ let connectAndInitialiseORAMOfSize desiredSizeInSectors desiredBlockSize =
             Block.connect (Printf.sprintf "disk%Ld.img" desiredSizeInSectors) >>= fun bd ->
             O.create ~desiredSizeInSectors ~desiredBlockSize bd) with
   | `Ok oram -> oram
+  | `Error (`Unknown s) -> failwith s
+  | `Error `Disconnected -> failwith "Disconnected!"
+  | `Error `Is_read_only -> failwith "Read only?!"
   | `Error _ -> failwith (Printf.sprintf "Failed to connect to oram with size %Ld" desiredSizeInSectors)
 
 let connectToORAM desiredSizeInSectors =
