@@ -318,7 +318,6 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     let numLeaves = Int64.(pow 2L (of_int height)) in
     let size_sectors = Int64.(bucketSize * (2L * numLeaves - 1L)) in
     (* let totalSizeSectors = Int64.(info.BlockDevice.size_sectors / of_int sectorsPerBlock) in *)
-    Printf.printf "Creating ORAM of size %Ld in block of size %Ld with block offset %Ld\n" size_sectors totalSizeSectors blockOffset;
     let stash = Stash.create () in
     PositionMap.create ~desiredSizeInSectors:size_sectors ~bucketSize ~desiredBlockSize ~offset:Int64.(offset + size_sectors) blockDevice >>= fun positionMap ->
     let t = {
@@ -339,7 +338,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
       then info.BlockDevice.sector_size
       else desiredBlockSize
     in
-    (*Printf.printf "Attempting to create ORAM of size %Ld with block size %d and bucket size %Ld\n%!" desiredSizeInSectors desiredBlockSizeToUse bucketSize;*)
+    Printf.printf "Attempting to create ORAM of size %Ld with block size %d\n%!" desiredSizeInSectors desiredBlockSizeToUse;
     createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSizeToUse offset blockDevice >>= fun t ->
     initialise t >>= fun () ->
     flush t >>= fun () ->
