@@ -258,11 +258,13 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     for i = 8 to Cstruct.len dummy_struct - 1 do
       Cstruct.set_uint8 dummy_struct i 0
     done;
+    Printf.printf "Created dummy struct\n%!";
     let rec loop = function
       | 0L -> return (`Ok ())
       | x -> BlockDevice.write t.blockDevice Int64.(t.offset + (x - 1L) * (of_int t.structuralInfo.sectorsPerBlock)) [dummy_struct] >>= fun () -> loop Int64.(x - 1L)
     in
     loop t.info.size_sectors >>= fun () ->
+    Printf.printf "Finished main loop\n%!";
     if t.offset > Int64.of_int t.structuralInfo.sectorsPerBlock
     then (
       let b = Float.(to_int (log (of_int t.info.sector_size * 8.) / log 2.)) in
