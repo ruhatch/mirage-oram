@@ -340,7 +340,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     in
     Printf.printf "Attempting to create ORAM of size %Ld with block size %d\n%!" desiredSizeInSectors desiredBlockSizeToUse;
     createInstanceOfType desiredSizeInSectors bucketSize desiredBlockSizeToUse offset blockDevice >>= fun t ->
-    Printf.printf "Initialising ORAM...\n%!"
+    Printf.printf "Initialising ORAM...\n%!";
     initialise t >>= fun () ->
     Printf.printf "Initialised ORAM\n%!";
     flush t >>= fun () ->
