@@ -12,7 +12,8 @@ let connectToBlockDevice desiredSizeInSectors desiredBlockSize =
 
 let dataForBlockDevice blockDevice =
   let info = Lwt_main.run (B.get_info blockDevice) in
-  Cstruct.create (info.B.sector_size)
+  let pagesPerBlock = info.B.sector_size / Io_page.page_size in
+  Io_page.(to_cstruct (get pagesPerBlock))
 
 let desiredSizes minHeight maxHeight =
   let heights = List.range minHeight maxHeight in
