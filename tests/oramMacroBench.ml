@@ -8,7 +8,7 @@ let ( >>= ) x f = Lwt.bind x @@ function
 
 let connectAndInitialiseORAMOfSize desiredSizeInSectors desiredBlockSize =
   match Lwt_main.run (
-            Block.connect (Printf.sprintf "buffered:disk%Ld.img" desiredSizeInSectors) >>= fun bd ->
+            Block.connect (Printf.sprintf "disk%Ld.img" desiredSizeInSectors) >>= fun bd ->
             O.create ~desiredSizeInSectors ~desiredBlockSize bd) with
   | `Ok oram -> oram
   | `Error (`Unknown s) -> failwith s
@@ -18,7 +18,7 @@ let connectAndInitialiseORAMOfSize desiredSizeInSectors desiredBlockSize =
 
 let connectToORAM desiredSizeInSectors =
   match Lwt_main.run (
-            Block.connect (Printf.sprintf "buffered:disk%Ld.img" desiredSizeInSectors) >>= fun bd ->
+            Block.connect (Printf.sprintf "disk%Ld.img" desiredSizeInSectors) >>= fun bd ->
             O.connect bd) with
   | `Ok oram -> oram
   | `Error _ -> failwith (Printf.sprintf "Failed to connect to oram with size %Ld" desiredSizeInSectors)

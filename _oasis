@@ -27,7 +27,9 @@ Library mirage_oram
                     cstruct,
                     lwt,
                     lwt.ppx,
-                    bin_prot
+                    bin_prot,
+                    io-page,
+                    io-page.unix
 
 Executable oram_tests
   Path:             tests

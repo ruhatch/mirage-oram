@@ -253,7 +253,8 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     return (`Ok (dataRead))
 
   let initialise t =
-    let dummy_struct = Cstruct.create (t.info.sector_size + 8) in
+    let pagesPerBlock = ((t.info.sector_size + 8) - 1) / Io_page.page_size + 1 in
+    let dummy_struct = Io_page.(to_cstruct (get pagesPerBlock)) in
     Cstruct.LE.set_uint64 dummy_struct 0 (-1L);
     for i = 8 to Cstruct.len dummy_struct - 1 do
       Cstruct.set_uint8 dummy_struct i 0

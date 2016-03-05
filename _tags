@@ -1,6 +1,6 @@
 <**/*>: thread
 # OASIS_START
-# DO NOT EDIT (digest: 3b73850d4bddb72f4d1b4cc159b8e659)
+# DO NOT EDIT (digest: 7ecaaf80339dce6812b16f33a15b9db9)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -21,6 +21,8 @@ true: annot, bin_annot
 <lib/*.ml{,i,y}>: pkg_bisect_ppx
 <lib/*.ml{,i,y}>: pkg_core_kernel
 <lib/*.ml{,i,y}>: pkg_cstruct
+<lib/*.ml{,i,y}>: pkg_io-page
+<lib/*.ml{,i,y}>: pkg_io-page.unix
 <lib/*.ml{,i,y}>: pkg_lwt
 <lib/*.ml{,i,y}>: pkg_lwt.ppx
 <lib/*.ml{,i,y}>: pkg_mirage-types
@@ -31,6 +33,8 @@ true: annot, bin_annot
 <tests/oram_tests.{native,byte}>: pkg_bisect_ppx
 <tests/oram_tests.{native,byte}>: pkg_core_kernel
 <tests/oram_tests.{native,byte}>: pkg_cstruct
+<tests/oram_tests.{native,byte}>: pkg_io-page
+<tests/oram_tests.{native,byte}>: pkg_io-page.unix
 <tests/oram_tests.{native,byte}>: pkg_lwt
 <tests/oram_tests.{native,byte}>: pkg_lwt.ppx
 <tests/oram_tests.{native,byte}>: pkg_lwt.unix
@@ -45,6 +49,8 @@ true: annot, bin_annot
 <tests/stash_tests.{native,byte}>: pkg_bisect_ppx
 <tests/stash_tests.{native,byte}>: pkg_core_kernel
 <tests/stash_tests.{native,byte}>: pkg_cstruct
+<tests/stash_tests.{native,byte}>: pkg_io-page
+<tests/stash_tests.{native,byte}>: pkg_io-page.unix
 <tests/stash_tests.{native,byte}>: pkg_lwt
 <tests/stash_tests.{native,byte}>: pkg_lwt.ppx
 <tests/stash_tests.{native,byte}>: pkg_lwt.unix
@@ -59,6 +65,8 @@ true: annot, bin_annot
 <tests/posmap_tests.{native,byte}>: pkg_bisect_ppx
 <tests/posmap_tests.{native,byte}>: pkg_core_kernel
 <tests/posmap_tests.{native,byte}>: pkg_cstruct
+<tests/posmap_tests.{native,byte}>: pkg_io-page
+<tests/posmap_tests.{native,byte}>: pkg_io-page.unix
 <tests/posmap_tests.{native,byte}>: pkg_lwt
 <tests/posmap_tests.{native,byte}>: pkg_lwt.ppx
 <tests/posmap_tests.{native,byte}>: pkg_lwt.unix
@@ -73,6 +81,8 @@ true: annot, bin_annot
 <tests/oblock_tests.{native,byte}>: pkg_bisect_ppx
 <tests/oblock_tests.{native,byte}>: pkg_core_kernel
 <tests/oblock_tests.{native,byte}>: pkg_cstruct
+<tests/oblock_tests.{native,byte}>: pkg_io-page
+<tests/oblock_tests.{native,byte}>: pkg_io-page.unix
 <tests/oblock_tests.{native,byte}>: pkg_lwt
 <tests/oblock_tests.{native,byte}>: pkg_lwt.ppx
 <tests/oblock_tests.{native,byte}>: pkg_lwt.unix
@@ -87,6 +97,8 @@ true: annot, bin_annot
 <tests/oramFsTests.{native,byte}>: pkg_bisect_ppx
 <tests/oramFsTests.{native,byte}>: pkg_core_kernel
 <tests/oramFsTests.{native,byte}>: pkg_cstruct
+<tests/oramFsTests.{native,byte}>: pkg_io-page
+<tests/oramFsTests.{native,byte}>: pkg_io-page.unix
 <tests/oramFsTests.{native,byte}>: pkg_lwt
 <tests/oramFsTests.{native,byte}>: pkg_lwt.ppx
 <tests/oramFsTests.{native,byte}>: pkg_lwt.unix
@@ -101,6 +113,7 @@ true: annot, bin_annot
 <tests/encryptionTests.{native,byte}>: pkg_bisect_ppx
 <tests/encryptionTests.{native,byte}>: pkg_core_kernel
 <tests/encryptionTests.{native,byte}>: pkg_cstruct
+<tests/encryptionTests.{native,byte}>: pkg_io-page
 <tests/encryptionTests.{native,byte}>: pkg_io-page.unix
 <tests/encryptionTests.{native,byte}>: pkg_lwt
 <tests/encryptionTests.{native,byte}>: pkg_lwt.ppx
@@ -120,6 +133,8 @@ true: annot, bin_annot
 <tests/oramBench.{native,byte}>: pkg_core_bench
 <tests/oramBench.{native,byte}>: pkg_core_kernel
 <tests/oramBench.{native,byte}>: pkg_cstruct
+<tests/oramBench.{native,byte}>: pkg_io-page
+<tests/oramBench.{native,byte}>: pkg_io-page.unix
 <tests/oramBench.{native,byte}>: pkg_lwt
 <tests/oramBench.{native,byte}>: pkg_lwt.ppx
 <tests/oramBench.{native,byte}>: pkg_mirage-block-fs
@@ -135,6 +150,8 @@ true: annot, bin_annot
 <tests/oramMacroBench.{native,byte}>: pkg_core
 <tests/oramMacroBench.{native,byte}>: pkg_core_kernel
 <tests/oramMacroBench.{native,byte}>: pkg_cstruct
+<tests/oramMacroBench.{native,byte}>: pkg_io-page
+<tests/oramMacroBench.{native,byte}>: pkg_io-page.unix
 <tests/oramMacroBench.{native,byte}>: pkg_lwt
 <tests/oramMacroBench.{native,byte}>: pkg_lwt.ppx
 <tests/oramMacroBench.{native,byte}>: pkg_lwt.unix
@@ -150,6 +167,8 @@ true: annot, bin_annot
 <tests/recOramMacroBench.{native,byte}>: pkg_core
 <tests/recOramMacroBench.{native,byte}>: pkg_core_kernel
 <tests/recOramMacroBench.{native,byte}>: pkg_cstruct
+<tests/recOramMacroBench.{native,byte}>: pkg_io-page
+<tests/recOramMacroBench.{native,byte}>: pkg_io-page.unix
 <tests/recOramMacroBench.{native,byte}>: pkg_lwt
 <tests/recOramMacroBench.{native,byte}>: pkg_lwt.ppx
 <tests/recOramMacroBench.{native,byte}>: pkg_lwt.unix
@@ -165,6 +184,8 @@ true: annot, bin_annot
 <tests/controlMacroBench.{native,byte}>: pkg_core
 <tests/controlMacroBench.{native,byte}>: pkg_core_kernel
 <tests/controlMacroBench.{native,byte}>: pkg_cstruct
+<tests/controlMacroBench.{native,byte}>: pkg_io-page
+<tests/controlMacroBench.{native,byte}>: pkg_io-page.unix
 <tests/controlMacroBench.{native,byte}>: pkg_lwt
 <tests/controlMacroBench.{native,byte}>: pkg_lwt.ppx
 <tests/controlMacroBench.{native,byte}>: pkg_lwt.unix
@@ -180,6 +201,8 @@ true: annot, bin_annot
 <tests/blockSizeExperiment.{native,byte}>: pkg_core
 <tests/blockSizeExperiment.{native,byte}>: pkg_core_kernel
 <tests/blockSizeExperiment.{native,byte}>: pkg_cstruct
+<tests/blockSizeExperiment.{native,byte}>: pkg_io-page
+<tests/blockSizeExperiment.{native,byte}>: pkg_io-page.unix
 <tests/blockSizeExperiment.{native,byte}>: pkg_lwt
 <tests/blockSizeExperiment.{native,byte}>: pkg_lwt.ppx
 <tests/blockSizeExperiment.{native,byte}>: pkg_lwt.unix
@@ -195,6 +218,7 @@ true: annot, bin_annot
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_core
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_core_kernel
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_cstruct
+<tests/encryptedTimeExperiment.{native,byte}>: pkg_io-page
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_io-page.unix
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_lwt
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_lwt.ppx
@@ -212,6 +236,7 @@ true: annot, bin_annot
 <tests/*.ml{,i,y}>: pkg_core
 <tests/*.ml{,i,y}>: pkg_core_kernel
 <tests/*.ml{,i,y}>: pkg_cstruct
+<tests/*.ml{,i,y}>: pkg_io-page
 <tests/*.ml{,i,y}>: pkg_io-page.unix
 <tests/*.ml{,i,y}>: pkg_lwt
 <tests/*.ml{,i,y}>: pkg_lwt.ppx
