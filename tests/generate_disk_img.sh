@@ -1,2 +1,2 @@
 #!/bin/sh
-dd if=/dev/zero of=disk$1.img count=$2
+dd if=/dev/zero of=buffered:$1.img count=$2
