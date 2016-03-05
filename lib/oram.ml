@@ -117,10 +117,11 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     let superblockBuffer = Io_page.get_buf ~n:1 () in
     let _ = bin_write_superblock (Cstruct.to_bigarray superblockBuffer) ~pos:0 superblock in
     BlockDevice.write t.blockDevice 0L [superblockBuffer] >>= fun () ->
-    let buffer = Bin_prot.Common.create_buf length in
-    let _ = bin_write_t buffer ~pos:0 t in
-    let cstruct = Cstruct.of_bigarray buffer in
-    BlockDevice.write t.blockDevice offset [cstruct] >>= fun () ->
+    (*let buffer = Bin_prot.Common.create_buf length in*)
+    let pageLength = Io_page.round_to_page_size length / Io_page.page_size in
+    let buffer = Io_page.get_buf ~n:pageLength () in
+    let _ = bin_write_t (Cstruct.to_bigarray buffer) ~pos:0 t in
+    BlockDevice.write t.blockDevice offset [buffer] >>= fun () ->
     return (`Ok ())
 
   let connect blockDevice =
