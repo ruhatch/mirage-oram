@@ -25,23 +25,25 @@ let connectToORAM desiredSizeInSectors =
 
 let dataForORAM oram =
   let info = Lwt_main.run (O.get_info oram) in
-  let pagesPerBlock = info.O.sector_size / Io_page.page_size in
+  let pagesPerBlock = Io_page.round_to_page_size info.O.sector_size / Io_page.page_size in
   Io_page.(to_cstruct (get pagesPerBlock))
 
 let desiredSizes minHeight maxHeight =
   let heights = List.range minHeight maxHeight in
   List.map ~f:(fun height -> Int64.of_int ((Int.pow 2 (height + 1) - 1) * 4)) heights
 
-let performExperiment oram desiredSizeInSectors data iterations =
+let performExperiment oram data desiredSizeInSectors iterations =
   let rec loopWrite = function
     | 0 -> Lwt.return (`Ok ())
     | n ->
-      O.write oram 0L [data] >>= fun () ->
+      let address = Random.int64 desiredSizeInSectors in
+      O.write oram address [data] >>= fun () ->
       loopRead (n - 1)
   and loopRead = function
   | 0 -> Lwt.return (`Ok ())
   | n ->
-    O.read oram 0L [data] >>= fun () ->
+    let address = Random.int64 desiredSizeInSectors in
+    O.read oram address [data] >>= fun () ->
     loopWrite (n - 1)
   in loopWrite iterations
 
@@ -78,7 +80,7 @@ let () =
                     else connectToORAM desiredSizeInSectors in
                   let data = dataForORAM oram in
                   let start = Time_ns.now () in
-                  begin match Lwt_main.run (performExperiment oram desiredSizeInSectors data iterations) with
+                  begin match Lwt_main.run (performExperiment oram data desiredSizeInSectors iterations) with
                   | `Ok () -> ()
                   | `Error _ -> failwith "Failed to perform experiment"
                   end;
