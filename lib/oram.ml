@@ -261,7 +261,6 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     let rec loop = function
       | 0L -> return (`Ok ())
       | x ->
-      Printf.printf "Writing block %Ld\n%!" Int64.(t.offset + (x - 1L) * (of_int t.structuralInfo.sectorsPerBlock));
       BlockDevice.write t.blockDevice Int64.(t.offset + (x - 1L) * (of_int t.structuralInfo.sectorsPerBlock)) [dummy_struct] >>= fun () -> loop Int64.(x - 1L)
     in
     loop t.info.size_sectors >>= fun () ->
