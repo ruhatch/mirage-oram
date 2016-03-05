@@ -126,14 +126,13 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
 
   let connect blockDevice =
     let%lwt info = BlockDevice.get_info blockDevice in
-    let superblockCstruct = Cstruct.create info.BlockDevice.sector_size in
-    BlockDevice.read blockDevice 0L [superblockCstruct] >>= fun () ->
-    let superblockBuffer = Cstruct.to_bigarray superblockCstruct in
-    let { offset ; length } = bin_read_superblock superblockBuffer ~pos_ref:(ref 0) in
-    let core = Cstruct.create length in
-    BlockDevice.read blockDevice offset [core] >>= fun () ->
-    let buffer = Cstruct.to_bigarray core in
-    let t = bin_read_t buffer ~pos_ref:(ref 0) blockDevice in
+    let superblockBuffer = Io_page.get_buf ~n:1 () in
+    BlockDevice.read blockDevice 0L [superblockBuffer] >>= fun () ->
+    let { offset ; length } = bin_read_superblock (Cstruct.to_bigarray superblockBuffer) ~pos_ref:(ref 0) in
+    let pageLength = Io_page.round_to_page_size length / Io_page.page_size in
+    let coreBuffer = Io_page.get_buf ~n:pageLength () in
+    BlockDevice.read blockDevice offset [coreBuffer] >>= fun () ->
+    let t = bin_read_t (Cstruct.to_bigarray coreBuffer) ~pos_ref:(ref 0) blockDevice in
     return (`Ok t)
 
   let fakeReconnect oram blockDevice =
