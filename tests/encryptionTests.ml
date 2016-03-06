@@ -125,7 +125,7 @@ let encryptionTests1 =
             F.writeFile fs "pg61.txt" file1  >>= fun () ->
             bind (O.disconnect fs.F.blockDevice) @@ fun () ->
             Block.connect "disk.img" >>= fun blockDevice ->
-            IncreasedBlockSize.connect blockDevice >>= fun blockDevice ->
+            IncreasedBlockSize.connect ~desiredBlockSize:0x4000 blockDevice >>= fun blockDevice ->
             E.connect blockDevice ~key:(Cstruct.of_string "keyofsixteenchar") >>= fun blockDevice ->
             O.fakeReconnect fs.F.blockDevice blockDevice >>= fun oram ->
             F.connect oram >>= fun fs ->

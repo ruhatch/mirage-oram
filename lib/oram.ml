@@ -119,7 +119,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     let length = requiredBlocks * info.BlockDevice.sector_size in
     let superblock = { offset ; length } in
     (*let superblockBuffer = Bin_prot.Common.create_buf info.BlockDevice.sector_size in*)
-    let superblockBuffer = Io_page.get_buf () in
+    let superblockBuffer = createPageAlignedBuffer info.BlockDevice.sector_size in
     let _ = bin_write_superblock (Cstruct.to_bigarray superblockBuffer) ~pos:0 superblock in
     BlockDevice.write t.blockDevice 0L [superblockBuffer] >>= fun () ->
     (*let buffer = Bin_prot.Common.create_buf length in*)
@@ -130,7 +130,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
 
   let connect blockDevice =
     let%lwt info = BlockDevice.get_info blockDevice in
-    let superblockBuffer = Io_page.get_buf () in
+    let superblockBuffer = createPageAlignedBuffer info.BlockDevice.sector_size in
     BlockDevice.read blockDevice 0L [superblockBuffer] >>= fun () ->
     let { offset ; length } = bin_read_superblock (Cstruct.to_bigarray superblockBuffer) ~pos_ref:(ref 0) in
     let coreBuffer = createPageAlignedBuffer length in
