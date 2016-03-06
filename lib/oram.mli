@@ -32,6 +32,8 @@ module Make (P : PosMapF) (B : V1_LWT.BLOCK) : sig
 
   val getStructuralInfo : t -> structuralInfo Lwt.t
 
+  val createPageAlignedBuffer : int -> Cstruct.t
+
   type bucket = OBlock.t list
 
   val calculateAddressOfBucket : t -> int64 -> int -> int64
