@@ -97,6 +97,11 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
 
   let getStructuralInfo { structuralInfo } = return structuralInfo
 
+  let createPageAlignedBuffer bytes =
+    let sizeInPages = Io_page.round_to_page_size bytes / Io_page.page_size in
+    let buffer = Io_page.get_buf ~n:sizeInPages () in
+    Cstruct.sub buffer 0 bytes
+
   let floor_log x =
     let rec loop acc = function
       | 1L -> acc
@@ -114,23 +119,21 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     let length = requiredBlocks * info.BlockDevice.sector_size in
     let superblock = { offset ; length } in
     (*let superblockBuffer = Bin_prot.Common.create_buf info.BlockDevice.sector_size in*)
-    let superblockBuffer = Io_page.get_buf ~n:1 () in
+    let superblockBuffer = Io_page.get_buf () in
     let _ = bin_write_superblock (Cstruct.to_bigarray superblockBuffer) ~pos:0 superblock in
     BlockDevice.write t.blockDevice 0L [superblockBuffer] >>= fun () ->
     (*let buffer = Bin_prot.Common.create_buf length in*)
-    let pageLength = Io_page.round_to_page_size length / Io_page.page_size in
-    let buffer = Io_page.get_buf ~n:pageLength () in
+    let buffer = createPageAlignedBuffer length in
     let _ = bin_write_t (Cstruct.to_bigarray buffer) ~pos:0 t in
     BlockDevice.write t.blockDevice offset [buffer] >>= fun () ->
     return (`Ok ())
 
   let connect blockDevice =
     let%lwt info = BlockDevice.get_info blockDevice in
-    let superblockBuffer = Io_page.get_buf ~n:1 () in
+    let superblockBuffer = Io_page.get_buf () in
     BlockDevice.read blockDevice 0L [superblockBuffer] >>= fun () ->
     let { offset ; length } = bin_read_superblock (Cstruct.to_bigarray superblockBuffer) ~pos_ref:(ref 0) in
-    let pageLength = Io_page.round_to_page_size length / Io_page.page_size in
-    let coreBuffer = Io_page.get_buf ~n:pageLength () in
+    let coreBuffer = createPageAlignedBuffer length in
     BlockDevice.read blockDevice offset [coreBuffer] >>= fun () ->
     let t = bin_read_t (Cstruct.to_bigarray coreBuffer) ~pos_ref:(ref 0) blockDevice in
     return (`Ok t)
@@ -174,9 +177,8 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     in loop path t.structuralInfo.height
 
   let createBuffersForBucket t =
-    let sector_size = t.info.sector_size + 8 in
     let zeroToBucketSize = List.range 0 (Option.value (Int64.to_int t.bucketSize) ~default:4) in
-    List.map ~f:(fun _ -> Cstruct.create sector_size) zeroToBucketSize
+    List.map ~f:(fun _ -> createPageAlignedBuffer (t.info.sector_size + 8)) zeroToBucketSize
 
   let readBucket t address =
     (* Printf.printf "%Ld\n" Int64.(address + t.offset);*)
@@ -253,16 +255,15 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     return (`Ok (dataRead))
 
   let initialise t =
-    let pagesPerBlock = ((t.info.sector_size + 8) - 1) / Io_page.page_size + 1 in
-    let dummy_struct = Io_page.(to_cstruct (get pagesPerBlock)) in
-    Cstruct.LE.set_uint64 dummy_struct 0 (-1L);
-    for i = 8 to Cstruct.len dummy_struct - 1 do
-      Cstruct.set_uint8 dummy_struct i 0
+    let dummyBuffer = createPageAlignedBuffer (t.info.sector_size + 8) in
+    Cstruct.LE.set_uint64 dummyBuffer 0 (-1L);
+    for i = 8 to Cstruct.len dummyBuffer - 1 do
+      Cstruct.set_uint8 dummyBuffer i 0
     done;
     let rec loop = function
       | 0L -> return (`Ok ())
       | x ->
-      BlockDevice.write t.blockDevice Int64.(t.offset + (x - 1L) * (of_int t.structuralInfo.sectorsPerBlock)) [dummy_struct] >>= fun () -> loop Int64.(x - 1L)
+      BlockDevice.write t.blockDevice Int64.(t.offset + (x - 1L) * (of_int t.structuralInfo.sectorsPerBlock)) [dummyBuffer] >>= fun () -> loop Int64.(x - 1L)
     in
     loop t.info.size_sectors >>= fun () ->
     if t.offset > Int64.of_int t.structuralInfo.sectorsPerBlock
@@ -270,14 +271,14 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
       let b = Float.(to_int (log (of_int t.info.sector_size * 8.) / log 2.)) in
       let height' = t.structuralInfo.height - 6 + b in
       let bound = Int64.(pow 2L (of_int height')) in
+      let randomBuffer = createPageAlignedBuffer t.info.sector_size in
       let rec loop = function
         | 0L -> return (`Ok ())
         | x ->
-           let data = Cstruct.create t.info.sector_size in
-           for i = 0 to (Cstruct.len data / 8) - 1 do
-             Cstruct.BE.set_uint64 data (i * 8) (Random.int64 bound);
+           for i = 0 to (Cstruct.len randomBuffer / 8) - 1 do
+             Cstruct.BE.set_uint64 randomBuffer (i * 8) (Random.int64 bound);
            done;
-           access t Write Int64.(x - 1L) (Some data) >>= fun _ ->
+           access t Write Int64.(x - 1L) (Some randomBuffer) >>= fun _ ->
            loop Int64.(x - 1L)
       in
       loop t.info.size_sectors

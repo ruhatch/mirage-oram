@@ -26,6 +26,7 @@ let connectToORAM desiredSizeInSectors =
 let dataForORAM oram =
   let info = Lwt_main.run (O.get_info oram) in
   let pagesPerBlock = Io_page.round_to_page_size info.O.sector_size / Io_page.page_size in
+  (* Being proper we should probably sub this buffer *)
   Io_page.(to_cstruct (get pagesPerBlock))
 
 let desiredSizes minHeight maxHeight =
