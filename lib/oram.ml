@@ -68,6 +68,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
   let bin_size_t t =
     let coreSize = core t |> bin_size_core in
     let posMapSize = PositionMap.bin_size_t t.positionMap in
+    Printf.printf "%d\n" posMapSize;
     coreSize + posMapSize
 
   let bin_write_t buf ~pos t =
@@ -232,7 +233,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
 
   let access t operation address dataToWrite =
     PositionMap.get t.positionMap address >>= fun leaf ->
-    Printf.printf "%Ld\n" leaf;
+    (*Printf.printf "%Ld\n" leaf;*)
     let newLeaf = Nocrypto.Rng.Int64.gen t.structuralInfo.numLeaves in
     PositionMap.set t.positionMap address newLeaf >>= fun () ->
     readPathToLeaf t leaf >>= fun pathRead ->
