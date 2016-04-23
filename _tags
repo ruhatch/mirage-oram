@@ -1,6 +1,6 @@
 <**/*>: thread
 # OASIS_START
-# DO NOT EDIT (digest: ac9ad4853270cdaf5f0665a625f77f51)
+# DO NOT EDIT (digest: f3aceb6d95e677a8a9cc9cc508f9b12d)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -215,6 +215,25 @@ true: annot, bin_annot
 <tests/controlMacroBench.{native,byte}>: pkg_nocrypto.lwt
 <tests/controlMacroBench.{native,byte}>: pkg_ppx_bin_prot
 <tests/controlMacroBench.{native,byte}>: use_mirage_oram
+# Executable initialise_oram
+<tests/initialiseOram.{native,byte}>: pkg_alcotest
+<tests/initialiseOram.{native,byte}>: pkg_bin_prot
+<tests/initialiseOram.{native,byte}>: pkg_bisect_ppx
+<tests/initialiseOram.{native,byte}>: pkg_core
+<tests/initialiseOram.{native,byte}>: pkg_core_kernel
+<tests/initialiseOram.{native,byte}>: pkg_cstruct
+<tests/initialiseOram.{native,byte}>: pkg_io-page
+<tests/initialiseOram.{native,byte}>: pkg_io-page.unix
+<tests/initialiseOram.{native,byte}>: pkg_lwt
+<tests/initialiseOram.{native,byte}>: pkg_lwt.ppx
+<tests/initialiseOram.{native,byte}>: pkg_lwt.unix
+<tests/initialiseOram.{native,byte}>: pkg_mirage-block-fs
+<tests/initialiseOram.{native,byte}>: pkg_mirage-block-unix
+<tests/initialiseOram.{native,byte}>: pkg_mirage-types
+<tests/initialiseOram.{native,byte}>: pkg_nocrypto
+<tests/initialiseOram.{native,byte}>: pkg_nocrypto.lwt
+<tests/initialiseOram.{native,byte}>: pkg_ppx_bin_prot
+<tests/initialiseOram.{native,byte}>: use_mirage_oram
 # Executable block_size_experiment
 <tests/blockSizeExperiment.{native,byte}>: pkg_alcotest
 <tests/blockSizeExperiment.{native,byte}>: pkg_bin_prot

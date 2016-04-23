@@ -68,7 +68,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
   let bin_size_t t =
     let coreSize = core t |> bin_size_core in
     let posMapSize = PositionMap.bin_size_t t.positionMap in
-    Printf.printf "%d\n" posMapSize;
+    (*Printf.printf "%d\n" posMapSize;*)
     coreSize + posMapSize
 
   let bin_write_t buf ~pos t =

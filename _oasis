@@ -215,6 +215,20 @@ Executable control_macro_bench
                     alcotest,
                     core
 
+Executable initialise_oram
+  Path:             tests
+  MainIs:           initialiseOram.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-oram,
+                    mirage-block-unix,
+                    mirage-block-fs,
+                    lwt,
+                    lwt.unix,
+                    alcotest,
+                    core
+
 Executable block_size_experiment
   Path:             tests
   MainIs:           blockSizeExperiment.ml
