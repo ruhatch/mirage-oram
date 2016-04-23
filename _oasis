@@ -28,6 +28,8 @@ Library mirage_oram
                     lwt,
                     lwt.ppx,
                     bin_prot,
+                    nocrypto,
+                    nocrypto.lwt,
                     io-page,
                     io-page.unix
 
@@ -216,6 +218,20 @@ Executable control_macro_bench
 Executable block_size_experiment
   Path:             tests
   MainIs:           blockSizeExperiment.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-oram,
+                    mirage-block-unix,
+                    mirage-block-fs,
+                    lwt,
+                    lwt.unix,
+                    alcotest,
+                    core
+
+Executable read_same_block
+  Path:             tests
+  MainIs:           readSameBlock.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false

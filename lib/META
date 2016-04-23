@@ -1,10 +1,10 @@
 # OASIS_START
-# DO NOT EDIT (digest: 2675369e5462a211b802ae785e787a3c)
+# DO NOT EDIT (digest: 267035941e967d64112338cfd4214748)
 version = "0.0.1"
 description =
 "A library that implements Path ORAM as a functor on the MirageOS V1.BLOCK interface"
 requires =
-"bisect_ppx ppx_bin_prot core_kernel mirage-types cstruct lwt lwt.ppx bin_prot io-page io-page.unix"
+"bisect_ppx ppx_bin_prot core_kernel mirage-types cstruct lwt lwt.ppx bin_prot nocrypto nocrypto.lwt io-page io-page.unix"
 archive(byte) = "mirage_oram.cma"
 archive(byte, plugin) = "mirage_oram.cma"
 archive(native) = "mirage_oram.cmxa"

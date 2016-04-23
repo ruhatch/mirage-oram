@@ -5,6 +5,8 @@ open Core_kernel.Std
 open PosMapIntf
 open Bin_prot.Std
 
+let _ = Nocrypto_entropy_lwt.initialize ()
+
 module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
 
   module PositionMap = MakePositionMap(BlockDevice)
@@ -230,7 +232,8 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
 
   let access t operation address dataToWrite =
     PositionMap.get t.positionMap address >>= fun leaf ->
-    let newLeaf = Random.int64 t.structuralInfo.numLeaves in
+    Printf.printf "%Ld\n" leaf;
+    let newLeaf = Nocrypto.Rng.Int64.gen t.structuralInfo.numLeaves in
     PositionMap.set t.positionMap address newLeaf >>= fun () ->
     readPathToLeaf t leaf >>= fun pathRead ->
     List.iter pathRead ~f:(
@@ -276,7 +279,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
         | 0L -> return (`Ok ())
         | x ->
            for i = 0 to (Cstruct.len randomBuffer / 8) - 1 do
-             Cstruct.BE.set_uint64 randomBuffer (i * 8) (Random.int64 bound);
+             Cstruct.BE.set_uint64 randomBuffer (i * 8) (Nocrypto.Rng.Int64.gen bound);
            done;
            access t Write Int64.(x - 1L) (Some randomBuffer) >>= fun _ ->
            loop Int64.(x - 1L)
@@ -334,7 +337,6 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) = struct
     return (`Ok t)
 
   let create ?(desiredSizeInSectors = 0L) ?(bucketSize = 4L) ?(desiredBlockSize = 0x2000) ?(offset = 1L) blockDevice =
-    Random.self_init ();
     let%lwt info = BlockDevice.get_info blockDevice in
     let desiredBlockSizeToUse =
       if info.BlockDevice.sector_size > desiredBlockSize
