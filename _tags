@@ -1,6 +1,6 @@
 <**/*>: thread
 # OASIS_START
-# DO NOT EDIT (digest: f3aceb6d95e677a8a9cc9cc508f9b12d)
+# DO NOT EDIT (digest: ce893be96e013203c1e410e2761b175d)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -17,18 +17,6 @@ true: annot, bin_annot
 "_darcs": not_hygienic
 # Library mirage_oram
 "lib/mirage_oram.cmxs": use_mirage_oram
-<lib/*.ml{,i,y}>: pkg_bin_prot
-<lib/*.ml{,i,y}>: pkg_bisect_ppx
-<lib/*.ml{,i,y}>: pkg_core_kernel
-<lib/*.ml{,i,y}>: pkg_cstruct
-<lib/*.ml{,i,y}>: pkg_io-page
-<lib/*.ml{,i,y}>: pkg_io-page.unix
-<lib/*.ml{,i,y}>: pkg_lwt
-<lib/*.ml{,i,y}>: pkg_lwt.ppx
-<lib/*.ml{,i,y}>: pkg_mirage-types
-<lib/*.ml{,i,y}>: pkg_nocrypto
-<lib/*.ml{,i,y}>: pkg_nocrypto.lwt
-<lib/*.ml{,i,y}>: pkg_ppx_bin_prot
 # Executable oram_tests
 <tests/oram_tests.{native,byte}>: pkg_alcotest
 <tests/oram_tests.{native,byte}>: pkg_bin_prot
@@ -177,6 +165,35 @@ true: annot, bin_annot
 <tests/oramMacroBench.{native,byte}>: pkg_nocrypto.lwt
 <tests/oramMacroBench.{native,byte}>: pkg_ppx_bin_prot
 <tests/oramMacroBench.{native,byte}>: use_mirage_oram
+# Executable rec_oram
+<lib/recOram.{native,byte}>: pkg_bin_prot
+<lib/recOram.{native,byte}>: pkg_bisect_ppx
+<lib/recOram.{native,byte}>: pkg_core
+<lib/recOram.{native,byte}>: pkg_core_kernel
+<lib/recOram.{native,byte}>: pkg_cstruct
+<lib/recOram.{native,byte}>: pkg_io-page
+<lib/recOram.{native,byte}>: pkg_io-page.unix
+<lib/recOram.{native,byte}>: pkg_lwt
+<lib/recOram.{native,byte}>: pkg_lwt.ppx
+<lib/recOram.{native,byte}>: pkg_mirage-types
+<lib/recOram.{native,byte}>: pkg_nocrypto
+<lib/recOram.{native,byte}>: pkg_nocrypto.lwt
+<lib/recOram.{native,byte}>: pkg_ppx_bin_prot
+<lib/recOram.{native,byte}>: use_mirage_oram
+<lib/*.ml{,i,y}>: pkg_bin_prot
+<lib/*.ml{,i,y}>: pkg_bisect_ppx
+<lib/*.ml{,i,y}>: pkg_core
+<lib/*.ml{,i,y}>: pkg_core_kernel
+<lib/*.ml{,i,y}>: pkg_cstruct
+<lib/*.ml{,i,y}>: pkg_io-page
+<lib/*.ml{,i,y}>: pkg_io-page.unix
+<lib/*.ml{,i,y}>: pkg_lwt
+<lib/*.ml{,i,y}>: pkg_lwt.ppx
+<lib/*.ml{,i,y}>: pkg_mirage-types
+<lib/*.ml{,i,y}>: pkg_nocrypto
+<lib/*.ml{,i,y}>: pkg_nocrypto.lwt
+<lib/*.ml{,i,y}>: pkg_ppx_bin_prot
+<lib/*.ml{,i,y}>: use_mirage_oram
 # Executable rec_oram_macro_bench
 <tests/recOramMacroBench.{native,byte}>: pkg_alcotest
 <tests/recOramMacroBench.{native,byte}>: pkg_bin_prot
@@ -272,6 +289,26 @@ true: annot, bin_annot
 <tests/readSameBlock.{native,byte}>: pkg_nocrypto.lwt
 <tests/readSameBlock.{native,byte}>: pkg_ppx_bin_prot
 <tests/readSameBlock.{native,byte}>: use_mirage_oram
+# Executable initialise_encrypted_oram
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_alcotest
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_bin_prot
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_bisect_ppx
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_core
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_core_kernel
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_cstruct
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_io-page
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_io-page.unix
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_lwt
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_lwt.ppx
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_lwt.unix
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_mirage-block-ccm
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_mirage-block-fs
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_mirage-block-unix
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_mirage-types
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_nocrypto
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_nocrypto.lwt
+<tests/initialiseEncryptedOram.{native,byte}>: pkg_ppx_bin_prot
+<tests/initialiseEncryptedOram.{native,byte}>: use_mirage_oram
 # Executable encrypted_time_experiment
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_alcotest
 <tests/encryptedTimeExperiment.{native,byte}>: pkg_bin_prot

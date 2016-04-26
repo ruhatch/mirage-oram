@@ -187,6 +187,15 @@ Executable oram_macro_bench
                     alcotest,
                     core
 
+Executable rec_oram
+  Path:             lib
+  MainIs:           recOram.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-oram,
+                    core
+
 Executable rec_oram_macro_bench
   Path:             tests
   MainIs:           recOramMacroBench.ml
@@ -252,6 +261,23 @@ Executable read_same_block
   BuildDepends:     mirage-oram,
                     mirage-block-unix,
                     mirage-block-fs,
+                    lwt,
+                    lwt.unix,
+                    alcotest,
+                    core
+
+Executable initialise_encrypted_oram
+  Path:             tests
+  MainIs:           initialiseEncryptedOram.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-oram,
+                    mirage-block-unix,
+                    mirage-block-fs,
+                    mirage-block-ccm,
+                    io-page.unix,
+                    nocrypto.lwt,
                     lwt,
                     lwt.unix,
                     alcotest,

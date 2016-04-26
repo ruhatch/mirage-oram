@@ -21,12 +21,13 @@ let printLevels lvls =
   Printf.printf "Used space: %f\n" (calcUsedSpace lvls)
 
 let testLevelCalc blockExp sizeSectors =
-  let l0 = calcL0 12. sizeSectors in
-  let lvls = calcLevelList 12. l0 0. in
-  assert (calcUsedSpace lvls < sizeSectors)
+  let l0 = calcL0 blockExp sizeSectors in
+  let lvls = calcLevelList blockExp l0 0. in
+  assert (calcUsedSpace lvls < sizeSectors);
+  printLevels lvls
 
 let () =
   for i = 1 to 100 do
     let sizeSectors = Random.float 10000000000000. in
-    testLevelCalc 12. sizeSectors
+    testLevelCalc 20. sizeSectors
   done

@@ -28,40 +28,28 @@ let connectToORAM desiredSizeInSectors desiredBlockSize =
 
 let dataForORAM oram =
   let info = Lwt_main.run (O.get_info oram) in
-  let pagesPerBlock = (info.O.sector_size - 1) / Io_page.page_size + 1 in
-  Io_page.(to_cstruct (get pagesPerBlock))
+  O.createPageAlignedBuffer info.O.sector_size
 
 let desiredSizes minHeight maxHeight =
   let heights = List.range minHeight maxHeight in
   List.map ~f:(fun height -> Int64.of_int ((Int.pow 2 (height + 1) - 1) * 4)) heights
 
 let performExperiment oram data desiredSizeInSectors iterations =
-  let rec loopWrite = function
+  let reverseOperation = function
+    | O.Read -> O.Write
+    | O.Write -> O.Read
+  in
+  let rec loop address operation = function
     | 0 -> Lwt.return (`Ok ())
     | n ->
-      let address = Random.int64 desiredSizeInSectors in
-      O.write oram address [data] >>= fun () ->
-      loopRead (n - 1)
-  and loopRead = function
-  | 0 -> Lwt.return (`Ok ())
-  | n ->
-    let address = Random.int64 desiredSizeInSectors in
-    O.read oram address [data] >>= fun () ->
-    loopWrite (n - 1)
-  in loopWrite iterations
-           
-(*let performExperiment oram desiredSizeInSectors data iterations =
-  let rec loopWrite = function
-    | 0 -> Lwt.return (`Ok ())
-    | n ->
-      O.write oram 0L [data] >>= fun () ->
-      loopRead (n - 1)
-  and loopRead = function
-  | 0 -> Lwt.return (`Ok ())
-  | n ->
-    O.read oram 0L [data] >>= fun () ->
-    loopWrite (n - 1)
-  in loopWrite iterations*)
+       begin match operation with
+        | O.Read -> O.read oram address [data]
+        | O.Write -> O.write oram address [data]
+       end >>= fun () ->
+       if address = Int64.(desiredSizeInSectors - 1L)
+       then loop 0L (reverseOperation operation) (n - 1)
+       else loop Int64.(address + 1L) operation (n - 1)
+  in loop 0L O.Write iterations
 
 let () =
   Command.basic
