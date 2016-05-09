@@ -11,25 +11,21 @@ module type ORAM = sig
   
   type t
 
-  type blockDevice
-
-  type blockError
-
   include V1_LWT.BLOCK
           with type t := t
           with type id = string
 
   include PosMap
           with type t := t
-                     and type block := blockDevice
-                                   and type error := blockError
+                     and type error := error
+                                        
 
   (* Don't expose the initialise method *)
   (*val initialise : BlockDevice.t -> [`Ok of unit | `Error of error] Lwt.t*)
   (*val connect : BlockDevice.t -> [`Ok of t | `Error of error] Lwt.t*)
-  val fakeReconnect : t -> blockDevice -> [`Ok of t | `Error of error] Lwt.t
+  val fakeReconnect : t -> block -> [`Ok of t | `Error of error] Lwt.t
   val disconnect : t -> unit Lwt.t
-  val connect : blockDevice -> [`Ok of t | `Error  of error] Lwt.t
+  val connect : block -> [`Ok of t | `Error  of error] Lwt.t
 
   (* Lower level functions - exposed for testing purposes *)
 
@@ -63,13 +59,13 @@ module type ORAM = sig
 
 end                                       
 
-module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) : ORAM
-       with type blockDevice = BlockDevice.t
-        and type blockError = BlockDevice.error = struct
-  
-  module PositionMap = MakePositionMap(BlockDevice)
+module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) 
+       (*with type block = BlockDevice.t
+        and type error = BlockDevice.error*) = struct
 
-  type blockDevice = BlockDevice.t
+  module PositionMap = MakePositionMap(BlockDevice)
+  
+  type block = BlockDevice.t
 
   type blockError = BlockDevice.error
 
@@ -201,6 +197,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) : ORAM
     let coreBuffer = createPageAlignedBuffer length in
     BlockDevice.read blockDevice offset [coreBuffer] >>= fun () ->
     let t = bin_read_t (Cstruct.to_bigarray coreBuffer) ~pos_ref:(ref 0) blockDevice in
+    (*Printf.printf "Connected to ORAM of height %d and block size %d\n%!" t.structuralInfo.height t.desiredBlockSize;*)
     return (`Ok t)
 
   let fakeReconnect oram blockDevice =
@@ -221,7 +218,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) : ORAM
     in loop 0L level
 
   let writeBucket t address bucket =
-    (* Printf.printf "%Ld\n" Int64.(address + t.offset); *)
+    Printf.printf "%Ld\n%!" Int64.(address + t.offset);
     let buffers = List.map ~f:OBlock.to_cstruct bucket in
     BlockDevice.write t.blockDevice Int64.(address + t.offset) buffers
 
@@ -246,7 +243,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) : ORAM
     List.map ~f:(fun _ -> createPageAlignedBuffer (t.info.sector_size + 8)) zeroToBucketSize
 
   let readBucket t address =
-    (* Printf.printf "%Ld\n" Int64.(address + t.offset);*)
+    Printf.printf "%Ld\n%!" Int64.(address + t.offset);
     let buffersForBucket = createBuffersForBucket t in
     BlockDevice.read t.blockDevice Int64.(address + t.offset) buffersForBucket >>= fun () ->
     let bucket = List.map ~f:OBlock.of_cstruct buffersForBucket in
@@ -295,7 +292,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) : ORAM
 
   let access t operation address dataToWrite =
     PositionMap.get t.positionMap address >>= fun leaf ->
-    (*Printf.printf "%Ld\n" leaf;*)
+    (*Printf.printf "%Ld\n%!" leaf;*)
     let newLeaf = Nocrypto.Rng.Int64.gen t.structuralInfo.numLeaves in
     PositionMap.set t.positionMap address newLeaf >>= fun () ->
     readPathToLeaf t leaf >>= fun pathRead ->
@@ -465,6 +462,7 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) : ORAM
     flush t
 
   let get t sectorAddress =
+    (*Printf.printf "Accessing recursive ORAM\n%!";*)
     let sizeOfPositionInBytes = 8 in
     let positionsPerSector = Int64.of_int (t.info.sector_size / sizeOfPositionInBytes) in
     let sectorAddressInPositionMap = Int64.(sectorAddress / positionsPerSector) in
@@ -485,5 +483,38 @@ module Make (MakePositionMap : PosMapF) (BlockDevice : BLOCK) : ORAM
 
   let length t =
     t.info.size_sectors
+
+                 end
+
+let floor_log x =
+  let rec loop acc = function
+    | 1L -> acc
+    | x -> loop (acc + 1) Int64.(x / 2L)
+  in loop 0 x
+
+module Builder (BlockDevice : BLOCK) = struct
+  
+  let rec buildPositionMap sizeOfOram bucketSize blockSize =
+    let reductionFactor = Float.(to_int (log (of_int blockSize * 8.) / log 2.)) in
+    let positionMapHeight = floor_log Int64.(sizeOfOram / bucketSize + 1L) + 5 - reductionFactor in
+    (*Printf.printf "Position map would have height %d\n" positionMapHeight;*)
+    if positionMapHeight > 0
+    then (
+      let positionMapNumLeaves = Int64.(pow 2L (of_int positionMapHeight)) in
+      let positionMapSize = Int64.(bucketSize * (2L * positionMapNumLeaves - 1L)) in
+      (module Make((val (buildPositionMap positionMapSize bucketSize blockSize) : PosMapF)) : PosMapF)
+    )
+    else (module PosMap.InMemory : PosMapF)
+           
+  let buildORAM ?(recursive = false) ?(desiredSizeInSectors = 0L) ?(bucketSize = 4L) ?(desiredBlockSize = 0x2000) blockDevice =
+    let%lwt info = BlockDevice.get_info blockDevice in
+    let blockSize =
+      if info.BlockDevice.sector_size > desiredBlockSize
+      then info.BlockDevice.sector_size
+      else desiredBlockSize
+    in
+    if recursive
+    then return (`Ok (module Make((val buildPositionMap desiredSizeInSectors bucketSize blockSize))(BlockDevice) : ORAM with type block = BlockDevice.t))
+    else return (`Ok (module Make(PosMap.InMemory)(BlockDevice) : ORAM with type block = BlockDevice.t))
 
 end

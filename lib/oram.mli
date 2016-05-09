@@ -3,26 +3,21 @@ open PosMapIntf
 module type ORAM = sig
   
   type t
-
-  type blockDevice
-
-  type blockError
-
+         
   include V1_LWT.BLOCK
           with type t := t
           with type id = string
 
   include PosMap
           with type t := t
-                     and type block := blockDevice
-                                   and type error := blockError
+                     and type error := error
 
   (* Don't expose the initialise method *)
   (*val initialise : BlockDevice.t -> [`Ok of unit | `Error of error] Lwt.t*)
   (*val connect : BlockDevice.t -> [`Ok of t | `Error of error] Lwt.t*)
-  val fakeReconnect : t -> blockDevice -> [`Ok of t | `Error of error] Lwt.t
+  val fakeReconnect : t -> block -> [`Ok of t | `Error of error] Lwt.t
   val disconnect : t -> unit Lwt.t
-  val connect : blockDevice -> [`Ok of t | `Error  of error] Lwt.t
+  val connect : block -> [`Ok of t | `Error  of error] Lwt.t
 
   (* Lower level functions - exposed for testing purposes *)
 
@@ -57,5 +52,10 @@ module type ORAM = sig
 end
 
 module Make (MakePositionMap : PosMapF) (BlockDevice : V1_LWT.BLOCK) : ORAM
-       with type blockDevice = BlockDevice.t
-        and type blockError = BlockDevice.error
+       with type block = BlockDevice.t
+
+module Builder (BlockDevice : V1_LWT.BLOCK) : sig
+
+  val buildORAM : ?recursive:bool -> ?desiredSizeInSectors:int64 -> ?bucketSize:int64 -> ?desiredBlockSize:int -> BlockDevice.t -> [`Ok of (module ORAM with type block = BlockDevice.t) | `Error of BlockDevice.error] Lwt.t
+                                                                                                                                     
+end

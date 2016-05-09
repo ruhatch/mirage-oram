@@ -187,15 +187,6 @@ Executable oram_macro_bench
                     alcotest,
                     core
 
-Executable rec_oram
-  Path:             lib
-  MainIs:           recOram.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     mirage-oram,
-                    core
-
 Executable rec_oram_macro_bench
   Path:             tests
   MainIs:           recOramMacroBench.ml
@@ -227,6 +218,20 @@ Executable control_macro_bench
 Executable initialise_oram
   Path:             tests
   MainIs:           initialiseOram.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     mirage-oram,
+                    mirage-block-unix,
+                    mirage-block-fs,
+                    lwt,
+                    lwt.unix,
+                    alcotest,
+                    core
+
+Executable initialise_recursive_oram
+  Path:             tests
+  MainIs:           initialiseRecursiveOram.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false

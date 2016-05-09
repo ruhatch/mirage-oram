@@ -49,7 +49,7 @@ let performExperiment oram data desiredSizeInSectors iterations =
     loopWrite (n - 1)
   in loopWrite iterations
 
-(*)  let reverseOperation = function
+(*  let reverseOperation = function
     | O.Read -> O.Write
     | O.Write -> O.Read
   in

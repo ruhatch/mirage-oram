@@ -19,7 +19,7 @@ let desiredSizes minHeight maxHeight =
   let heights = List.range minHeight maxHeight in
   List.map ~f:(fun height -> Int64.of_int ((Int.pow 2 (height + 1) - 1) * 4)) heights
 
-let performExperiment oram data desiredSizeInSectors iterations =
+(*let performExperiment oram data desiredSizeInSectors iterations =
   let rec loopWrite = function
     | 0 -> Lwt.return (`Ok ())
     | n ->
@@ -32,7 +32,21 @@ let performExperiment oram data desiredSizeInSectors iterations =
     let address = Random.int64 desiredSizeInSectors in
     B.read oram address [data] >>= fun () ->
     loopWrite (n - 1)
-  in loopWrite iterations
+  in loopWrite iterations*)
+
+let performExperiment oram data desiredSizeInSectors iterations =
+  let rec loop address write = function
+    | 0 -> Lwt.return (`Ok ())
+    | n ->
+       begin
+         if write
+         then B.write oram address [data]
+         else B.read oram address [data]
+       end >>= fun () ->
+       if address = Int64.(desiredSizeInSectors - 1L)
+       then loop 0L (not write) (n - 1)
+       else loop Int64.(address + 1L) write (n - 1)
+  in loop 0L true iterations
 
 let () =
   Command.basic
@@ -46,14 +60,14 @@ let () =
     (fun iterations minHeight maxHeight desiredBlockSize () ->
       List.iter (desiredSizes minHeight maxHeight)
                 ~f:(fun desiredSizeInSectors ->
-                  Printf.printf "%Ld, %!" desiredSizeInSectors;
+                  (*Printf.printf "%Ld, %!" desiredSizeInSectors;*)
                   let blockDevice = connectToBlockDevice desiredSizeInSectors desiredBlockSize in
                   let data = dataForBlockDevice blockDevice in
-                  let start = Time_ns.now () in
+                  (*let start = Time_ns.now () in*)
                   begin match Lwt_main.run (performExperiment blockDevice data desiredSizeInSectors iterations) with
                   | `Ok () -> ()
                   | `Error _ -> failwith "Failed to perform experiment"
-                  end;
+                  end(*;
                   let time = Time_ns.abs_diff start (Time_ns.now ()) in
-                  Printf.printf "%f\n%!" (Time_ns.Span.to_ms time)))
+                  Printf.printf "%f\n%!" (Time_ns.Span.to_ms time)*)))
   |> Command.run
